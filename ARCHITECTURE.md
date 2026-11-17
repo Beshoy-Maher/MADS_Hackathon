@@ -5,43 +5,57 @@
 Venture Builder is a pipeline of small, role-named agents run by one orchestrator. A founder brief goes in; six phases run one at a time; after each phase a gate measures the results against thresholds fixed in code **before** the data arrives and recommends **go, repeat, pivot or stop**. The run then pauses until the founder decides. Models only write text (ideas, copy, product content). Every decision that matters (scores, gates, tests, prices, payments, approvals) is deterministic code, so it is reproducible and can't be talked into a different answer. Before each gate, a critic agent **debates** the phase's main outputs with the agents that wrote them; the founder sees what was conceded and what is still open, and the recommendation stays with the code. Each kind of work (writer, fast intake, safety judge, critic) has its own model setting. The default is the local Qwen3-4B model for all of them, so it runs on any laptop; `models-large.env` switches the writer to a 30B mixture-of-experts model and the critic to gpt-oss-20b, a different model family. Guardrails screen the brief, every free-text request and every generated text. Every action is appended to the decision log.
 
 ```mermaid
-flowchart LR
-    B[Founder brief] --> I[Intake + guardrails<br/>screen_brief]
-    I -->|excluded product| S0[STOP]
-    I -->|close to an excluded category| SC{Scope check<br/>founder confirms}
+flowchart TD
+    B["Founder brief, JSON or free text"] --> IN["intake.py: brief to fields, missing fields stay missing"]
+    IN --> SB{{"guardrails.screen_brief"}}
+    SB -->|excluded product| X["STOP, the only option"]
+    SB -->|close to money, health or legal| SC{{"Scope gate: founder confirms go, pivot or stop"}}
+    SB -->|allowed| P1
     SC -->|go| P1
-    SC -->|stop| S0
-    I --> P1[1 Discover<br/>researcher, scorer,<br/>market analyst, interviewer,<br/>notes analyst]
-    P1 --> G1{Evidence gate}
-    G1 -->|go| P2[2 Validate<br/>strategist, copywriter, analyst]
-    G1 -->|pivot| P1
-    G1 -->|stop| S1[STOP + memo]
-    P2 --> G2{Demand gate}
-    G2 -->|go| P3[3 Build<br/>builder, verifier, QA]
-    G2 -->|pivot| P1
-    P3 --> G3{Build gate: tests}
-    G3 -->|go| P4[4 Commercial setup<br/>pricing, policy writer]
-    G3 -->|repeat| P3
-    P4 --> G4{Founder gate}
-    G4 -->|go| P5[5 Launch<br/>copywriter, launcher, promise checker]
-    P5 --> G5{Launch gate}
-    G5 -->|go| P6[6 Operate and learn<br/>support, analyst]
-    P6 --> G6{Persevere / pivot gate}
-    G6 -->|pivot| P1
-    C[[Debate before each gate<br/>critic vs. authors]] -. open objections .-> G1 & G2 & G3 & G4 & G5 & G6
-    F((Founder)) -. decides every gate .-> G1 & G2 & G3 & G4 & G5 & G6
-    F -. approves every publish / send / refund .-> Q[(Approval queue)]
-    P1 & P2 & P5 -->|outbound drafts| Q
+
+    P1["Phase 1 Discover<br/>researcher, scorer, market_analyst, interviewer<br/>tools/sources.py: Hacker News, Reddit, GitHub, Stack Exchange"] --> G1{{"Gate 1 Evidence<br/>gates.evidence_gate<br/>critic debate first, informs only"}}
+    G1 -->|go| P2["Phase 2 Validate<br/>strategist, copywriter, analyst"]
+    P2 --> G2{{"Gate 2 Demand<br/>gates.demand_gate<br/>critic debate first, informs only"}}
+    G2 -->|go| P3["Phase 3 Build<br/>builder, verifier, qa + tools/originality.py"]
+    P3 --> G3{{"Gate 3 Build<br/>gates.build_gate, 12 tests<br/>critic debate first, informs only"}}
+    G3 -->|go| P4["Phase 4 Commercial setup<br/>pricing, policy_writer, economist"]
+    P4 --> G4{{"Gate 4 Commercial<br/>gates.commercial_gate<br/>critic debate first, informs only"}}
+    G4 -->|go| P5["Phase 5 Launch<br/>copywriter, launcher, promise_checker<br/>sale to cash on the MOCKED provider"]
+    P5 --> G5{{"Gate 5 Launch<br/>gates.launch_gate<br/>critic debate first, informs only"}}
+    G5 -->|go| P6["Phase 6 Operate and learn<br/>support, analyst"]
+    P6 --> G6{{"Gate 6 Operate<br/>gates.operate_gate<br/>critic debate first, informs only"}}
+
+    N["notes_analyst: real interview notes pasted by the founder"] -.-> P1
+    P1 -->|outreach to send| Q
+    P2 -->|landing page to publish| Q
+    P5 -->|store page and posts to publish| Q
+    RF["refunds.py"] -->|refund| Q
+    Q[("approval.py queue<br/>founder Approve or Reject")] -->|approved| OB["pages, posts, outreach: outbox.jsonl, STUBBED<br/>refund: MOCKED provider, then access revoked"]
+    P5 -. a broken promise blocks Approve .-> Q
+```
+
+What the founder's decision does at any gate (`orchestrator.decide`):
+
+```mermaid
+flowchart LR
+    O["Phase outputs"] --> T["gates.py compares them with THRESHOLDS,<br/>fixed before the data"]
+    T --> R["Recommendation: go, repeat, pivot or stop"]
+    R --> F{"Founder decides<br/>an override is logged"}
+    F -->|go| GO["Next phase; after Gate 6 the run is completed"]
+    F -->|repeat| RE["Same phase again, with the founder's note or the debate's open points<br/>at most 2 attempts; at Gate 6: keep operating"]
+    F -->|pivot| PV["Back to Phase 1 with the new idea,<br/>screened again like a new brief"]
+    F -->|stop| ST["Run stopped"]
 ```
 
 ```
 Layers
-  static/index.html, cli.py      founder interfaces (Approve / Reject, Go / Repeat / Pivot / Stop)
+  static/index.html, cli.py      founder interfaces (Go / Repeat / Pivot / Stop, Approve / Reject, interview notes, Ask the team)
   app.py                         HTTP API
-  orchestrator.py                phase sequencing, run state, outputs, gate pausing
-  agents/<role>.py + prompts/    one agent per role
-  agents/critic.py               debate before each gate (devil's advocate vs. the authors)
-  gates.py  approval.py  guardrails.py      decisions, founder control, safety (deterministic)
+  orchestrator.py                phase sequencing, run state, outputs, gate pausing, founder decisions
+  agents/<role>.py + prompts/    one agent per role; agents/critic.py runs the debate before each gate
+  gates.py  approval.py          decisions and founder control (deterministic)
+  guardrails.py  tools/claims.py every brief, request and agent text: safety rules, sources or ASSUMPTION
+  tools/originality.py           copied passages and name clashes (Phase 3 QA test)
   payments.py webhooks.py delivery.py refunds.py reconcile.py   sale to cash (provider MOCKED)
   llm.py  tools/sources.py       local models per role (Ollama) and public evidence APIs
   decision_log.py                one JSON entry per agent action
@@ -81,10 +95,10 @@ Layers
 
 ### Phase 4: Commercial setup (Core step: set the price and policies)
 
-- **Agents:** `pricing`, `policy_writer`.
+- **Agents:** `pricing`, `policy_writer`, `economist`.
 - **Tools:** price extraction from cited evidence; templates.
-- **Method:** *Set the price (Core):* anchor = median of prices found in cited sources (else a labelled `ASSUMPTION` by format), x0.8 for a new product, x0.8 again if the founder values affordability, clamped to $5-$49; the model writes the rationale and one price experiment with a pre-set threshold. No fake "was $X" anchors or countdown discounts. *Set the policies (Core):* draft terms of sale, privacy notice and refund policy (14 days, access revoked on refund, refunds approved by the founder), marked DRAFT / not legal advice. No payments of any kind in this phase.
-- **Output:** `phase4_step1_pricing.md`, `phase4_step2_policies.md`, `phase4_step3_debate.md`, `phase4_gate_decision.md`.
+- **Method:** *Set the price (Core):* anchor = median of prices found in cited sources (else a labelled `ASSUMPTION` by format), x0.8 for a new product, x0.8 again if the founder values affordability, clamped to $5-$49; the model writes the rationale and one price experiment with a pre-set threshold. No fake "was $X" anchors or countdown discounts. *Set the policies (Core):* draft terms of sale, privacy notice and refund policy (14 days, access revoked on refund, refunds approved by the founder), marked DRAFT / not legal advice. No payments of any kind in this phase. *Unit economics:* the economist (`agents/economist.py`, code, no model) works out what each sale keeps on average after the payment fee (the same fee model as the MOCKED provider) and an assumed 10% refund rate, both labelled `ASSUMPTION`; how many sales cover the founder's budget; and, only if the brief gives the optional `hourly_rate_usd`, how many sales a month pay for the founder's weekly hours. If either number is more than the Phase 2 demand target, the gate shows a warning: even if every sign-up bought, it would not be enough. It never forecasts sales or income, and it does not change the gate's recommendation.
+- **Output:** `phase4_step1_pricing.md`, `phase4_step2_policies.md`, `phase4_step3_debate.md`, `phase4_step4_unit-economics.md`, `phase4_gate_decision.md`.
 
 ### Phase 5: Launch (Core steps: open the store; deliver automatically)
 
@@ -112,7 +126,7 @@ Every phase ends with a gate. Thresholds live in `gates.THRESHOLDS`, are fixed b
 | 1 Evidence | evidence | >= 5 relevant sources, >= 4 independent voices, >= 2 pain posts, demand >= 40, founder fit >= 50, total >= 50, allowed category | **go** if all pass; **pivot** to an alternative that passes; **repeat** with broader queries if no candidate has enough evidence either way (or sources were unreachable); otherwise **stop** |
 | 2 Demand | evidence | Lean Canvas complete; real waitlist sign-ups vs. pre-registered target (default 100 in 14 days) | **go** at target; **repeat** while the window is open or the test hasn't run; **pivot/stop** below 50% at the end |
 | 3 Build | tests | all 12 MVP tests pass, including no errors left open by the verifier and the originality check | **go** / **repeat** (rebuild with feedback) |
-| 4 Commercial | founder | price with rationale, three policies drafted, no guardrail violations left | **go** / **repeat** |
+| 4 Commercial | founder | price with rationale, three policies drafted, no guardrail violations left; unit economics warnings are shown as reasons, not checks | **go** / **repeat** |
 | 5 Launch | founder | sale-to-cash tests pass; every page/post approved or rejected | **go** / **repeat** |
 | 6 Operate | evidence | >= 10 real buyers to judge; refund rate < 15% | **go** (persevere) / **repeat** (keep operating, review later) / **pivot** |
 
@@ -164,6 +178,7 @@ brief (JSON/text) -> intake -> run state  data/runs/<id>/state.json   (git-ignor
                    decision log: critic/debate_challenge, <author>/debate_response, <author>/apply_debate_correction, critic/debate_verdict
   each model call -> role (writer / fast / judge / critic) -> its model, or the next one if it cannot load
   every action -> decision log  (timestamp, agent, action, sources[], model, cost, approved_by, + run_id, outcome)
+  price + budget + hours/week + demand target -> economist -> phase4_step4_unit-economics.md + warning on gate 4 (recommendation unchanged)
   store page + posts + product + price + delivery test -> promise checker -> verdict on each approval item
   outbound drafts -> approval queue (run state) -> founder Approve (refused if a promise is broken) -> outbox.jsonl (STUBBED)
   waitlist form -> data/runs/<id>/waitlist.json (consented emails, local only) -> demand gate
@@ -181,7 +196,7 @@ Personal data: only consented waitlist emails, stored locally and never logged. 
 | Guardrails (briefs, requests, outputs), trick-prompt tests | Built |
 | Evidence research on public APIs, scoring, market definition | Built |
 | Module verifier: model review with quoted errors, one revision, SQL examples executed in SQLite | Built. The SQL execution and format checks are the dependable part. The model review is limited by the small local model: in our tests it found few of the factual slips a human reviewer finds, and it does not look anything up online |
-| Lean Canvas, landing page, product build, QA tests, pricing, policy drafts, store page, posts, support, metrics, memo | Built |
+| Lean Canvas, landing page, product build, QA tests, pricing, policy drafts, unit economics, store page, posts, support, metrics, memo | Built |
 | Webhooks, idempotent delivery, refunds with approval, reconciliation | Built (against a MOCKED provider) |
 | Payment provider / checkout | **MOCKED** |
 | Publishing pages and posts, sending outreach, delivery emails | **STUBBED** (outbox) |

@@ -155,6 +155,7 @@ def normalize(brief: dict) -> dict:
     for k in ("waitlist_target", "waitlist_window_days", "slug", "budget_note"):
         if brief.get(k):
             out[k] = brief[k]
+    out["hourly_rate_usd"] = _number(brief.get("hourly_rate_usd"))  # optional; used only by the economist, never guessed
     missing = [k for k in REQUIRED if out[k] in (None, "", [])]
     if not name:
         missing.insert(0, "founder_name")

@@ -31,6 +31,7 @@ from agents.interviewer import Interviewer
 from agents.launcher import Launcher
 from agents.market_analyst import MarketAnalyst
 from agents.notes_analyst import MAX_NOTES_CHARS, NotesAnalyst
+from agents.economist import Economist
 from agents.policy_writer import PolicyWriter
 from agents.pricing import Pricing
 from agents.promise_checker import PromiseChecker
@@ -310,8 +311,17 @@ def _phase4(run: dict) -> gates.GateResult:
     pol = PolicyWriter(run).run_step(spec, p.data)
     _record_step(run, 4, 2, pol)
     # Re-scan the final texts: anything the guardrails already removed is gone, anything left counts.
-    left = len(guardrails.scan_output(p.content).violations) + len(guardrails.scan_output(pol.content).violations)
-    return gates.commercial_gate(bool(p.data.get("price_usd")), pol.data["complete"], left, run["attempts"].get("4", 1))
+    _progress(run, "economist: working out how many sales this price needs")
+    target = (run["ctx"].get("demand") or {}).get("target") or gates.THRESHOLDS["demand"]["default_waitlist_target"]
+    econ = Economist(run).run_step(p.data, target)
+    run["ctx"]["economics"] = econ.data
+    _record_step(run, 4, 4, econ)
+    # Re-scan the final texts: anything the guardrails already removed is gone, anything left counts.
+    left = sum(len(guardrails.scan_output(r.content).violations) for r in (p, pol, econ))
+    g = gates.commercial_gate(bool(p.data.get("price_usd")), pol.data["complete"], left, run["attempts"].get("4", 1))
+    # The unit economics inform the founder; they do not change the recommendation or any threshold.
+    g.reasons += [f"Unit economics warning: {f}" for f in econ.data["flags"]]
+    return g
 
 
 def _phase5_gate(run: dict) -> gates.GateResult:

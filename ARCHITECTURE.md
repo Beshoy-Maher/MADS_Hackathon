@@ -2,7 +2,7 @@
 
 ## Overview
 
-Venture Builder is a pipeline of small, role-named agents run by one orchestrator. A founder brief goes in; six phases run one at a time; after each phase a gate measures the results against thresholds fixed in code **before** the data arrives and recommends **go, repeat, pivot or stop**. The run then pauses until the founder decides. Models only write text (ideas, copy, product content). Every decision that matters (scores, gates, tests, prices, payments, approvals) is deterministic code, so it is reproducible and can't be talked into a different answer. Guardrails screen the brief, every free-text request and every generated text. Every action is appended to the decision log.
+Venture Builder is a pipeline of small, role-named agents run by one orchestrator. A founder brief goes in; six phases run one at a time; after each phase a gate measures the results against thresholds fixed in code **before** the data arrives and recommends **go, repeat, pivot or stop**. The run then pauses until the founder decides. Models only write text (ideas, copy, product content). Every decision that matters (scores, gates, tests, prices, payments, approvals) is deterministic code, so it is reproducible and can't be talked into a different answer. Before each gate, a critic agent on a different model family **debates** the phase's main outputs with the agents that wrote them; the founder sees what was conceded and what is still open, and the recommendation stays with the code. Each kind of work runs on its own local open-weight model: a 30B mixture-of-experts writer, a 4B model for intake and the safety judges, and gpt-oss-20b as the critic. Guardrails screen the brief, every free-text request and every generated text. Every action is appended to the decision log.
 
 ```mermaid
 flowchart LR
@@ -28,6 +28,7 @@ flowchart LR
     G5 -->|go| P6[6 Operate and learn<br/>support, analyst]
     P6 --> G6{Persevere / pivot gate}
     G6 -->|pivot| P1
+    C[[Debate before each gate<br/>critic gpt-oss-20b vs. authors]] -. open objections .-> G1 & G2 & G3 & G4 & G5 & G6
     F((Founder)) -. decides every gate .-> G1 & G2 & G3 & G4 & G5 & G6
     F -. approves every publish / send / refund .-> Q[(Approval queue)]
     P1 & P2 & P5 -->|outbound drafts| Q
@@ -39,9 +40,10 @@ Layers
   app.py                         HTTP API
   orchestrator.py                phase sequencing, run state, outputs, gate pausing
   agents/<role>.py + prompts/    one agent per role
+  agents/critic.py               debate before each gate (devil's advocate vs. the authors)
   gates.py  approval.py  guardrails.py      decisions, founder control, safety (deterministic)
   payments.py webhooks.py delivery.py refunds.py reconcile.py   sale to cash (provider MOCKED)
-  llm.py  tools/sources.py       local model (Ollama) and public evidence APIs
+  llm.py  tools/sources.py       local models per role (Ollama) and public evidence APIs
   decision_log.py                one JSON entry per agent action
 ```
 
@@ -112,6 +114,36 @@ Every phase ends with a gate. Thresholds live in `gates.THRESHOLDS`, are fixed b
 
 **When the system recommends STOP:** the starting idea fails the evidence thresholds and no alternative passes; a second, broader search still finds no public evidence of the problem (absence of evidence first triggers a repeat, not a verdict); the product is in an excluded category (STOP is then the only option); or the waitlist ends below 50% of target on the second attempt. Example from the brief: target 100 sign-ups in 14 days, got 12 → pivot, then stop, never "almost there" (`tests/test_gates.py::test_waitlist_12_of_100_is_not_spun`). The committed demo shows a weak idea (a paid daily quotes email for developers, 2 h/week, $0) stopped at gate 1: `outputs/phase1_gate_decision_weak-idea.md`.
 
+### Debate before each gate
+
+After a phase's steps and before its gate is shown, `orchestrator._debate` hands the phase's main documents to the critic (`agents/critic.py`, `prompts/critic.md`).
+
+| Phase | Debated (author) | Debate output |
+|---|---|---|
+| 1 | opportunities (researcher), market (market_analyst) | `phase1_step6_debate.md` |
+| 2 | Lean Canvas (strategist), demand test (analyst) | `phase2_step4_debate.md` |
+| 3 | MVP spec, product (builder) | `phase3_step5_debate.md` |
+| 4 | pricing (pricing), policies (policy_writer) | `phase4_step3_debate.md` |
+| 5 | store page, launch posts (copywriter) | `phase5_step4_debate.md` |
+| 6 | persevere-or-pivot memo (analyst); the critic argues for the **opposite** decision | `phase6_step4_debate.md` |
+
+```
+Round 1  critic  (gpt-oss-20b)   up to 4 objections: exact quote, problem, severity, evidence URL or ASSUMPTION
+         code                    drops an objection whose quote is not in the document, one that attacks a line computed
+                                 by code (counts, scores, check tables) or a fetched evidence title, and one that calls
+                                 a fetched link fake; an evidence URL that was never fetched becomes ASSUMPTION
+Round 2  author  (writer model,  CONCEDE with a corrected sentence, or DEFEND with a URL from the fetched evidence
+          in its own role)
+Round 3  critic                  verdict on each defence; code keeps it OPEN if the defence cites no fetched source
+Moderator (code)                 transcript file, one decision-log entry per turn, summary on the gate card
+```
+
+- **It informs, it does not decide.** The gate's recommendation comes from `gates.py` alone; the debate is shown next to it. A test runs the same brief with and without the debate and checks the recommendation is identical.
+- **REPEAT uses it.** A REPEAT with no founder note feeds the corrections and open objections into the next attempt (Phase 3 rebuilds from them).
+- **Different model family.** The critic (`LLM_CRITIC_MODEL`, default `gpt-oss:20b`) is not a Qwen model, so it does not share the writer's blind spots. If it is not available, the next model in `LLM_FALLBACK_MODELS` plays the critic and the transcript names it.
+- **Same safety as every other text.** Every turn passes the guardrail output scan; the transcript passes the claim check. Without any model the debate is not run and the gate card says so: objections are never written by templates.
+- Switch off with `DEBATE=false`.
+
 ### Safety layers around every gate
 
 | Layer | Where | What it does |
@@ -161,6 +193,8 @@ sequenceDiagram
 ```
 brief (JSON/text) -> intake -> run state  data/runs/<id>/state.json   (git-ignored)
   phase steps -> outputs  data/runs/<id>/outputs/phase<N>_step<M>_<name>.<ext>
+  phase outputs -> critic <-> authors -> phase<N>_step<M>_debate.md + gate card (the gate itself is unchanged)
+  each model call -> role (writer / fast / judge / critic) -> its model, or the next one if it cannot load
   every action -> decision log  (timestamp, agent, action, sources[], model, cost, approved_by, + run_id, outcome)
   outbound drafts -> approval queue (run state) -> founder Approve -> outbox.jsonl (STUBBED)
   waitlist form -> data/runs/<id>/waitlist.json (consented emails, local only) -> demand gate
@@ -185,6 +219,8 @@ Personal data: only consented waitlist emails, stored locally and never logged. 
 | Public hosting of the waitlist page | **STUBBED** (form works on the local app) |
 | Customer interviews | **STUBBED** (guide and outreach built; the conversations are the founder's own) |
 | Interview notes: commitments vs. compliments, quotes checked against the founder's pasted notes | Built |
+| Debate before each gate: critic vs. authors, quotes checked in code, open objections on the gate card | Built |
+| One model per role with hand-over to the next model when one cannot load | Built |
 
 ## Roadmap
 

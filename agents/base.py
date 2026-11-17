@@ -122,6 +122,21 @@ def community_places(communities: dict, limit: int = 4) -> list[str]:
     return out[:limit]
 
 
+def _fmt(n) -> str:
+    return str(int(n)) if float(n) == int(n) else str(n)
+
+
+def hours_text(brief: dict) -> str:
+    """'10 hours/week', or an honest 'not given' (never a default)."""
+    h = brief.get("hours_per_week")
+    return f"{_fmt(h)} hours/week" if h is not None else "hours per week not given in the brief"
+
+
+def budget_text(brief: dict) -> str:
+    b = brief.get("budget_usd")
+    return f"${_fmt(b)} budget" if b is not None else "budget not given in the brief"
+
+
 def brief_summary(brief: dict) -> str:
     return json.dumps({k: brief.get(k) for k in ("founder_name", "idea", "skills", "budget_usd", "hours_per_week",
                                                  "target_market", "values", "constraints")}, ensure_ascii=False, indent=1)

@@ -206,6 +206,44 @@ def screen_brief(brief: dict | str) -> Verdict:
     return Verdict(True)
 
 
+# A founder's background is not a product: "I work in insurance", "Skills: nursing" must not refuse a brief.
+_BACKGROUND = re.compile(
+    r"^\s*[-*•]?\s*(skills?|background|experience|constraints?|about me|bio|name|founder|values|المهارات|القيود|الاسم)\s*[:\-]"
+    r"|\b(i am|i'm|i was|i work(ed)?|i have worked|i used to|my (day )?job|my background|my experience|my degree|i studied|years? (as|in|of)|"
+    r"by day|full[- ]time (job|as)|worked (as|in|at|for))\b|(أعمل|اعمل|عملت|خبرتي|درست|وظيفتي)", FLAGS)
+
+
+def screen_brief_text(raw: str) -> Verdict:
+    """Screen a whole free-text brief, sentence by sentence, for an excluded product mentioned anywhere in it.
+
+    The structured fields only hold what intake extracted as the idea, so a second product slipped into the middle
+    ("...and bundle it with crypto signals") would otherwise never be screened. A hit in a sentence about the
+    founder's background is not refused: the run pauses at the scope check and the founder confirms the product.
+    """
+    background = None
+    for sentence in re.split(r"(?<=[.!?؟])\s+|\n+", raw or ""):
+        if not sentence.strip():
+            continue
+        verdict = Verdict(True)
+        for v in variants(sentence):
+            verdict = _screen_excluded(v)
+            if not verdict.allowed:
+                break
+        if verdict.allowed:
+            continue
+        if not _BACKGROUND.search(sentence):
+            return Verdict(False, verdict.category, verdict.reason + " The brief asks for this alongside the main idea.",
+                           "Take that part out of the brief, or pick a digital product outside these categories, and run it again.",
+                           verdict.matches)
+        background = background or verdict
+    if background:
+        return Verdict(True, background.category.replace("excluded_product", "borderline_product"),
+                       background.reason + " The brief mentions this in the founder's background.",
+                       "Confirm that the product itself contains none of it and gives no advice, reword the idea, or stop.",
+                       background.matches, clarify=True)
+    return Verdict(True)
+
+
 # --------------------------------------------------------------- 2. requests
 REQUEST_RULES: list[dict] = [
     {

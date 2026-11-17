@@ -7,7 +7,7 @@ worksheets), and a user guide. The QA agent then tests it.
 from __future__ import annotations
 
 import decision_log
-from agents.base import Agent, StepResult, brief_summary, footer
+from agents.base import Agent, StepResult, brief_summary, footer, hours_text
 from tools.text import keywords
 
 MAX_MODULES = 4
@@ -64,7 +64,8 @@ class Builder(Agent):
                                       "A user guide explains how to use it and how to get support"]}
         task = (f"Founder brief:\n{brief_summary(self.brief)}\nProduct: {candidate['title']}\nProblem: {candidate.get('problem', '')}\n"
                 f"Lean canvas solution: {canvas.get('solution')}\n\nDesign the smallest useful version (MVP) of this digital product that the "
-                f"founder can finish in {self.brief.get('hours_per_week', 5)} hours/week within 2 weeks. "
+                "founder can finish within 2 weeks of part-time work "
+                f"({hours_text(self.brief)}). "
                 f"JSON: {{\"product_name\": \"...\", \"format\": \"...\", \"modules\": [{{\"title\": \"...\", \"goal\": \"...\"}}] (3-{MAX_MODULES} modules), "
                 "\"out_of_scope\": [\"...\"], \"acceptance_criteria\": [\"...\"]}")
         data = self.ask_json(task, fb, max_tokens=700)

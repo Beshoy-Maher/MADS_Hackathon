@@ -137,7 +137,7 @@ async function render() {
     return `<div class="step ${r.phase == n ? "cur" : ""}"><b>${n}. ${esc(p.name)}</b><span class="muted">${esc(p.core === "None" ? "Support, metrics, memo" : p.core)}</span><div>${esc(st)}</div></div>`;
   }).join("");
   let html = `<div class="card"><div class="row"><h2 class="grow">${esc(r.brief.founder_name)}: ${esc(r.brief.idea)}</h2>${statusBadge(r.status)}</div>
-    <p class="small muted">Skills: ${esc((r.brief.skills||[]).join(", "))} · Budget: $${esc(r.brief.budget_usd)} · Time: ${esc(r.brief.hours_per_week)} h/week · Market: ${esc(r.brief.target_market)} · Values: ${esc((r.brief.values||[]).join(", "))}</p>
+    <p class="small muted">Skills: ${(r.brief.skills||[]).length ? esc(r.brief.skills.join(", ")) : "<b>not given</b>"} · Budget: ${r.brief.budget_usd == null ? "<b>not given</b>" : "$" + esc(r.brief.budget_usd)} · Time: ${r.brief.hours_per_week == null ? "<b>not given</b>" : esc(r.brief.hours_per_week) + " h/week"} · Market: ${r.brief.target_market ? esc(r.brief.target_market) : "<b>not given</b>"} · Values: ${esc((r.brief.values||[]).join(", "))}</p>
     ${r.screening && !r.screening.allowed ? `<p class="bad"><b>Refused by guardrails:</b> ${esc(r.screening.reason)}</p>` : ""}
     ${r.screening && r.screening.clarify ? `<p class="small"><span class="badge warn">scope check</span> ${esc(r.screening.reason)}</p>` : ""}
     ${v.error ? `<p class="bad">Error: ${esc(v.error)} <button onclick="advance()">Retry</button></p>` : ""}

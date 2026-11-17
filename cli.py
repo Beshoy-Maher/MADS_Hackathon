@@ -35,6 +35,8 @@ def cmd_run(args) -> int:
     print(f"Model: {status['model']} ({status['detail']})")
     run = orchestrator.create_run(raw)
     print(f"Run {run['id']} for: {run['brief']['idea']}")
+    for w in run.get("warnings", []):
+        print(f"NOTE: {w}")
     while True:
         print(f"\n=== Phase {run['phase']}: {orchestrator.PHASES[run['phase']]['name']} ===")
         run = orchestrator.advance(run["id"])

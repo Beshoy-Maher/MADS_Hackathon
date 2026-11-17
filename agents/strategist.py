@@ -1,7 +1,7 @@
 """Phase 2, step 1 (Core step): design the business with a Lean Canvas."""
 from __future__ import annotations
 
-from agents.base import Agent, StepResult, brief_summary, footer
+from agents.base import Agent, StepResult, brief_summary, budget_text, footer, hours_text
 
 BOXES = ["problem", "customer_segments", "unique_value_proposition", "solution", "channels",
          "revenue_streams", "cost_structure", "key_metrics", "unfair_advantage"]
@@ -22,8 +22,8 @@ class Strategist(Agent):
             "channels": [f"Communities where the evidence came from: {', '.join(list(market.get('communities', {}))[:3]) or 'ASSUMPTION'}",
                          "Founder's own network", "Landing page with waitlist"],
             "revenue_streams": ["One-time purchase of the digital product (price set in phase 4)"],
-            "cost_structure": [f"Founder time: {self.brief.get('hours_per_week', '?')} h/week",
-                               f"Budget: ${self.brief.get('budget_usd', 0)} (hosting/store fees)", "Model cost: $0 (local open-weight model)"],
+            "cost_structure": [f"Founder time: {hours_text(self.brief)}",
+                               f"Money: {budget_text(self.brief)} (hosting/store fees)", "Model cost: $0 (local open-weight model)"],
             "key_metrics": ["Waitlist sign-ups vs. pre-set target", "Landing-page conversion", "Refund rate", "Support questions per buyer"],
             "unfair_advantage": [f"Founder skills: {', '.join(self.brief.get('skills') or []) or 'ASSUMPTION'}"],
         }

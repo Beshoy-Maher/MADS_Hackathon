@@ -7,7 +7,7 @@ short rationale. The formulas are printed in the output.
 from __future__ import annotations
 
 import guardrails
-from agents.base import Agent, StepResult, brief_summary, footer
+from agents.base import Agent, StepResult, brief_summary, budget_text, footer, hours_text
 from tools.sources import Evidence, engagement_score
 from tools.text import keywords
 
@@ -89,8 +89,10 @@ class Scorer(Agent):
         for i, s in enumerate(scores):
             md.append(f"- **{s['title'][:80]}**: {s['rationale'] or 'No rationale.'} (skill match {s['skill_match']})")
         md += ["", "## How the scores are calculated", "", FORMULA, "",
-               "Founder fit uses the brief: skills, " f"{self.brief.get('hours_per_week', 0)} hours/week, "
-               f"${self.brief.get('budget_usd', 0)} budget. Engagement counts are public numbers from the linked sources; "
+               "Founder fit uses the brief: skills, " f"{hours_text(self.brief)}, {budget_text(self.brief)}. "
+               + ("A value that is not given counts as 0 in founder fit; it is not replaced by a typical figure. "
+                  if self.brief.get("hours_per_week") is None or self.brief.get("budget_usd") is None else "") +
+               "Engagement counts are public numbers from the linked sources; "
                "they show interest, not guaranteed buyers (ASSUMPTION that interest relates to demand).",
                footer(self.model, [])]
         return self.result("scorecard", "score_ideas", "\n".join(md), data={"scores": scores})

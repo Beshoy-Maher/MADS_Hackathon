@@ -5,43 +5,57 @@
 Venture Builder is a pipeline of small, role-named agents run by one orchestrator. A founder brief goes in; six phases run one at a time; after each phase a gate measures the results against thresholds fixed in code **before** the data arrives and recommends **go, repeat, pivot or stop**. The run then pauses until the founder decides. Models only write text (ideas, copy, product content). Every decision that matters (scores, gates, tests, prices, payments, approvals) is deterministic code, so it is reproducible and can't be talked into a different answer. Before each gate, a critic agent **debates** the phase's main outputs with the agents that wrote them; the founder sees what was conceded and what is still open, and the recommendation stays with the code. Each kind of work (writer, fast intake, safety judge, critic) has its own model setting. The default is the local Qwen3-4B model for all of them, so it runs on any laptop; `models-large.env` switches the writer to a 30B mixture-of-experts model and the critic to gpt-oss-20b, a different model family. Guardrails screen the brief, every free-text request and every generated text. Every action is appended to the decision log.
 
 ```mermaid
-flowchart LR
-    B[Founder brief] --> I[Intake + guardrails<br/>screen_brief]
-    I -->|excluded product| S0[STOP]
-    I -->|close to an excluded category| SC{Scope check<br/>founder confirms}
+flowchart TD
+    B["Founder brief, JSON or free text"] --> IN["intake.py: brief to fields, missing fields stay missing"]
+    IN --> SB{{"guardrails.screen_brief"}}
+    SB -->|excluded product| X["STOP, the only option"]
+    SB -->|close to money, health or legal| SC{{"Scope gate: founder confirms go, pivot or stop"}}
+    SB -->|allowed| P1
     SC -->|go| P1
-    SC -->|stop| S0
-    I --> P1[1 Discover<br/>researcher, scorer,<br/>market analyst, interviewer,<br/>notes analyst]
-    P1 --> G1{Evidence gate}
-    G1 -->|go| P2[2 Validate<br/>strategist, copywriter, analyst]
-    G1 -->|pivot| P1
-    G1 -->|stop| S1[STOP + memo]
-    P2 --> G2{Demand gate}
-    G2 -->|go| P3[3 Build<br/>builder, verifier, QA]
-    G2 -->|pivot| P1
-    P3 --> G3{Build gate: tests}
-    G3 -->|go| P4[4 Commercial setup<br/>pricing, policy writer, economist]
-    G3 -->|repeat| P3
-    P4 --> G4{Founder gate}
-    G4 -->|go| P5[5 Launch<br/>copywriter, launcher, promise checker]
-    P5 --> G5{Launch gate}
-    G5 -->|go| P6[6 Operate and learn<br/>support, analyst]
-    P6 --> G6{Persevere / pivot gate}
-    G6 -->|pivot| P1
-    C[[Debate before each gate<br/>critic vs. authors]] -. open objections .-> G1 & G2 & G3 & G4 & G5 & G6
-    F((Founder)) -. decides every gate .-> G1 & G2 & G3 & G4 & G5 & G6
-    F -. approves every publish / send / refund .-> Q[(Approval queue)]
-    P1 & P2 & P5 -->|outbound drafts| Q
+
+    P1["Phase 1 Discover<br/>researcher, scorer, market_analyst, interviewer<br/>tools/sources.py: Hacker News, Reddit, GitHub, Stack Exchange"] --> G1{{"Gate 1 Evidence<br/>gates.evidence_gate<br/>critic debate first, informs only"}}
+    G1 -->|go| P2["Phase 2 Validate<br/>strategist, copywriter, analyst"]
+    P2 --> G2{{"Gate 2 Demand<br/>gates.demand_gate<br/>critic debate first, informs only"}}
+    G2 -->|go| P3["Phase 3 Build<br/>builder, verifier, qa + tools/originality.py"]
+    P3 --> G3{{"Gate 3 Build<br/>gates.build_gate, 12 tests<br/>critic debate first, informs only"}}
+    G3 -->|go| P4["Phase 4 Commercial setup<br/>pricing, policy_writer, economist"]
+    P4 --> G4{{"Gate 4 Commercial<br/>gates.commercial_gate<br/>critic debate first, informs only"}}
+    G4 -->|go| P5["Phase 5 Launch<br/>copywriter, launcher, promise_checker<br/>sale to cash on the MOCKED provider"]
+    P5 --> G5{{"Gate 5 Launch<br/>gates.launch_gate<br/>critic debate first, informs only"}}
+    G5 -->|go| P6["Phase 6 Operate and learn<br/>support, analyst"]
+    P6 --> G6{{"Gate 6 Operate<br/>gates.operate_gate<br/>critic debate first, informs only"}}
+
+    N["notes_analyst: real interview notes pasted by the founder"] -.-> P1
+    P1 -->|outreach to send| Q
+    P2 -->|landing page to publish| Q
+    P5 -->|store page and posts to publish| Q
+    RF["refunds.py"] -->|refund| Q
+    Q[("approval.py queue<br/>founder Approve or Reject")] -->|approved| OB["pages, posts, outreach: outbox.jsonl, STUBBED<br/>refund: MOCKED provider, then access revoked"]
+    P5 -. a broken promise blocks Approve .-> Q
+```
+
+What the founder's decision does at any gate (`orchestrator.decide`):
+
+```mermaid
+flowchart LR
+    O["Phase outputs"] --> T["gates.py compares them with THRESHOLDS,<br/>fixed before the data"]
+    T --> R["Recommendation: go, repeat, pivot or stop"]
+    R --> F{"Founder decides<br/>an override is logged"}
+    F -->|go| GO["Next phase; after Gate 6 the run is completed"]
+    F -->|repeat| RE["Same phase again, with the founder's note or the debate's open points<br/>at most 2 attempts; at Gate 6: keep operating"]
+    F -->|pivot| PV["Back to Phase 1 with the new idea,<br/>screened again like a new brief"]
+    F -->|stop| ST["Run stopped"]
 ```
 
 ```
 Layers
-  static/index.html, cli.py      founder interfaces (Approve / Reject, Go / Repeat / Pivot / Stop)
+  static/index.html, cli.py      founder interfaces (Go / Repeat / Pivot / Stop, Approve / Reject, interview notes, Ask the team)
   app.py                         HTTP API
-  orchestrator.py                phase sequencing, run state, outputs, gate pausing
-  agents/<role>.py + prompts/    one agent per role
-  agents/critic.py               debate before each gate (devil's advocate vs. the authors)
-  gates.py  approval.py  guardrails.py      decisions, founder control, safety (deterministic)
+  orchestrator.py                phase sequencing, run state, outputs, gate pausing, founder decisions
+  agents/<role>.py + prompts/    one agent per role; agents/critic.py runs the debate before each gate
+  gates.py  approval.py          decisions and founder control (deterministic)
+  guardrails.py  tools/claims.py every brief, request and agent text: safety rules, sources or ASSUMPTION
+  tools/originality.py           copied passages and name clashes (Phase 3 QA test)
   payments.py webhooks.py delivery.py refunds.py reconcile.py   sale to cash (provider MOCKED)
   llm.py  tools/sources.py       local models per role (Ollama) and public evidence APIs
   decision_log.py                one JSON entry per agent action
@@ -164,6 +178,7 @@ brief (JSON/text) -> intake -> run state  data/runs/<id>/state.json   (git-ignor
                    decision log: critic/debate_challenge, <author>/debate_response, <author>/apply_debate_correction, critic/debate_verdict
   each model call -> role (writer / fast / judge / critic) -> its model, or the next one if it cannot load
   every action -> decision log  (timestamp, agent, action, sources[], model, cost, approved_by, + run_id, outcome)
+  price + budget + hours/week + demand target -> economist -> phase4_step4_unit-economics.md + warning on gate 4 (recommendation unchanged)
   store page + posts + product + price + delivery test -> promise checker -> verdict on each approval item
   outbound drafts -> approval queue (run state) -> founder Approve (refused if a promise is broken) -> outbox.jsonl (STUBBED)
   waitlist form -> data/runs/<id>/waitlist.json (consented emails, local only) -> demand gate

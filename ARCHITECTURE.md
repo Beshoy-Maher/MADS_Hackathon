@@ -56,6 +56,7 @@ Layers
   gates.py  approval.py          decisions and founder control (deterministic)
   guardrails.py  tools/claims.py every brief, request and agent text: safety rules, sources or ASSUMPTION
   tools/originality.py           copied passages and name clashes (Phase 3 QA test)
+  tools/honesty.py               removes unbacked counts, founder experience, covert promotion, pause advice against the gate
   payments.py webhooks.py delivery.py refunds.py reconcile.py   sale to cash (provider MOCKED)
   llm.py  tools/sources.py       local models per role (Ollama) and public evidence APIs
   decision_log.py                one JSON entry per agent action
@@ -80,7 +81,7 @@ Layers
 
 - **Agents:** `strategist`, `copywriter`, `analyst`.
 - **Tools:** local model; waitlist endpoint `POST /api/waitlist/{run}` (consent required; emails stay in local, git-ignored storage).
-- **Method:** *Design the business (Core):* a Lean Canvas (problem, segments, UVP, solution, channels, revenue, costs, key metrics, unfair advantage) built from the evidence, with every guess marked `ASSUMPTION`. The copywriter writes a landing page with a consent-based waitlist form and no testimonials, counters or urgency; publishing it is an approval-gated action. The analyst pre-registers the demand test (default 100 real sign-ups in 14 days) and channels to reach real people without spam or ads.
+- **Method:** *Design the business (Core):* a Lean Canvas (problem, segments, UVP, solution, channels, revenue, costs, key metrics, unfair advantage) built from the evidence, with every guess marked `ASSUMPTION`. The copywriter writes a landing page with a consent-based waitlist form and no testimonials, counters or urgency; publishing it is an approval-gated action. The analyst pre-registers the demand test (default 100 real sign-ups in 14 days) and channels to reach real people without spam or ads. Code (`tools/honesty.py`) then keeps only Lean Canvas channels and demand-test places found in the evidence, and drops advice that is covert promotion ("subtly mention", commenting on others' threads to link the waitlist), fake urgency ("limited-time") or experience the brief does not state.
 - **Output:** `phase2_step1_lean-canvas.md`, `phase2_step2_landing-page.html`, `phase2_step3_demand-test.md`, `phase2_step4_debate.md`, `phase2_gate_decision.md`.
 
 ### Phase 3: Build (Core step: build the product)
@@ -104,7 +105,7 @@ Layers
 
 - **Agents:** `copywriter`, `launcher`, `promise_checker`.
 - **Tools:** `payments.py` (MOCKED provider), `webhooks.py`, `delivery.py`, `refunds.py`, `reconcile.py`, `approval.py`.
-- **Method:** *Open the store (Core):* store page with price, contents, refund terms and a MOCKED checkout button; launch posts per community, written in the founder's voice for them to post. Each post is a separate model call for one community; code drops a post that still shares a sentence with another post (or pastes the problem statement) after one rewrite, and posts go only to communities found in the evidence that allow sharing your own work (Show HN, never GitHub or Stack Exchange), otherwise the output points to the founder's own network. Each page and post is an approval-gated action; after approval it goes to the outbox (STUBBED), never to the internet. *Deliver automatically (Core):* the launcher runs the full sale-to-cash flow against the MOCKED provider with two test buyers and checks 11 properties (see [Sale to cash](#sale-to-cash)).
+- **Method:** *Open the store (Core):* store page with price, contents, refund terms and a MOCKED checkout button; launch posts per community, written in the founder's voice for them to post. Each post is a separate model call for one community; code drops a post that still shares a sentence with another post (or pastes the problem statement) after one rewrite, and posts go only to communities found in the evidence that allow sharing your own work (Show HN, never GitHub or Stack Exchange), otherwise the output points to the founder's own network. Before the promise check, code (`tools/honesty.py`) removes from the copy any count or file format the product cannot back ("15 questions", "PDF, 45 pages") and any sentence claiming founder experience that the brief's skills and constraints do not state; the store button text is written by code. Each page and post is an approval-gated action; after approval it goes to the outbox (STUBBED), never to the internet. *Deliver automatically (Core):* the launcher runs the full sale-to-cash flow against the MOCKED provider with two test buyers and checks 11 properties (see [Sale to cash](#sale-to-cash)).
 - **Promise checker:** before the founder approves anything, every promise on the store page and in each post is checked against the product, the price, the refund policy and the delivery test; an item with a broken promise cannot be approved. Detail: [docs/architecture-details.md](docs/architecture-details.md#promise-checker).
 - **Output:** `phase5_step1_store-page.html`, `phase5_step2_launch-posts.md`, `phase5_step3_delivery-test.md`, `phase5_step4_promise-check.md`, `payment_test_log.md`, `phase5_step5_debate.md`, `phase5_gate_decision.md`.
 - **Order:** in Phase 5 the debate runs before the promise checker (its file is numbered step 5 because the promise check keeps step 4). A correction the debate writes into the store page or a post is also applied to the pending approval item and to the copy the promise checker reads, so the founder approves, and the checker checks, the corrected text.
@@ -113,7 +114,7 @@ Layers
 ### Phase 6: Operate and learn
 
 - **Agents:** `support`, `analyst`.
-- **Method:** support kit (FAQ, reply drafts signed by the founder, escalation rules: refunds, payments and legal always go to the founder); metrics that separate real numbers (waitlist, real orders) from MOCKED test numbers, which never count; a persevere-or-pivot memo built from the gate history. Its "Evidence for" and "Evidence against" lists are built by code from the facts (gate outcomes and overrides, real buyers, real sign-ups, refund rate; MOCKED numbers excluded), a missing or zero fact always counts against, the model writes only a short reasoning paragraph with no numbers, and the code-built lists are not debated.
+- **Method:** support kit (FAQ, reply drafts signed by the founder, escalation rules: refunds, payments and legal always go to the founder); metrics that separate real numbers (waitlist, real orders) from MOCKED test numbers, which never count; a persevere-or-pivot memo built from the gate history. Its "Evidence for" and "Evidence against" lists are built by code from the facts (gate outcomes and overrides, real buyers, real sign-ups, refund rate; MOCKED numbers excluded), a missing or zero fact always counts against, the model writes only a short reasoning paragraph with no numbers, and the code-built lists are not debated. Code drops any sentence in that paragraph that advises pausing or stopping when the gate did not recommend stop, a dangling opener and a sentence cut off by the token limit.
 - **Output:** `phase6_step1_support.md`, `phase6_step2_metrics.md`, `phase6_step3_persevere-or-pivot.md`, `phase6_step4_debate.md`, `phase6_gate_decision.md`.
 
 ## Gates
@@ -134,7 +135,7 @@ Every phase ends with a gate. Thresholds live in `gates.THRESHOLDS`, are fixed b
 
 ### Debate before each gate
 
-Before each gate a critic agent challenges the phase's main documents and their author agents answer: concede with a correction, or defend with a fetched source. Code keeps only objections that quote the document, writes a conceded correction into the document only when it passes the guardrails and the claim checker, and labels every objection fixed, conceded not applied, defended or open on the gate card. The debate informs the founder and never changes the gate's recommendation. Full rounds, checks and statuses: [docs/architecture-details.md](docs/architecture-details.md#debate-before-each-gate).
+Before each gate a critic agent challenges the phase's main documents and their author agents answer: concede with a correction, or defend with a fetched source. Code keeps only objections that quote the document, writes a conceded correction into the document only when it passes the guardrails, the claim checker and the same honesty checks (no broken punctuation, no pause advice, no founder experience, no covert promotion), and labels every objection fixed, conceded not applied, defended or open on the gate card. The debate informs the founder and never changes the gate's recommendation. Full rounds, checks and statuses: [docs/architecture-details.md](docs/architecture-details.md#debate-before-each-gate).
 
 ### Safety layers around every gate
 
@@ -206,6 +207,7 @@ Personal data: only consented waitlist emails, stored locally and never logged. 
 | Debate before each gate: critic vs. authors, quotes checked in code, open objections on the gate card | Built |
 | One model per role with hand-over to the next model when one cannot load | Built |
 | Promise checker: store page and posts matched to the product, price, refund policy and delivery test; broken promises block approval | Built. Without a model, promises that need a quote stay unverifiable |
+| Honesty filters (`tools/honesty.py`): unbacked counts and formats, founder experience, covert promotion and urgency, places outside the evidence, pause advice against the gate | Built. Pattern lists, so a new phrasing can get through; they cover sales copy, posts, growth advice and the memo, not the product's own explanations |
 | Originality guard: copied passages and name clashes against the fetched evidence | Built. Compares fetched titles and snippets only, not full pages; licences of reused code are not checked yet |
 
 ## Roadmap

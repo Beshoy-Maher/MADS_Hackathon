@@ -9,7 +9,7 @@ Most AI business tools promise income, lock founders into closed platforms and s
 - **Excluded idea, refused:** a crypto-signals channel is refused before any agent runs ([gate](outputs/phase1_gate_decision_excluded-idea.md)).
 - **Unseen brief:** a Figma case-study template pack for junior UX designers passes the evidence gate on 14 relevant sources and 3 pain posts, all from one platform ([gate](outputs/phase1_gate_decision_designer-idea.md)); the demand gate recommended repeat and then stop, because no real visitor has seen the page, and the founder accepted it ([gate](outputs/phase2_gate_decision_designer-idea.md)).
 
-**Measured, not claimed:** more than 440 tests that run with no model or network, on every push ([CI](.github/workflows/ci.yml)); guardrails refuse 37 of 40 trick prompts they were never tuned on (rules alone: 2 of 40) and wrongly refuse 0 of 62 normal requests ([`evals/results.md`](evals/results.md)); Phase 1, including its debate, took 32 seconds on an NVIDIA RTX 4080 in the committed run; $0.00 per run.
+**Measured, not claimed:** more than 480 tests that run with no model or network, on every push ([CI](.github/workflows/ci.yml)); guardrails refuse 37 of 40 trick prompts they were never tuned on (rules alone: 2 of 40) and wrongly refuse 0 of 62 normal requests ([`evals/results.md`](evals/results.md)); Phase 1, including its debate, took 32 seconds on an NVIDIA RTX 4080 in the committed run; $0.00 per run.
 
 | Claim | Where to check it |
 |---|---|
@@ -43,14 +43,14 @@ Then open **http://localhost:8000**, pick a sample founder (or paste any brief) 
 | 1 Discover | Mom Test interview guide; founder's real notes sorted into commitments vs. compliments | **Working** |
 | 1 Discover | Sending outreach / running interviews | **STUBBED** (the founder does it; answers are never simulated) |
 | 1 Gate | Evidence gate with pre-set thresholds, recommends STOP on weak evidence | **Working** |
-| 2 Validate | Lean Canvas; landing page with a consent-based waitlist form | **Working** |
+| 2 Validate | Lean Canvas (channels only from the evidence); landing page with a consent-based waitlist form; demand-test plan without covert promotion or fake urgency | **Working** |
 | 2 Validate | Publishing the landing page | **STUBBED** (approval-gated, saved to outbox) |
 | 2 Gate | Demand gate: pre-registered sign-up target, real sign-ups only | **Working** |
 | 3 Build | MVP spec, product, user guide; verifier (facts, SQL run in SQLite); originality guard | **Working** |
 | 3 Gate | 12 deterministic MVP tests, all must pass | **Working** |
 | 4 Commercial | Rule-based price from sourced comparables; draft terms, privacy and refund policy | **Working** |
 | 4 Commercial | Unit economics: what each sale keeps after fees and refunds, how many sales cover the budget (and the founder's time, if an hourly rate is given), a warning when that is more than the demand target; arithmetic only, no forecast | **Working** (fee and refund rate are labelled assumptions) |
-| 5 Launch | Store page and launch posts in the founder's voice; promise checker | **Working** |
+| 5 Launch | Store page and launch posts in the founder's voice; code removes counts, formats and founder experience the product or brief cannot back; promise checker | **Working** |
 | 5 Launch | Publishing the store page and posts | **STUBBED** (approval-gated, saved to outbox) |
 | 5 Launch | Checkout and payment provider | **MOCKED** (no payments of any kind) |
 | 5 Launch | Automatic delivery, idempotent webhooks, refunds revoke access, reconciliation | **Working** (against the MOCKED provider) |

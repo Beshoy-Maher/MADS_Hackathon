@@ -20,7 +20,7 @@ Where each claim can be checked:
 | Every market claim has a source or the label `ASSUMPTION` | [`outputs/phase1_step1_opportunities.md`](outputs/phase1_step1_opportunities.md), [`outputs/phase1_step3_market.md`](outputs/phase1_step3_market.md), checker in [`tools/claims.py`](tools/claims.py) |
 | Payment triggers delivery, refunds revoke access, books reconcile (MOCKED provider) | [`outputs/payment_test_log.md`](outputs/payment_test_log.md), [`tests/test_payments.py`](tests/test_payments.py) |
 | Every agent action is logged with sources, model, cost and approver | [`decision_log.json`](decision_log.json) |
-| The product passes 11 deterministic tests | [`outputs/phase3_step4_qa-report.md`](outputs/phase3_step4_qa-report.md), tests in [`agents/qa.py`](agents/qa.py) |
+| The product passes the deterministic build tests (11 in the committed demo run; the current code adds a 12th, originality) | [`outputs/phase3_step4_qa-report.md`](outputs/phase3_step4_qa-report.md), tests in [`agents/qa.py`](agents/qa.py) |
 
 ## Quickstart
 
@@ -52,11 +52,11 @@ Then open **http://localhost:8000**. Pick a sample founder (or paste any brief) 
 | 2 Validate | Publishing the landing page to a public URL | **STUBBED** (approval-gated, saved to outbox) |
 | 2 Gate | Demand gate (pre-registered sign-up target, counts only real sign-ups) | **Working** |
 | 3 Build | MVP spec, product content, user guide; verifier reviews each module (facts, SQL run in SQLite), one revision | **Working** |
-| 3 Build | Originality guard: no passage copied from the sources read, no name taken from an existing product (code, compares fetched snippets) | **Working** |
+| 3 Build | Originality guard: no passage copied from the sources read, no name taken from an existing product (code, compares fetched snippets) | **Working** (added after the committed demo run, so its result is not in `outputs/` yet; tested in `tests/test_promise_originality.py`) |
 | 3 Gate | Automated MVP tests (12 checks, among them: the verifier left no error open, the product is original); gate needs all to pass | **Working** |
 | 4 Commercial | Price from sourced comparables (rule-based), draft terms / privacy / refund policy | **Working** |
 | 5 Launch | Store page and launch posts (drafts in the founder's voice) | **Working** |
-| 5 Launch | Promise checker: every promise on the store page and in the posts matched to the product, price, refund policy and delivery test; a broken promise cannot be approved | **Working** |
+| 5 Launch | Promise checker: every promise on the store page and in the posts matched to the product, price, refund policy and delivery test; a broken promise cannot be approved | **Working** (added after the committed demo run, so `phase5_step4_promise-check.md` is not in `outputs/` yet; tested in `tests/test_promise_originality.py`) |
 | 5 Launch | Publishing store page and posts | **STUBBED** (approval-gated, saved to outbox) |
 | 5 Launch | Checkout and payment provider | **MOCKED** (no real payments of any kind) |
 | 5 Launch | Automatic delivery, idempotent webhooks, refunds revoke access, reconciliation | **Working** (against the MOCKED provider) |

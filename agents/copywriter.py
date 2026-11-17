@@ -180,9 +180,13 @@ class Copywriter(Agent):
             text = re.sub(rf"\b(?:from|starting (?:at|from)|as low as|only|just|under|up to)\s+(\${re.escape(str(price))})", r"\1", text,
                           flags=re.IGNORECASE)
         from tools import honesty
-        text, _ = honesty.strip_counts(text)
-        text, _ = honesty.strip_experience(text, self.brief)
-        return honesty.complete_sentences(text).strip()
+        cleaned, _ = honesty.strip_counts(text)
+        cleaned, _ = honesty.strip_experience(cleaned, self.brief)
+        cleaned = honesty.complete_sentences(cleaned).strip()
+        # Show HN needs its title: if a filter removed the sentence that carried it, the title is the product's name.
+        if "show hn" in place.lower() and not cleaned.lower().startswith("show hn:"):
+            cleaned = f"Show HN: {candidate['title']}\n\n{cleaned}".strip()
+        return cleaned
 
     def launch_posts(self, candidate: dict, communities: dict, price: float | None = None) -> StepResult:
         places = launch_places(communities)

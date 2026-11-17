@@ -163,3 +163,30 @@ def test_store_copy_fallback_never_cuts_a_sentence():
            "specifically for junior analysts in Egypt and the MENA region.")
     assert len(uvp) > 160 and whole_sentences(uvp, 160) == uvp
     assert whole_sentences("Short one. Second sentence here. Third.", 20) == "Short one."
+
+
+def test_memo_drops_any_pause_advice_under_repeat():
+    from tools import honesty
+    memo = ("No real buyers have made purchases. The founder should pause and conduct a repeat test with a live landing page. "
+            "Collect real sign-ups before deciding.")
+    out = honesty.clean_memo(memo, "repeat")
+    assert "pause" not in out and out.endswith("Collect real sign-ups before deciding.")
+    assert "pause" in honesty.clean_memo(memo, "stop")
+
+
+def test_show_hn_post_always_has_its_title(monkeypatch):
+    import llm
+    import orchestrator
+    from agents.copywriter import Copywriter
+    run = orchestrator.create_run({"idea": "SQL workbook for junior analysts", "founder_name": "M"})
+    text = "SQL questions modeled on common interview patterns. What feels unclear?"
+    monkeypatch.setattr(llm, "complete", lambda *a, **k: llm.LLMResult(text=text, model="m"))
+    post = Copywriter(run)._one_post("Hacker News (Show HN)", {"title": "SQL Workbook"}, None)
+    assert post.startswith("Show HN: SQL Workbook\n\n") and post.endswith("What feels unclear?")
+
+
+def test_unbacked_learning_and_job_posting_claims_are_removed():
+    from tools import honesty
+    brief = {"constraints": "Works full time as a data analyst.", "skills": ["SQL"]}
+    for s in ("It's something I'd have wanted when I was learning.", "Questions based on actual job postings in the region."):
+        assert honesty.strip_experience(s, brief)[1] == 1

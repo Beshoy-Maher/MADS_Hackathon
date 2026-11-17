@@ -31,7 +31,8 @@ EXPERIENCE = re.compile(r"\b(i(?:'|’)?ve (?:seen|been|faced|hired|interviewed|
                         r"i (?:encountered|ran into|came across|went through|wish (?:something|this|i had|there was))|"
                         r"when i (?:was starting|started|first started|began)|starting out|"
                         r"(?:struggles?|problems?|challenges?|pain) you (?:faced|had|went through)|you(?:'|’)?ve (?:faced|been through)|"
-                        r"when you were (?:a|an|starting|junior|new))\b", re.IGNORECASE)
+                        r"when you were (?:a|an|starting|junior|new)|when i was (?:learning|new|junior)|i(?:'|’)?d have (?:wanted|loved|liked)|"
+                        r"(?:actual|real) job postings)\b", re.IGNORECASE)
 
 COVERT = re.compile(r"\b(subtl\w*|covert\w*|disguis\w*|without (?:saying|disclosing|mentioning|revealing)|pretend\w*|"
                     r"limited[- ]time|for a limited|only \w+ (?:spots?|copies|seats?) (?:left|available)|hurry|act now|"
@@ -47,6 +48,9 @@ GROUP_PLACE = re.compile(r"\b(facebook|linkedin|discord|slack|telegram|whatsapp|
 # Advice to stop or pause selling: only the gate (code) can recommend that.
 PAUSE = re.compile(r"\b(?:pause|halt|stop|suspend|freeze|shut down|pull)\w*\s+(?:the |all |your |any )?(?:launch\w*|sales?|selling|store|product)\b",
                    re.IGNORECASE)
+# In the memo, any advice to pause, halt or put the work on hold contradicts a REPEAT/GO gate, whatever follows the verb.
+MEMO_PAUSE = re.compile(r"\b(?:pause[sd]?|pausing|halt\w*|suspend\w*|freez\w*|put\b[^.]{0,30}\bon hold|stop (?:selling|launching|work\w*)|"
+                        r"wind down|shut\w* down)\b", re.IGNORECASE)
 _DANGLING = re.compile(r"^(?:since then|despite this|however|still|yet|but|nevertheless|that said|even so|because of this|"
                        r"as a result|in addition|also|moreover|furthermore|therefore|thus|so|and),?\s+", re.IGNORECASE)
 
@@ -119,7 +123,7 @@ def clean_memo(text: str, recommendation: str) -> str:
     t = fix_punctuation(text)
     sents = [s for s in _SENT.split(t.strip()) if s]
     if recommendation.lower() != "stop":
-        sents = [s for s in sents if not PAUSE.search(s)]
+        sents = [s for s in sents if not PAUSE.search(s) and not MEMO_PAUSE.search(s)]
     t = " ".join(sents)
     t = _DANGLING.sub("", t)
     t = t[:1].upper() + t[1:]

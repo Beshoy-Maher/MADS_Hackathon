@@ -1,21 +1,15 @@
 {
-  "weak_founder": {
-    "1": {"decision": "accept", "default_action": "reject", "action_note": "Not contacting anyone: the evidence says stop."}
-  },
-  "strong_founder": {
-    "1": {"decision": "accept", "default_action": "approve"},
-    "2": {"decision": "go", "default_action": "approve", "note": "Founder override: build the MVP in parallel with the waitlist test, accepting the risk; re-check demand before launch."},
-    "3": {"decision": "accept", "default_action": "approve"},
-    "4": {"decision": "accept", "default_action": "approve"},
-    "5": {"decision": "accept", "default_action": "approve", "actions": {"launch post: Hacker News (Show HN)": "reject"}, "action_note": "Reviewed by founder."},
-    "6": {"decision": "accept", "default_action": "approve", "note_if_accepted": "Keep operating; review after 14 days of real sales data."}
-  },
-  "designer_founder": {
-    "1": {"decision": "accept", "default_action": "approve", "action_note": "Reviewed by founder."},
-    "2": {"decision": "accept", "default_action": "approve", "action_note": "Reviewed by founder."},
-    "3": {"decision": "accept", "default_action": "approve", "action_note": "Reviewed by founder."},
-    "4": {"decision": "accept", "default_action": "approve", "action_note": "Reviewed by founder."},
-    "5": {"decision": "accept", "default_action": "approve", "action_note": "Reviewed by founder."},
-    "6": {"decision": "accept", "default_action": "approve", "action_note": "Reviewed by founder."}
-  }
+  "strong_idea.json": [
+    {"decision": "go", "reason": "semantic-release automates version bumps; ReleaseKit is a writing guide for the notes themselves, so it complements that tool instead of competing with it"},
+    {"decision": "go"},
+    {"decision": "go"},
+    {"decision": "go"},
+    {"approve_all_outbound": true},
+    {"decision": "go"},
+    {"decision": "wait"}
+  ],
+  "weak_idea.json": [
+    {"decision": "stop"}
+  ],
+  "excluded_idea.json": []
 }

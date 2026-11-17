@@ -1,0 +1,95 @@
+{
+ "model_available": false,
+ "model": null,
+ "runs": [
+  {
+   "brief": "strong_idea.json",
+   "run_id": "da4f7165",
+   "final_status": "awaiting_founder",
+   "last_phase": 6,
+   "history": [
+    {
+     "phase": 1,
+     "recommended": "pivot",
+     "decision": "go",
+     "reason": "semantic-release automates version bumps; ReleaseKit is a writing guide for the notes themselves, so it complements that tool instead of competing with it"
+    },
+    {
+     "phase": 2,
+     "recommended": "go",
+     "decision": "go",
+     "reason": ""
+    },
+    {
+     "phase": 3,
+     "recommended": "go",
+     "decision": "go",
+     "reason": ""
+    },
+    {
+     "phase": 4,
+     "recommended": "go",
+     "decision": "go",
+     "reason": ""
+    },
+    {
+     "phase": 5,
+     "recommended": "go",
+     "decision": "go",
+     "reason": ""
+    }
+   ],
+   "last_recommendation": "repeat",
+   "outbound": [
+    {
+     "kind": "publish",
+     "title": "Publish landing page",
+     "status": "approved"
+    },
+    {
+     "kind": "publish",
+     "title": "Publish store page",
+     "status": "approved"
+    },
+    {
+     "kind": "send",
+     "title": "Post launch announcement",
+     "status": "approved"
+    },
+    {
+     "kind": "refund",
+     "title": "Refund pay_a0a4a601",
+     "status": "approved"
+    }
+   ]
+  },
+  {
+   "brief": "weak_idea.json",
+   "run_id": "58e06f0f",
+   "final_status": "stopped",
+   "last_phase": 1,
+   "history": [
+    {
+     "phase": 1,
+     "recommended": "stop",
+     "decision": "stop",
+     "reason": ""
+    }
+   ],
+   "last_recommendation": "stop",
+   "outbound": []
+  },
+  {
+   "brief": "excluded_idea.json",
+   "run_id": "609b1148",
+   "final_status": "refused",
+   "last_phase": 1,
+   "history": [],
+   "last_recommendation": "stop",
+   "outbound": []
+  }
+ ],
+ "decision_log_entries": 63,
+ "entries_with_model": 0,
+ "total_cost_usd": 0
+}

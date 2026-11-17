@@ -1,40 +1,25 @@
-"""Reconciliation: orders vs. provider charges, refunds, fees and payouts.
-
-Every paid order must have exactly one charge; every refunded order exactly
-one refund; the payout must equal charges - refunds - fees. Any mismatch is
-reported, never silently fixed.
-"""
-from __future__ import annotations
-
-from collections import Counter
-
-from payments import Store
+"""Reconciliation: orders, payments, fees, refunds and payouts must add up."""
 
 
-def reconcile(store: Store) -> dict:
-    charges = Counter(t["order_id"] for t in store.ledger if t["type"] == "charge")
-    refunds = Counter(t["order_id"] for t in store.ledger if t["type"] == "refund")
+def reconcile(provider, delivery):
+    paid_orders = [o for o in provider.orders.values() if o["status"] == "paid"]
+    gross = round(sum(p["amount"] for p in provider.payments.values()), 2)
+    fees = round(sum(p["fee"] for p in provider.payments.values()), 2)
+    refunded = round(sum(r["amount"] for r in provider.refunds.values()), 2)
+    payout = round(sum(po["amount"] for po in provider.payouts), 2)
+    expected = round(gross - fees - refunded, 2)
+    refunded_orders = {provider.payments[r["payment"]]["order"] for r in provider.refunds.values()}
     issues = []
-    for oid, o in store.orders.items():
-        if o["status"] in ("paid", "refunded") and charges[oid] != 1:
-            issues.append(f"{oid}: {charges[oid]} charges for a {o['status']} order")
-        if o["status"] == "pending" and charges[oid]:
-            issues.append(f"{oid}: charged but still pending")
-        if o["status"] == "refunded" and refunds[oid] != 1:
-            issues.append(f"{oid}: {refunds[oid]} refunds for a refunded order")
-        if o["status"] != "refunded" and refunds[oid]:
-            issues.append(f"{oid}: refund recorded but order not refunded")
-        active = store.access.get(oid, {}).get("active", False)
-        if o["status"] == "paid" and not active:
-            issues.append(f"{oid}: paid but not delivered")
-        if o["status"] != "paid" and active:
-            issues.append(f"{oid}: has access but is {o['status']}")
-    gross = round(sum(t["amount"] for t in store.ledger if t["type"] == "charge"), 2)
-    refunded = round(-sum(t["amount"] for t in store.ledger if t["type"] == "refund"), 2)
-    fees = round(sum(t["fee"] for t in store.ledger), 2)
-    payouts = round(sum(t["amount"] for t in store.ledger if t["type"] == "payout"), 2)
-    expected_net = round(gross - refunded - fees, 2)
-    if payouts and abs(payouts - expected_net) > 0.01:
-        issues.append(f"payouts {payouts} != gross - refunds - fees {expected_net}")
-    return {"orders": len(store.orders), "gross": gross, "refunded": refunded, "fees": fees, "payouts": payouts,
-            "expected_net": expected_net, "balanced": not issues, "issues": issues}
+    for o in paid_orders:
+        g = delivery.grants.get(o["id"])
+        if not g:
+            issues.append(f"{o['id']}: paid but not delivered")
+        elif o["id"] in refunded_orders and g["active"]:
+            issues.append(f"{o['id']}: refunded but access still active")
+    if abs(payout - expected) > 0.009:
+        issues.append(f"payout {payout} != gross {gross} - fees {fees} - refunds {refunded}")
+    if len(provider.payments) != len(paid_orders):
+        issues.append("payments and paid orders differ")
+    return {"orders": len(provider.orders), "paid": len(paid_orders), "gross": gross, "fees": fees,
+            "refunded": refunded, "payout": payout, "expected_payout": expected,
+            "matched": not issues, "issues": issues}

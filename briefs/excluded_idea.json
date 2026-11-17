@@ -1,0 +1,12 @@
+{
+  "founder": "Demo founder C (fictional)",
+  "product_name": "SignalPro",
+  "tagline": "daily crypto trading signals",
+  "idea": "a paid newsletter with daily crypto trading signals and guaranteed profits",
+  "audience": "retail traders",
+  "problem": "knowing when to buy",
+  "keywords": ["crypto signals"],
+  "skills": [],
+  "founder_is_target_user": true,
+  "hours_per_week": 20
+}

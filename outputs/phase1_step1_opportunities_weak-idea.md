@@ -1,63 +1,17 @@
-# Phase 1, step 1: Opportunities for Karim
+# Phase 1 Step 1: Opportunities and evidence
 
-**Starting idea (founder's words):** A paid daily email of motivational quotes for software developers
+_TEMPLATE: no model reachable, deterministic text._
 
-The researcher sharpened the idea, proposed alternatives that fit the founder, and searched public discussions for evidence that people have this problem. Every item below links to its source and shows its date. A problem statement no fetched post supports is labelled ASSUMPTION.
+Idea: an app that picks a colour palette for your website based on your pet's mood
+Audience: pet owners who build websites
+Found 0 pain voices and 0 existing solutions across 1 search terms.
 
-## Sharpened founder idea: Daily dev motivation via email
+## Search terms
+pet mood color palette
 
-- Problem: ASSUMPTION (no fetched post describes this): Developers struggle to stay positive during long coding sessions.
-- Format: Daily email
-- Search queries: dev burnout quotes, coding motivation email, motivational quotes software
-- Relevant items found: 15 (of 52 results)
+## Pain voices (most engaged first)
 
-People describing the problem (3):
-- [Issue: Raspberry Pie Zero Bot](https://github.com/cis3296f24/Section3ProjectPresentation/issues/14) (github, 2024-10-10, 4 pts/stars, 2 comments)
-- [Ask HN: Daily motivation screen theme for Android](https://news.ycombinator.com/item?id=22865790) (hackernews, 2020-04-14, 1 pts/stars, 0 comments)
-- [Issue: [Content] Expand the array of Daily Motivational Quotes](https://github.com/devftkrshna/Seiri/issues/5) (github, 2026-04-06, 0 pts/stars, 0 comments)
+## Existing solutions (competition)
 
-Existing solutions (12):
-- [Repository hpolatyuruk/daily-developer-tips: A basic python script which periodically tweet developers' mistak](https://github.com/hpolatyuruk/daily-developer-tips) (github, 2019-04-17, 1 pts/stars, 0 comments)
-- [Repository Yeshwini-J/n8n-motivational-emails: A low-code workflow that sends daily motivational quotes via em](https://github.com/Yeshwini-J/n8n-motivational-emails) (github, 2025-06-19, 0 pts/stars, 0 comments)
-- [Repository hasib-muntasir/Motivational-Quotes-send-to-mail-with-python: Send motivational code to Email addres](https://github.com/hasib-muntasir/Motivational-Quotes-send-to-mail-with-python) (github, 2023-11-04, 0 pts/stars, 0 comments)
-- [Repository ruyonga/dev-quotes: Android app to collect amazing and motivational quotes from engineers and softw](https://github.com/ruyonga/dev-quotes) (github, 2020-07-23, 0 pts/stars, 0 comments)
-- [Repository Diego620/Quote-App: This project features a simple layout with my own motivational quotes specifica](https://github.com/Diego620/Quote-App) (github, 2024-06-03, 0 pts/stars, 0 comments)
-- [Repository henriquealho/Programming-Quotes: Web application designed to inspire developers with a curated coll](https://github.com/henriquealho/Programming-Quotes) (github, 2026-03-11, 0 pts/stars, 0 comments)
-- [Repository FaithRovina/motivational_email: This is a program that sends motivational quotes via email using Si](https://github.com/FaithRovina/motivational_email) (github, 2023-04-25, 0 pts/stars, 0 comments)
-- [Repository bowlersp/Monday-Motivational-Automated-Email: Monday Motivational Automated Email (day 32 of 100 da](https://github.com/bowlersp/Monday-Motivational-Automated-Email) (github, 2023-03-28, 0 pts/stars, 0 comments)
-
-## Alternative 1: Minimalist dev mood board
-
-- Problem: ASSUMPTION (no fetched post describes this): Developers want quick visual boosts without distractions.
-- Format: Instagram post
-- Search queries: dev mood board, coding inspiration
-- Relevant items found: 5 (of 16 results)
-
-People describing the problem (2):
-- [Ask HN: Another job board? Need feedback on the idea](https://news.ycombinator.com/item?id=29053103) (hackernews, 2021-10-30, 10 pts/stars, 18 comments)
-- [Issue: Mood board](https://github.com/LucHauser/ThunderBoost/issues/19) (github, 2022-10-05, 0 pts/stars, 1 comments)
-
-Existing solutions (3):
-- [Repository slubendo/Web-Dev-MoodBoard: ](https://github.com/slubendo/Web-Dev-MoodBoard) (github, 2024-03-15, 0 pts/stars, 0 comments)
-- [Repository AnnaHoerschgen/MobileDev_MoodBoard: ](https://github.com/AnnaHoerschgen/MobileDev_MoodBoard) (github, 2025-04-16, 0 pts/stars, 0 comments)
-- [Repository cdmccune/DevMountain-Specs-W4D3-MoodBoardCreator: ](https://github.com/cdmccune/DevMountain-Specs-W4D3-MoodBoardCreator) (github, 2022-06-08, 0 pts/stars, 0 comments)
-
-## Alternative 2: Code-positive Instagram feed
-
-- Problem: ASSUMPTION (no fetched post describes this): Developers seek daily positivity through simple, clean visuals.
-- Format: Instagram feed
-- Search queries: positive dev quotes, developer mood board
-- Relevant items found: 0 (of 10 results)
-
-- No sources found. Every market statement below is an ASSUMPTION.
-
-## Source coverage
-
-- hackernews: 3 queries ok
-- reddit: 0 queries ok, error: HTTPStatusError: Client error '403 Blocked' for url 'https://old.reddit.com/login/?reason=lor2&dest=https%3A%2F%2Fold.reddit.com%2Fsearch
-- github: 3 queries ok
-- stackexchange: 0 queries ok, error: HTTPStatusError: Client error '429 Too Many Requests' for url 'https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&q=
-
----
-Generated by the pipeline. Model: `qwen3:30b-a3b-instruct-2507-q4_K_M` (local open-weight model). Cost: $0.00.
-Sources cited: 20. Claims without a source are marked ASSUMPTION.
+## Sources that failed (not replaced by guesses)
+- hackernews 'pet mood color palette': URLError: <urlopen error Tunnel connection failed: 403 Forbidden>

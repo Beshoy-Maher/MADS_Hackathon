@@ -1,0 +1,13 @@
+{
+  "founder": "Demo founder A (fictional)",
+  "product_name": "ReleaseKit",
+  "tagline": "a changelog and release-notes toolkit for small software teams",
+  "idea": "a toolkit of templates and checklists that helps small software teams write changelogs and release notes",
+  "audience": "maintainers and small software teams who ship releases",
+  "problem": "writing changelogs and release notes",
+  "keywords": ["changelog", "release notes"],
+  "broader_keywords": ["release process", "versioning"],
+  "skills": ["release", "changelog", "documentation"],
+  "founder_is_target_user": true,
+  "hours_per_week": 10
+}

@@ -128,18 +128,31 @@ After a phase's steps and before its gate is shown, `orchestrator._debate` hands
 | 6 | persevere-or-pivot memo (analyst); the critic argues for the **opposite** decision | `phase6_step4_debate.md` |
 
 ```
-Round 1  critic                  up to 4 objections: exact quote, problem, severity, evidence URL or ASSUMPTION
+Round 1  critic                  up to 4 objections, only to statements that are factually wrong, unsupported by the
+                                 fetched evidence, or contradicted by another document of the run (no "should also
+                                 consider", no style): exact quote, problem, severity, evidence URL or ASSUMPTION
          code                    drops an objection whose quote is not in the document, one that attacks a line computed
                                  by code (counts, scores, check tables) or a fetched evidence title, and one that calls
                                  a fetched link fake; an evidence URL that was never fetched becomes ASSUMPTION
-Round 2  author  (writer model,  CONCEDE with a corrected sentence, or DEFEND with a URL from the fetched evidence
-          in its own role)
-Round 3  critic                  verdict on each defence; code keeps it OPEN if the defence cites no fetched source
+Round 2  author  (writer model,  CONCEDE only if the statement is wrong or unsupported, with replacement text for the
+          in its own role)       quoted words; otherwise DEFEND with a URL from the fetched evidence
+Apply    code                    writes a conceded replacement into the step's output file only if all of these hold
+Round 3  critic                  verdict on each defence: accepted or open
 Moderator (code)                 transcript file, one decision-log entry per turn, summary on the gate card
 ```
 
-- **It informs, it does not decide.** The gate's recommendation comes from `gates.py` alone; the debate is shown next to it. A test runs the same brief with and without the debate and checks the recommendation is identical.
-- **REPEAT uses it.** A REPEAT with no founder note feeds the corrections and open objections into the next attempt (Phase 3 rebuilds from them).
+A conceded replacement is written into the document only if: the quote is found **exactly once** in the file; the replacement is not empty and at most about **3 times** as long as the quote; it is not on a line computed by code (counts, scores, tables, thresholds, the evidence list) and does not change the document's structure; the **guardrail output scan** removes nothing from it; and the **claim checker** (light mode, the run's evidence URLs) changes nothing in it. Each applied correction is logged as `<author> / apply_debate_correction` (sources: the evidence URLs used, `approved_by: null`). Corrections are applied before the gate is shown, so the founder reads the corrected documents.
+
+Every objection ends in exactly one of four statuses, counted on the gate card and in the debate file:
+
+| Status | Meaning |
+|---|---|
+| fixed | conceded, and the correction was written into the document |
+| conceded, not applied | conceded, but the replacement failed a check above; the document is unchanged and the debate file says why |
+| defended | defended with a fetched source, and the critic accepted the defence |
+| open | anything else, including a defence without a fetched source |
+
+- **REPEAT uses it.** A REPEAT with no founder note feeds the open objections and the corrections that could not be applied into the next attempt (Phase 3 rebuilds from them).
 - **Critic model.** `LLM_CRITIC_MODEL` defaults to the same 4B model as the writer. With `models-large.env` it is `gpt-oss:20b`, a different model family that does not share the writer's blind spots. If the configured critic is not available, the next model in `LLM_FALLBACK_MODELS` plays the critic and the transcript names it.
 - **Same safety as every other text.** Every turn passes the guardrail output scan; the transcript passes the claim check. Without any model the debate is not run and the gate card says so: objections are never written by templates.
 - Switch off with `DEBATE=false`.
@@ -194,7 +207,7 @@ sequenceDiagram
 brief (JSON/text) -> intake -> run state  data/runs/<id>/state.json   (git-ignored)
   phase steps -> outputs  data/runs/<id>/outputs/phase<N>_step<M>_<name>.<ext>
   phase outputs -> critic <-> authors -> phase<N>_step<M>_debate.md + gate card (the gate itself is unchanged)
-                   decision log: critic/debate_challenge, <author>/debate_response, critic/debate_verdict
+                   decision log: critic/debate_challenge, <author>/debate_response, <author>/apply_debate_correction, critic/debate_verdict
   each model call -> role (writer / fast / judge / critic) -> its model, or the next one if it cannot load
   every action -> decision log  (timestamp, agent, action, sources[], model, cost, approved_by, + run_id, outcome)
   outbound drafts -> approval queue (run state) -> founder Approve -> outbox.jsonl (STUBBED)

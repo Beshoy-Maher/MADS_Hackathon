@@ -25,7 +25,7 @@ from agents.analyst import Analyst
 from agents.base import StepResult
 from agents.builder import Builder
 from agents.copywriter import Copywriter
-from agents.critic import DEBATE_STEP, DEBATED_STEPS, Critic, doc_text
+from agents.critic import DEBATE_STEP, DEBATED_STEPS, OPEN, NOT_APPLIED, Critic, doc_text, summary_line
 from agents.interviewer import Interviewer
 from agents.launcher import Launcher
 from agents.market_analyst import MarketAnalyst
@@ -361,7 +361,7 @@ def _debate(run: dict, phase: int) -> None:
             if path.exists():
                 limit = 5000 if st["agent"] == "builder" and st["step"] == 2 else None
                 text = doc_text(path.read_text(encoding="utf-8"), limit) if limit else doc_text(path.read_text(encoding="utf-8"))
-                docs.append({"file": st["file"], "author": st["agent"], "text": text})
+                docs.append({"file": st["file"], "author": st["agent"], "text": text, "path": str(path)})
     if not docs:
         return
     _progress(run, "critic: debating this phase's outputs with their authors (devil's advocate)")
@@ -396,9 +396,10 @@ def _gate_markdown(run: dict, phase: int) -> str:
         md += ["", f"Gate type: {g['kind']}. Allowed outcomes: {', '.join(g['allowed'])}. Thresholds are fixed in `gates.py` before the data is seen.", ""]
         deb = g.get("debate")
         if deb and deb.get("ran"):
-            md += [f"Debate before this gate (`{deb.get('file')}`): {deb['objections']} objection(s), {deb['conceded']} conceded, "
-                   f"{deb['open']} open ({deb['high_open']} high severity). It informs this decision; it does not change the recommendation."]
-            md += [f"- OPEN [{o['severity']}] {o['problem']}" for o in deb["items"] if o["status"] == "open"] + [""]
+            md += [f"Debate before this gate (`{deb.get('file')}`): {summary_line(deb)} ({deb['high_open']} open with high severity). "
+                   "Fixed corrections were written into the documents before this gate was shown. It informs this decision; "
+                   "it does not change the recommendation."]
+            md += [f"- {o['status'].upper()} [{o['severity']}] {o['problem']}" for o in deb["items"] if o["status"] in (OPEN, NOT_APPLIED)] + [""]
         if fd:
             override = " (founder overrode the recommendation)" if fd != g["recommendation"] else ""
             md += [f"**Founder decision: {fd.upper()}**{override} at {g.get('decided_at')}." + (f" Note: {g['note']}" if g.get("note") else ""), ""]
@@ -487,9 +488,10 @@ def decide(run_id: str, decision: str, actor: str, note: str = "") -> dict:
     elif decision == gates.REPEAT:
         run["attempts"][str(phase)] = run["attempts"].get(str(phase), 1) + 1
         deb = g.get("debate") or {}
-        from_debate = "; ".join((o["fix"] or o["problem"]) for o in deb.get("items", []) if o["status"] == "open" or o["fix"])
+        from_debate = "; ".join((o["fix"] if o["status"] == NOT_APPLIED and o["fix"] else o["problem"])
+                                for o in deb.get("items", []) if o["status"] in (OPEN, NOT_APPLIED))
         if note or from_debate:
-            # No note: the next attempt works from the debate's corrections and open objections.
+            # No note: the next attempt works from the debate's open objections and the corrections it could not apply.
             run["ctx"].setdefault("feedback", {})[str(phase)] = note or ("Points from the debate: " + from_debate)[:1500]
         # Phase 6 "repeat" means: keep operating and re-run the review when real data arrives.
         run["status"] = "monitoring" if phase == 6 else "ready"

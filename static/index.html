@@ -79,12 +79,12 @@ function debateHtml(d) {
   if (!d.ran) return `<p class="small muted">Debate not run: no model was available for the critic.</p>`;
   const sev = {high: "bad", medium: "warn", low: "muted"};
   return `<h3>Debate before this gate <span class="small muted">(critic vs. authors; informs you, does not change the recommendation)</span></h3>
-    <p><b>${d.objections}</b> objection(s): <b>${d.conceded}</b> conceded, <b>${d.open}</b> still open${d.high_open ? ` (<span class="bad">${d.high_open} high severity</span>)` : ""}.
+    <p><b>${d.objections}</b> objection(s): <b>${d.fixed}</b> fixed, <b>${d.not_applied}</b> conceded not applied, <b>${d.defended}</b> defended, <b>${d.open}</b> open${d.high_open ? ` (<span class="bad">${d.high_open} open with high severity</span>)` : ""}.
     <span class="small muted">Models: ${esc((d.models || []).join(", "))}. Full transcript: ${esc(d.file || "")}</span></p>
     ${d.items.length ? `<table><tr><th>#</th><th>Severity</th><th>Objection</th><th>Outcome</th></tr>${d.items.map(o => `<tr><td>${o.id}</td>
       <td><span class="badge ${sev[o.severity] || "muted"}">${esc(o.severity)}</span></td>
-      <td><span class="muted small">"${esc(o.quote)}"</span><br>${esc(o.problem)}${o.fix ? `<br><span class="small">Correction: ${esc(o.fix)}</span>` : ""}</td>
-      <td class="${o.status === "open" ? "bad" : "ok"}">${esc(o.status.toUpperCase())}${o.stance ? ` <span class="small muted">(${esc(o.stance)})</span>` : ""}</td></tr>`).join("")}</table>
+      <td><span class="muted small">"${esc(o.quote)}"</span><br>${esc(o.problem)}${o.fix && o.stance === "concede" ? `<br><span class="small">${o.status === "fixed" ? "Written into the document" : "Not applied"}: ${esc(o.fix)}</span>` : ""}${o.status === "conceded, not applied" ? `<br><span class="small muted">${esc(o.verdict)}</span>` : ""}</td>
+      <td class="${o.status === "open" ? "bad" : (o.status === "conceded, not applied" ? "warn" : "ok")}">${esc(o.status.toUpperCase())}${o.stance ? ` <span class="small muted">(${esc(o.stance)})</span>` : ""}</td></tr>`).join("")}</table>
       ${d.open ? `<p class="small muted">Click REPEAT with no note and the next attempt works from these points.</p>` : ""}` : ""}`;
 }
 let current = null, timer = null, viewerRun = null, modelReady = true, statusTimer = null;

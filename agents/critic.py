@@ -1,9 +1,17 @@
 """Debate before each gate: the critic (devil's advocate) challenges a phase's outputs, their authors answer.
 
-    Round 1  critic   -> objections, each quoting the exact words it disputes (quote checked in code)
-    Round 2  authors  -> concede (with a correction) or defend (with a fetched source)
-    Round 3  critic   -> verdict on each defended objection: resolved or open
-    Moderator (code)  -> transcript, open objections shown on the gate card
+    Round 1  critic   -> objections to statements that are wrong, unsupported by the fetched evidence or contradicted by
+                         another output, each quoting the exact words it disputes (quote checked in code)
+    Round 2  authors  -> concede (with replacement text for the quoted words) or defend (with a fetched source)
+    Apply    code     -> a conceded replacement is written into the document only if it passes every safety check
+    Round 3  critic   -> verdict on each defence: accepted or open
+    Moderator (code)  -> transcript and summary on the gate card
+
+Four statuses, and only these:
+    fixed                  conceded, and the correction was written into the document (logged as apply_debate_correction)
+    conceded, not applied  conceded, but the replacement failed a safety check; the document is unchanged, the reason is shown
+    defended               defended with a fetched source, and the critic accepted it
+    open                   anything else
 
 The critic's model is set separately (config.LLM_CRITIC_MODEL); with models-large.env it is a different model
 family from the writer, so it does not share the writer's blind spots. The debate informs the founder; it never changes a gate's recommendation. Every turn
@@ -13,6 +21,7 @@ run, and the output says so: objections are never made up by templates.
 from __future__ import annotations
 
 import re
+from pathlib import Path
 
 import decision_log
 import guardrails
@@ -26,6 +35,8 @@ DOC_CHARS = 3500
 DEBATED_STEPS = {1: [1, 3], 2: [1, 3], 3: [1, 2], 4: [1, 2], 5: [1, 2], 6: [3]}
 DEBATE_STEP = {1: 6, 2: 4, 3: 5, 4: 3, 5: 4, 6: 4}
 SEVERITIES = ("high", "medium", "low")
+FIXED, NOT_APPLIED, DEFENDED, OPEN = "fixed", "conceded, not applied", "defended", "open"
+STATUSES = (FIXED, NOT_APPLIED, DEFENDED, OPEN)
 COMPUTED = ("Counts, scores, thresholds and tables of results (lines like 'Relevant items found', 'Total', 'demand', "
             "'founder fit', pass/fail checks) are computed by code from the fetched search results. They are facts about this run, "
             "not claims: do not dispute them, and do not concede them.")
@@ -70,6 +81,59 @@ def doc_text(raw: str, limit: int = DOC_CHARS) -> str:
     return t[:limit]
 
 
+def summary_line(s: dict) -> str:
+    return (f"{s['objections']} objection(s): {s['fixed']} fixed, {s['not_applied']} conceded not applied, "
+            f"{s['defended']} defended, {s['open']} open")
+
+
+def _quote_rx(quote: str) -> re.Pattern:
+    """The quote as it appears in the file: same words, any run of whitespace between them."""
+    return re.compile(r"\s+".join(re.escape(w) for w in quote.split()))
+
+
+_LINE_PREFIX = re.compile(r"^\s*(\d+[.)]|- \[[ xX]\]|[-*+]|#+|>)?\s*")
+_PLACEHOLDER = re.compile(r"placeholder|lorem ipsum|\bTODO\b|\bTBD\b|\[insert|\[your |XXX", re.I)
+
+
+def _apply_problem(quote: str, fix: str, path, allowed: set[str]) -> str:
+    """Why a conceded replacement must not be written into the document, or "" if it is safe."""
+    from tools import claims
+    if not path or not Path(path).exists():
+        return "the document file was not found"
+    fix = fix or ""
+    if not fix.strip():
+        return "no replacement text was given"
+    if _norm(fix) == _norm(quote):
+        return "the replacement is the same as the quote"
+    if len(fix) > 3 * len(quote) + 20:
+        return f"the replacement is {len(fix)} characters for a {len(quote)}-character quote (more than about 3 times)"
+    raw = Path(path).read_text(encoding="utf-8")
+    hits = list(_quote_rx(quote).finditer(raw))
+    if len(hits) != 1:
+        return f"the quote is found {len(hits)} times in the file, not exactly once"
+    start = raw.rfind("\n", 0, hits[0].start()) + 1
+    end = raw.find("\n", hits[0].end())
+    line = raw[start:end if end != -1 else len(raw)]
+    if _COMPUTED_LINE.match(line) or _EVIDENCE_LINE.match(line) or _TEMPLATE_LINE.search(line):
+        return "the quote is on a line computed by code"
+    span = raw[hits[0].start():hits[0].end()]
+    new_line = line.replace(span, fix, 1)
+    if ("\n" in span or "<" in fix or ">" in fix or "`" in fix or "|" in fix
+            or _LINE_PREFIX.match(new_line).group(0).strip() != _LINE_PREFIX.match(line).group(0).strip()
+            or span.count("**") % 2 or span.count("`") % 2 or fix.count("*") % 2):
+        # Numbered steps, checklist boxes, headings, tables and formatting stay as they were, so the build tests
+        # that already ran on this document still hold.
+        return "the replacement would change the document's structure"
+    if _PLACEHOLDER.search(fix):
+        return "the replacement contains placeholder text"
+    if guardrails.scan_output(fix).violations:
+        return "the guardrail scan would remove part of the replacement"
+    checked, _ = claims.check(fix, allowed, mode="light")
+    if checked.strip() != fix.strip():
+        return "the claim check would change the replacement (an unsourced figure or a link that was never fetched)"
+    return ""
+
+
 class Critic(Agent):
     role = "critic"
 
@@ -87,10 +151,12 @@ class Critic(Agent):
                               for i, d in enumerate(docs))
         goal = ("Argue the strongest honest case for the OPPOSITE of the decision this memo recommends: quote the claims that "
                 "lead to its recommendation and say why they do not hold." if opposite else
-                "Find the weakest points: unsupported claims, wrong numbers, ignored alternatives, hidden risks, overselling.")
+                "Object only to statements that are factually wrong, unsupported by the fetched evidence, or contradicted by "
+                "another document of this run. No objections about missing analysis, style, tone, or things the author "
+                "\"should also consider\".")
         task = (f"Founder brief: {self.brief.get('idea', '')} | market: {self.brief.get('target_market', '')}\n"
                 f"Phase {phase} before its gate.\n\n{listing}\n\nEVIDENCE URLS fetched by the researcher:\n{evidence}\n\n"
-                f"{goal} {COMPUTED} At most {MAX_OBJECTIONS} objections.\n"
+                f"{goal} {COMPUTED} At most {MAX_OBJECTIONS} objections; zero is a valid answer.\n"
                 'JSON: {"objections": [{"document": 1, "quote": "exact words (5-25) from that document", '
                 '"problem": "what is wrong and why it matters", "severity": "high|medium|low", "evidence": "URL or ASSUMPTION"}]}. '
                 'Nothing serious: {"objections": []}.')
@@ -132,13 +198,21 @@ class Critic(Agent):
         # Round 2: each author answers the objections to its own document, in its own role.
         for author in dict.fromkeys(o["author"] for o in objections):
             mine = [o for o in objections if o["author"] == author]
-            doc = next(d for d in docs if d["author"] == author)
-            listing2 = "\n".join(f'{o["id"]}. "{o["quote"]}": {o["problem"]}' for o in mine)
-            task2 = (f"You wrote this document ({doc['file']}):\n{doc['text']}\n\nEVIDENCE URLS:\n{evidence}\n\n"
+            # An author can have several debated documents (Phase 3: spec and product): show all of them, and apply
+            # each correction to the document its objection quotes.
+            own = [d for d in docs if d["author"] == author and any(o["file"] == d["file"] for o in mine)]
+            listing2 = "\n".join(f'{o["id"]}. In {o["file"]}: "{o["quote"]}": {o["problem"]}' for o in mine)
+            yours = "\n\n".join(f"DOCUMENT {d['file']}:\n{d['text']}" for d in own)
+            task2 = (f"You wrote these documents:\n{yours}\n\nEVIDENCE URLS:\n{evidence}\n\n"
                      f"A critic raised these objections:\n{listing2}\n\n"
                      f"{COMPUTED}\n"
-                     "Answer each one honestly, using the same numbers as the objections. CONCEDE if the critic is right and give the corrected sentence in \"fix\". "
-                     "DEFEND only if a URL from EVIDENCE URLS supports you; put it in \"evidence\". Do not defend with confidence alone.\n"
+                     "Answer each one honestly, using the same numbers as the objections.\n"
+                     "- CONCEDE only if the quoted statement is actually wrong or unsupported by the evidence. Then \"fix\" is the "
+                     "replacement text for the quoted words only: it replaces them word for word in your document. Same language and "
+                     "about the same length; no advice, no explanation, no new numbers, no new links. Making the claim smaller or "
+                     "marking it ASSUMPTION is a good fix.\n"
+                     "- DEFEND if the statement is correct: cite the URL from EVIDENCE URLS that supports it in \"evidence\". "
+                     "Do not concede to be polite, and do not defend with confidence alone.\n"
                      'JSON: {"responses": [{"id": 1, "stance": "concede|defend", "reply": "...", "fix": "...", "evidence": "URL or empty"}]}')
             system = load_prompt(author) + "\n\nYou are now answering a reviewer's objections to your own draft.\n\n" + GLOBAL_RULES
             d2, r2 = llm.complete_json(system, task2, {"responses": []}, max_tokens=700, role="writer")
@@ -160,11 +234,11 @@ class Critic(Agent):
                 if not r:
                     continue
                 o["stance"] = "concede" if str(r.get("stance", "")).lower().startswith("concede") else "defend"
-                o["reply"], o["fix"] = _clean(r.get("reply")), _clean(r.get("fix"))
+                o["reply"], o["fix"] = _clean(r.get("reply")), " ".join(str(r.get("fix") or "").split())[:600]
                 ev = str(r.get("evidence", "")).strip()
                 o["reply_evidence"] = ev if ev in allowed else ""
                 if o["stance"] == "concede":
-                    o["status"], o["verdict"] = "resolved", "conceded by the author; correction proposed"
+                    self._apply(o, next(d for d in own if d["file"] == o["file"]), allowed, r2.model, phase)
             self._log(author, "debate_response", r2.model, r2.cost,
                       f"phase {phase}: " + ", ".join(f"#{o['id']} {o['stance'] or 'no answer'}" for o in mine),
                       [o["reply_evidence"] for o in mine])
@@ -175,8 +249,8 @@ class Critic(Agent):
             listing3 = "\n".join(f'{o["id"]}. Objection: {o["problem"]}\n   Reply: {o["reply"]}\n   Source given: '
                                  f'{o["reply_evidence"] or "none"}' for o in defended)
             task3 = (f"Your objections and the author's defences:\n{listing3}\n\n"
-                     "For each, is the objection resolved by the reply, or still open?\n"
-                     'JSON: {"verdicts": [{"id": 1, "status": "resolved|open", "reason": "..."}]}')
+                     "For each: does the reply, with its source, answer the objection (accepted), or is it still open?\n"
+                     'JSON: {"verdicts": [{"id": 1, "status": "accepted|open", "reason": "..."}]}')
             d3, r3 = llm.complete_json(self.system(), task3, {"verdicts": []}, max_tokens=500, temperature=0.0, role="critic")
             self._track(r3)
             if r3.model:
@@ -187,21 +261,39 @@ class Critic(Agent):
                 o = next((x for x in defended if str(x["id"]) == str(v.get("id"))), None)
                 if not o:
                     continue
-                resolved = str(v.get("status", "")).lower() == "resolved" and bool(o["reply_evidence"])
-                o["status"], o["verdict"] = ("resolved" if resolved else "open"), _clean(v.get("reason"))
-                if str(v.get("status", "")).lower() == "resolved" and not o["reply_evidence"]:
+                said_ok = str(v.get("status", "")).lower() in ("accepted", "resolved")
+                o["status"], o["verdict"] = (DEFENDED if said_ok and o["reply_evidence"] else OPEN), _clean(v.get("reason"))
+                if said_ok and not o["reply_evidence"]:
                     o["verdict"] = (o["verdict"] + " (kept open: the defence cites no fetched source)").strip()
             self._log("critic", "debate_verdict", r3.model, r3.cost,
                       f"phase {phase}: " + ", ".join(f"#{o['id']} {o['status']}" for o in defended))
 
         return self._result(phase, docs, objections, models, opposite)
 
+    # -------------------------------------------------------------- apply a conceded correction
+    def _apply(self, o: dict, doc: dict, allowed: set[str], model: str | None, phase: int) -> None:
+        """Write a conceded replacement into the step's output file, only if every check passes. Sets o["status"]."""
+        reason = _apply_problem(o["quote"], o["fix"], doc.get("path"), allowed)
+        if reason:
+            o["status"], o["verdict"] = NOT_APPLIED, "not applied: " + reason
+            return
+        path = Path(doc["path"])
+        raw = path.read_text(encoding="utf-8")
+        m = _quote_rx(o["quote"]).search(raw)
+        path.write_text(raw[:m.start()] + o["fix"] + raw[m.end():], encoding="utf-8")
+        o["status"], o["verdict"], o["applied"] = FIXED, "correction written into the document", True
+        used = sorted({u for u in re.findall(r"https?://[^\s)\]>\"']+", o["fix"]) if u in allowed}
+                      | ({o["evidence"]} if o["evidence"].startswith("http") else set()))
+        decision_log.log(o["author"], "apply_debate_correction", model=model, cost=0, run_id=self.run["id"], sources=used,
+                         approved_by=None, phase=phase, step=doc["file"],
+                         detail=f"objection #{o['id']}: replaced {len(o['quote'])} chars with {len(o['fix'])} chars")
+
     # -------------------------------------------------------------- output
     def _summary(self, objections: list[dict], ran: bool, models: set[str]) -> dict:
-        open_ = [o for o in objections if o["status"] == "open"]
-        return {"ran": ran, "objections": len(objections), "open": len(open_),
-                "high_open": sum(1 for o in open_ if o["severity"] == "high"),
-                "conceded": sum(1 for o in objections if o["stance"] == "concede"),
+        count = {st: sum(1 for o in objections if o["status"] == st) for st in STATUSES}
+        return {"ran": ran, "objections": len(objections), "fixed": count[FIXED], "not_applied": count[NOT_APPLIED],
+                "defended": count[DEFENDED], "open": count[OPEN],
+                "high_open": sum(1 for o in objections if o["status"] == OPEN and o["severity"] == "high"),
                 "items": [{k: o[k] for k in ("id", "file", "severity", "quote", "problem", "status", "stance", "fix", "verdict")}
                           for o in objections],
                 "models": sorted(models)}
@@ -220,9 +312,10 @@ class Critic(Agent):
               f"Critic (devil's advocate): `{llm.role_model('critic')}` configured; models that took part: "
               f"{', '.join('`' + m + '`' for m in sorted(models))}.",
               "The critic quotes the words it disputes (quotes not found in the document are dropped by code). The author concedes "
-              "with a correction or defends with a fetched source. A defence without a source stays open.",
-              "", f"**Result: {s['objections']} objection(s), {s['conceded']} conceded, {s['open']} still open "
-              f"({s['high_open']} high severity).** The debate informs the founder; it does not change the gate's recommendation.", ""]
+              "with replacement text or defends with a fetched source. A conceded replacement is written into the document only if "
+              "the quote is found exactly once, it is at most about 3 times as long, and the guardrail scan and claim check leave it "
+              "unchanged; code-computed lines are never changed. A defence without a fetched source stays open.",
+              "", f"**Result: {summary_line(s)}.** The debate informs the founder; it does not change the gate's recommendation.", ""]
         if opposite:
             md.insert(2, "Mode: the critic argues for the **opposite** of the memo's recommendation.")
         if not objections:
@@ -234,8 +327,9 @@ class Critic(Agent):
             if o["stance"]:
                 md += [f"**Author ({o['author']}), {o['stance']}:** {o['reply']}" +
                        (f" Source: {o['reply_evidence']}" if o["reply_evidence"] else ""), ""]
-                if o["fix"]:
-                    md += [f"Proposed correction: {o['fix']}", ""]
+                if o["stance"] == "concede" and o["fix"]:
+                    md += [(f"Correction written into `{o['file']}`: " if o["status"] == FIXED else "Replacement offered (not applied): ")
+                           + o["fix"], ""]
             else:
                 md += [f"**Author ({o['author']}):** no answer.", ""]
             if o["verdict"]:

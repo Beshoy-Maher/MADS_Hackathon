@@ -149,8 +149,9 @@ def normalize(brief: dict) -> dict:
     out["values"] = _list(out.get("values"))
     for k in ("budget_usd", "hours_per_week"):
         out[k] = _number(out.get(k))  # None when the founder did not say; never a default
-    out["target_market"] = str(out.get("target_market") or "").strip()[:300]
-    out["constraints"] = str(out.get("constraints") or "").strip()[:300]
+    for k in ("target_market", "constraints"):  # a model sometimes answers with a list where a sentence is expected
+        v = out.get(k)
+        out[k] = ("; ".join(_list(v)) if isinstance(v, list) else str(v or "")).strip()[:300]
     for k in ("waitlist_target", "waitlist_window_days", "slug", "budget_note"):
         if brief.get(k):
             out[k] = brief[k]

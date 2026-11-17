@@ -154,6 +154,7 @@ def test_messy_json_brief():
     assert b["idea"].startswith("A Chrome extension") and b["skills"] == ["JavaScript", "language teaching"]
     assert b["budget_usd"] == 50 and b["hours_per_week"] is None and b["founder_name"] == "Founder"
     assert set(b["missing"]) == {"founder_name", "hours_per_week", "target_market"}
+    assert intake.normalize({"idea": "x", "constraints": ["evenings only", "no ads"]})["constraints"] == "evenings only; no ads"
     assert orchestrator.current_gate(run)["gate"] == "evidence_gate"
 
 

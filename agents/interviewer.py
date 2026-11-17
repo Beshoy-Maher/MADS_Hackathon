@@ -32,15 +32,19 @@ class Interviewer(Agent):
         ], 1))
         task = (f"Founder brief:\n{brief_summary(self.brief)}\nProduct idea: {candidate['title']}\nProblem: {candidate.get('problem', '')}\n\n"
                 "Write a Mom Test interview guide: 6 numbered questions about the person's past behaviour with this problem, one short "
-                "sentence each (no hypothetical 'would you buy' questions, no pitching). Then 'What counts as a strong signal' with "
+                "sentence each. Open questions only, starting with words like 'Tell me about the last time', 'What did you do when', "
+                "'How did you', 'What have you tried', 'How much time or money'. No yes/no questions ('Have you ever', 'Did you'), "
+                "no hypothetical 'would you buy' questions, no pitching. Then 'What counts as a strong signal' with "
                 "3 short bullets. Markdown, max 140 words, no introduction.")
         guide = self.write(task, fallback_questions + "\n\nWhat counts as a strong signal:\n- They already spent money or hours on a workaround.\n"
                                                       "- They ask when they can get it, unprompted.\n- They offer an intro to someone else with the problem.",
                            max_tokens=400)
         name = self.brief.get("founder_name", "the founder")
-        outreach = (f"Hi! I'm {name}. I'm researching how {self.brief.get('target_market', 'people')} deal with "
-                    f"{candidate.get('problem', 'this problem').rstrip('.').lower()}. I'm not selling anything. "
-                    "Could I ask you about your experience in a 15-minute call? Thank you either way.")
+        problem = " ".join(str(candidate.get("problem") or "").split()).rstrip(".")
+        outreach = (f"Hi! I'm {name}. I'm talking to people about one problem I keep hearing about"
+                    + (f": \"{problem}.\" " if problem else ". ") +
+                    "If that sounds familiar, could I ask you about your own experience in a 15-minute call? "
+                    "I'm not selling anything. Thank you either way.")
         places = ", ".join(community_places(communities)) or "communities the founder already belongs to"
         action = approval.request_action(self.run, "send", "customer interview outreach (5 people)",
                                          f"Personal message from {name} to 5 people found in {places}.",
@@ -53,6 +57,7 @@ class Interviewer(Agent):
               f"Status: waiting for founder approval (action `{action['id']}`). Sending is STUBBED: after approval the message is "
               "saved to the outbox and the founder sends it personally.", "",
               "## Interview results", "",
-              "No interviews have been run by the system. Results must come from real conversations: record them in the "
-              "dashboard notes. The system does not simulate customers.", footer(self.model)]
+              "No interviews have been run by the system. Results must come from real conversations: paste your notes into "
+              "'Interview notes' in the dashboard, and the notes analyst will separate commitments from compliments "
+              "(phase1_step5_interview-notes.md). The system does not simulate customers.", footer(self.model)]
         return self.result("interviews", "plan_customer_interviews", "\n".join(md), data={"outreach_action": action["id"]})

@@ -48,6 +48,8 @@ def check(text: str, allowed_urls: set[str], mode: str = "full") -> tuple[str, d
         if m.group(2).rstrip(".,") in allowed_urls:
             return m.group(0)
         removed_links += 1
+        if m.group(1).strip().startswith(("http://", "https://", "www.")):
+            return "(unverified link removed)"
         return f"{m.group(1)} (unverified link removed)"
 
     def fix_bare(m: re.Match) -> str:

@@ -195,3 +195,33 @@ def test_qa_fails_when_a_module_was_never_reviewed():
              for i in (1, 2, 3)]
     results = qa.run_tests(product, "## How to use\n## Getting help", ["M1", "M2", "M3"], "SQL workbook", reviews=clean)
     assert next(r for r in results if r["name"] == "verifier_last_pass_has_no_errors")["passed"]
+
+
+# ------------------------------------------------- format slips and unfenced SQL
+def test_broken_checkbox_and_split_number_are_reported():
+    text = "- [ ] fine\n- [_ ] 3 employee records inserted\n\n| name | salary |\n|---|---|\n| Ahmed | 500 0  |\n| Sara | 7000 |"
+    errs = v.format_errors(text)
+    assert len(errs) == 2 and "checklist box" in errs[0] and "500 0" in errs[1]
+    assert v.format_errors("- [ ] a\n- [x] b\n| 1 | 5000 |\n```\n- [_ ] inside code is left alone\n```") == []
+
+
+def test_a_query_written_outside_a_code_block_is_still_executed():
+    text = "Query:\nSELECT users.name, orders.amount\nFROM users\nINNER JOIN orders\nON users.user_id = orders.user_id;\n\nResult: two rows."
+    assert v.check_sql(text) == {"blocks": 1, "executed": 1, "errors": []}
+    bad = "Query:\nSELECT name FROM users WHERE COUNT(*) > 1;\n"
+    assert "aggregate" in v.check_sql(bad)["errors"][0]
+
+
+def test_format_slips_reach_the_builder_and_fail_qa_if_left(monkeypatch):
+    broken = _module("| name | salary |\n|---|---|\n| Ahmed | 500 0 |")
+    calls = _fake_model(monkeypatch, broken, broken + "\n\nStill broken.", [])
+    run = orchestrator.create_run(STRONG)
+    run = _to_build_gate(run["id"])
+    assert calls["revise"] >= 1
+    build = [g for g in run["gates"] if g["phase"] == 3][-1]
+    assert build["recommendation"] == "repeat"
+
+
+def test_a_stray_character_in_a_checklist_box_is_repaired():
+    from agents.builder import Builder
+    assert Builder._clean("- [_ ] one\n- [- ] two\n- [ ] three\n- [x] done") == "- [ ] one\n- [ ] two\n- [ ] three\n- [x] done"

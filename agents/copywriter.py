@@ -9,6 +9,7 @@ from __future__ import annotations
 import html
 
 import approval
+from tools.text import wrong_money
 from agents.base import Agent, StepResult, brief_summary, community_places, footer
 
 PAGE_CSS = """body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:720px;margin:40px auto;padding:0 16px;color:#1d2433;line-height:1.55}
@@ -58,6 +59,8 @@ class Copywriter(Agent):
 
     def landing_page(self, candidate: dict, canvas: dict) -> StepResult:
         c = self._copy(candidate, canvas, "landing")
+        # The product does not exist yet: the page offers a place on the list, never a download.
+        c["cta"] = "Join the early-access list"
         run_id = self.run["id"]
         page = f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -126,6 +129,9 @@ class Copywriter(Agent):
             from guardrails import scan_output
             s = scan_output(str(post))
             self.violations += s.violations
+            if price:  # the only dollar amount a launch post may state is the price the pricing rule set
+                for bad in wrong_money(s.text, [price]):
+                    s.text = s.text.replace(bad, f"${price}")
             act = approval.request_action(self.run, "publish", f"launch post: {place}", f"Post in {place}", {"text": s.text}, agent=self.role)
             ids.append(act["id"])
             md += [f"## {place}", "", s.text, "", f"Approval: `{act['id']}` (pending)", ""]

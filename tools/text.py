@@ -19,6 +19,40 @@ collection series app tool tools platform website channel program plan plans che
 made ready-made premium free sell""".split())
 
 
+_MONEY = re.compile(r"\$\s?\d[\d.,\-–]*\d|\$\s?\d")
+_EMAIL = re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+")
+
+
+def money_tokens(text: str) -> list[str]:
+    return [m.group(0) for m in _MONEY.finditer(text or "")]
+
+
+def wrong_money(text: str, allowed: list[float]) -> list[str]:
+    """Dollar amounts in a text that are none of the amounts the code computed (a model garbles or invents prices)."""
+    ok = set()
+    for a in allowed:
+        ok |= {f"${a:.2f}", f"${a:g}", f"${int(a)}" if float(a) == int(a) else f"${a:.2f}"}
+    return [t for t in money_tokens(text) if t.replace(" ", "").rstrip(".,") not in ok]
+
+
+def drop_sentences_with(text: str, needles: list[str]) -> str:
+    """Remove the sentences that contain any of the given strings."""
+    if not needles:
+        return text
+    lines = []
+    for line in (text or "").splitlines():
+        parts = re.split(r"(?<=[.!?])\s+", line)
+        kept = [p for p in parts if not any(n in p for n in needles)]
+        if kept or not line.strip():
+            lines.append(" ".join(kept))
+    return "\n".join(lines)
+
+
+def strip_invented_contacts(text: str, known: str = "") -> str:
+    """Email addresses that are not in the founder's brief are invented: replace them with a neutral phrase."""
+    return _EMAIL.sub(lambda m: m.group(0) if m.group(0).lower() in (known or "").lower() else "the address on your receipt", text or "")
+
+
 def topic_keywords(text: str, n: int = 3) -> list[str]:
     """Keywords about the problem/topic, without format words like 'workbook' or 'newsletter'."""
     return [w for w in keywords(text, 30) if w not in FORMAT_WORDS][:n]

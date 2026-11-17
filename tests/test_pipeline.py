@@ -133,3 +133,31 @@ def test_single_platform_evidence_is_flagged_at_the_gate():
     c = {"title": "X", "relevant_sources": 9, "voices": 9, "pain": 4, "demand_score": 80, "founder_fit": 90, "total": 70, "platforms": 1}
     g = gates.evidence_gate([c])
     assert g.recommendation == "go" and any("one platform" in r for r in g.reasons)
+
+
+def test_only_computed_dollar_amounts_survive():
+    from tools.text import drop_sentences_with, strip_invented_contacts, wrong_money
+    text = "The price is $11.99. We clamp within $5–$4.9. It costs $11.9-9 today."
+    bad = wrong_money(text, [11.99, 15, 5, 49])
+    assert bad == ["$4.9", "$11.9-9"]
+    assert drop_sentences_with(text, bad) == "The price is $11.99."
+    assert wrong_money("Start at $11.99, anchor $15.", [11.99, 15]) == []
+    assert strip_invented_contacts("Write to support@sqlworkbook.com for help.") == "Write to the address on your receipt for help."
+
+
+def test_a_link_whose_text_is_the_url_leaves_one_placeholder():
+    from tools import claims
+    out, report = claims.check("See [https://a.example/x](https://a.example/x) now.", set(), mode="light")
+    assert out == "See (unverified link removed) now." and report["removed_links"] == 1
+
+
+def test_user_guide_has_no_invented_email_or_sources(monkeypatch):
+    import llm
+    from agents.builder import Builder
+    guide = ("## How to use this product\n1. Read it.\n\n## Getting help\nContact support@madeup.com. "
+             "Full refund within 14 days if not used.\n\nSources:\n- https://example.com/x")
+    monkeypatch.setattr(llm, "complete", lambda *a, **k: llm.LLMResult(text=guide, model="fake-model"))
+    run = orchestrator.create_run(STRONG)
+    res = Builder(run).user_guide({"product_name": "X", "format": "PDF", "modules": [{"title": "M1"}]})
+    assert "madeup.com" not in res.content and "Sources" not in res.content and "if not used" not in res.content
+    assert "the address on your receipt" in res.content

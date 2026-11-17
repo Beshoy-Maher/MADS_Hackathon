@@ -37,8 +37,32 @@ _FROM = re.compile(r"\b(?:from|join|update|into)\s+\"?([A-Za-z_]\w*)\"?(?:\s+(?:
 _DENIED = {sqlite3.SQLITE_ATTACH, sqlite3.SQLITE_DETACH, sqlite3.SQLITE_PRAGMA}
 
 
+_ANY_FENCE = re.compile(r"```.*?```", re.DOTALL)
+_BARE_SQL = re.compile(r"^(?:SELECT|WITH)\b[^;`]{10,600};", re.MULTILINE)
+
+
 def sql_blocks(markdown: str) -> list[str]:
-    return [b.strip() for b in _SQL_BLOCK.findall(markdown or "") if b.strip()]
+    """Fenced SQL blocks, plus statements written as plain lines (a query the model forgot to fence is still code)."""
+    text = markdown or ""
+    blocks = [b.strip() for b in _SQL_BLOCK.findall(text) if b.strip()]
+    return blocks + [m.group(0) for m in _BARE_SQL.finditer(_ANY_FENCE.sub("", text))]
+
+
+_CHECKBOX = re.compile(r"^\s*[-*]\s*\[([^\]]*)\]")
+_SPLIT_NUMBER = re.compile(r"\|\s*(\d+ \d+)\s*(?=\|)")
+
+
+def format_errors(markdown: str) -> list[str]:
+    """Slips a reader would trip over, found without a model: a broken checklist box, a number split in two in a table."""
+    out = []
+    for line in _ANY_FENCE.sub("", markdown or "").splitlines():
+        m = _CHECKBOX.match(line)
+        if m and m.group(1) not in (" ", "x", "X"):
+            out.append(f"Broken checklist box, write '- [ ]': `{line.strip()[:80]}`")
+        m = _SPLIT_NUMBER.search(line) if line.lstrip().startswith("|") else None
+        if m:
+            out.append(f"A number in a table looks split in two ('{m.group(1)}'): `{line.strip()[:80]}`")
+    return out[:MAX_ERRORS]
 
 
 def _statements(block: str) -> list[str]:
@@ -148,8 +172,11 @@ class Verifier(Agent):
     def model_errors(self, module: dict, body: str) -> tuple[list[str], str | None, float]:
         """Errors the model found, each grounded in a quote from the module. Returns (errors, model or None, cost)."""
         task = (f"Product for: {self.brief.get('target_market', '')}\nModule: {module.get('title', '')}\n\nMODULE TEXT:\n{body[:4500]}\n\n"
-                "List the factual errors in MODULE TEXT: statements that are wrong, code or formulas that would not run or give a "
-                "different result than the text says, and invented facts (made-up tools, people, statistics, sources).\n"
+                "List the factual errors in MODULE TEXT. Check these four things in order:\n"
+                "1. Each numbered step: is the instruction technically correct? Would a beginner who follows it literally succeed?\n"
+                "2. The worked example: does the code do what the text says, and is the shown result exactly what the code returns for the shown data?\n"
+                "3. Each item under 'Common mistakes': is it really a mistake? If the thing is optional, allowed or correct, the item is an error.\n"
+                "4. Invented facts: made-up tools, people, statistics, sources or web addresses.\n"
                 "Not errors: style, tone, length, missing topics, simplifications, opinions, things you would have written differently.\n"
                 "For each error copy the wrong words exactly from MODULE TEXT into \"quote\" (5-20 words) and say in \"problem\" what "
                 f"is wrong and what is correct. At most {MAX_ERRORS}. If you are not sure something is wrong, leave it out.\n"
@@ -172,6 +199,7 @@ class Verifier(Agent):
     def review(self, index: int, module: dict, body: str, pass_no: int = 1) -> dict:
         errors, model, cost = self.model_errors(module, body)
         sql = check_sql(body)
+        sql["errors"] = (sql["errors"] + format_errors(body))[:MAX_ERRORS]  # both are found by code, not by the model
         review = {"module": index, "title": module.get("title", ""), "pass": pass_no, "errors": errors, "sql_errors": sql["errors"],
                   "sql_blocks": sql["blocks"], "sql_executed": sql["executed"], "model": model}
         found = len(errors) + len(sql["errors"])

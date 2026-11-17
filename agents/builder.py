@@ -6,9 +6,11 @@ worksheets), and a user guide. The QA agent then tests it.
 """
 from __future__ import annotations
 
+import re
+
 import decision_log
 from agents.base import Agent, StepResult, brief_summary, footer, hours_text
-from tools.text import keywords
+from tools.text import keywords, strip_invented_contacts
 
 MAX_MODULES = 4
 
@@ -82,7 +84,9 @@ class Builder(Agent):
     @staticmethod
     def _clean(body: str) -> str:
         # Keep the product's heading structure: drop any top-level heading the model added.
-        return "\n".join(l for l in body.splitlines() if not l.startswith("# ")).strip()
+        body = "\n".join(l for l in body.splitlines() if not l.startswith("# ")).strip()
+        # A small model now and then puts a stray character into a checklist box ("- [_ ]"): put the box back.
+        return re.sub(r"(?m)^(\s*[-*]) ?\[[^\]A-Za-z0-9]{0,3}\]", r"\1 [ ]", body)
 
     def revise(self, index: int, module: dict, body: str, errors: list[str]) -> str:
         """One revision of a module, with the verifier's error list as feedback. Returns the old text if the rewrite is unusable."""
@@ -152,8 +156,13 @@ class Builder(Agent):
         ])
         task = (f"Write the user guide for '{spec['product_name']}' ({spec['format']}). Modules: {[m['title'] for m in spec['modules']]}.\n"
                 "Sections: '## How to use this product' (numbered steps), '## What you need', '## Getting help' (support by email from the "
-                "founder, refunds per the refund policy). Max 220 words. Markdown.")
-        body = self.write(task, fallback, max_tokens=600)
+                "founder at the address on the buyer's receipt, refunds per the refund policy). Max 180 words. Markdown. "
+                "Do not write an email address, a link, a 'Sources' section or refund conditions of your own.")
+        body = self.write(task, fallback, max_tokens=450)
+        # An address or a source list the model made up would be an invented fact in the buyer's hands.
+        body = strip_invented_contacts(body, brief_summary(self.brief))
+        body = re.split(r"(?im)^\s*[*#]*\s*(sources?|references?)\s*[*:]*\s*$", body)[0].rstrip()
+        body = re.sub(r"(?i)\s*(if|when|provided|as long as)\s+(it is |it's |you have |the product is )?(not|un)\s?(been )?(used|opened|downloaded)", "", body)
         if "## Getting help" not in body:
             body += "\n\n## Getting help\n- Email the founder using the address on your receipt.\n- Refunds: see the refund policy."
         md = f"# User guide: {spec['product_name']}\n\n{body}\n{footer(self.model)}"

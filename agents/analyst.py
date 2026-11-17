@@ -23,10 +23,13 @@ class Analyst(Agent):
                               "- One honest post per channel; no paid ads (budget is kept for the product)."])
         task = (f"Founder brief:\n{brief_summary(self.brief)}\nProduct: {candidate['title']}\nChannels found in research: {channels}\n"
                 "Write 3-5 bullets: how the founder can bring real, relevant visitors to the waitlist page in 14 days, without "
-                "spam, paid ads or fake accounts. Markdown bullets only.")
+                "spam, paid ads or fake accounts. One short sentence per bullet. Do not write post titles, links or sources, and do "
+                "not call the product free. Markdown bullets only.")
         plan = self.write(task, fallback, max_tokens=400)
         from tools import claims
         plan, _ = claims.check(plan, self.evidence_urls())
+        # A bullet that still leans on a link the checker removed says nothing the founder can use.
+        plan = "\n".join(l for l in plan.splitlines() if "(unverified link removed)" not in l) or fallback
         signups = waitlist.get("count")
         md = [f"# Phase 2, step 3: Demand test for '{candidate['title']}'", "",
               "## Pre-registered target (set before any data comes in)",

@@ -10,6 +10,8 @@ from __future__ import annotations
 import re
 import statistics
 
+from tools.text import drop_sentences_with, wrong_money
+
 from agents.base import Agent, StepResult, brief_summary, footer
 
 PRICE_RX = re.compile(r"\$\s?(\d{1,3}(?:\.\d{2})?)\b")
@@ -55,6 +57,8 @@ class Pricing(Agent):
                 "and these buyers, and why there are no discounts with fake deadlines. "
                 "Do not change the price. Do not state any number other than the price and the anchor. No income projections.")
         rationale = self.write(task, fallback, max_tokens=300)
+        # The price is a rule, not the model's to restate: a sentence with any other dollar amount is dropped.
+        rationale = drop_sentences_with(rationale, wrong_money(rationale, [price, anchor])) or fallback
         # The next price test is a rule too, fixed before any sales data exists (a small model invents thresholds otherwise).
         lower = max(5, round(price * 0.8)) - (0.01 if price > 6 else 0)
         experiment = (f"After the first 100 real store-page visits, compare purchases per 100 visitors. If fewer than 2 in 100 buy, "

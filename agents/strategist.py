@@ -31,7 +31,9 @@ class Strategist(Agent):
                 f"Evidence scores: demand {score.get('demand_score')}, pay signals {score.get('willingness_to_pay')}, competition {score.get('competition')}.\n"
                 f"Existing solutions: {existing[:4]}\n\n"
                 "Fill a Lean Canvas. Keys: " + ", ".join(BOXES) + ". Each value is a list of 1-3 short strings "
-                "(unique_value_proposition is one string). Mark guesses with 'ASSUMPTION:'. No income promises.")
+                "(unique_value_proposition is one string). Mark guesses with 'ASSUMPTION:'. No income promises. "
+                "revenue_streams is exactly one item: a one-time purchase of the digital product (no subscription, ads or affiliate links). "
+                "channels: only the communities listed in the evidence and the founder's own network.")
         data = self.ask_json(task, fb, max_tokens=900)
         canvas = {k: data.get(k) or fb[k] for k in BOXES}
         complete = all(canvas[k] for k in BOXES)

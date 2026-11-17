@@ -55,7 +55,13 @@ _SPLIT_NUMBER = re.compile(r"\|\s*(\d+ \d+)\s*(?=\|)")
 def format_errors(markdown: str) -> list[str]:
     """Slips a reader would trip over, found without a model: a broken checklist box, a number split in two in a table."""
     out = []
-    for line in _ANY_FENCE.sub("", markdown or "").splitlines():
+    text = _ANY_FENCE.sub("", markdown or "")
+    # The QA tests need numbered steps and a checklist in every module: say so before QA, so the builder can fix it.
+    if not re.search(r"^\s*\d+\.\s", text, re.MULTILINE):
+        out.append("The module has no numbered steps: write the steps as a numbered list (1. 2. 3.), not as checklist items")
+    if "- [ ]" not in text and "checklist" not in text.lower():
+        out.append("The module has no checklist: add one with '- [ ]' items")
+    for line in text.splitlines():
         m = _CHECKBOX.match(line)
         if m and m.group(1) not in (" ", "x", "X"):
             out.append(f"Broken checklist box, write '- [ ]': `{line.strip()[:80]}`")

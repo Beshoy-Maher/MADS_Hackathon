@@ -190,3 +190,21 @@ def test_unsourced_generalisations_in_pricing_text_are_labelled():
     from tools import claims
     out, _ = claims.check("Data tools are often costly for students in the region. The price is $11.99.", set(), mode="light")
     assert "ASSUMPTION (unverified): Data tools are often costly" in out and "The price is $11.99." in out
+
+
+def test_verifier_reports_a_module_without_numbered_steps():
+    from agents.verifier import format_errors
+    body = "Intro.\n\n- [ ] Read the question twice\n- [ ] Write the query\n\nCommon mistakes: none."
+    assert any("no numbered steps" in e for e in format_errors(body))
+    assert not any("numbered" in e for e in format_errors("Intro.\n\n1. Read it\n2. Write it\n\n- [ ] Done"))
+
+
+def test_builder_numbers_its_own_steps_as_a_last_resort():
+    from agents.builder import Builder
+    run = orchestrator.create_run(STRONG)
+    body = "Intro text.\n\n- [ ] Read the question twice\n- [ ] Write the query\n- [ ] Check NULLs\n\nCommon mistakes: none."
+    out = Builder(run)._ensure_steps(4, body)
+    assert "1. Read the question twice" in out and "3. Check NULLs" in out
+    assert "- [ ] Read the question twice" in out  # the checklist stays
+    assert Builder(run)._ensure_steps(4, "1. One\n2. Two\n- [ ] Done") == "1. One\n2. Two\n- [ ] Done"
+    assert any(e["action"] == "repair_module_format" for e in decision_log.read(run_id=run["id"]))

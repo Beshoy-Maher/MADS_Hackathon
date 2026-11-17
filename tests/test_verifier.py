@@ -199,10 +199,10 @@ def test_qa_fails_when_a_module_was_never_reviewed():
 
 # ------------------------------------------------- format slips and unfenced SQL
 def test_broken_checkbox_and_split_number_are_reported():
-    text = "- [ ] fine\n- [_ ] 3 employee records inserted\n\n| name | salary |\n|---|---|\n| Ahmed | 500 0  |\n| Sara | 7000 |"
+    text = "1. Step one\n\n- [ ] fine\n- [_ ] 3 employee records inserted\n\n| name | salary |\n|---|---|\n| Ahmed | 500 0  |\n| Sara | 7000 |"
     errs = v.format_errors(text)
     assert len(errs) == 2 and "checklist box" in errs[0] and "500 0" in errs[1]
-    assert v.format_errors("- [ ] a\n- [x] b\n| 1 | 5000 |\n```\n- [_ ] inside code is left alone\n```") == []
+    assert v.format_errors("1. Step\n- [ ] a\n- [x] b\n| 1 | 5000 |\n```\n- [_ ] inside code is left alone\n```") == []
 
 
 def test_a_query_written_outside_a_code_block_is_still_executed():

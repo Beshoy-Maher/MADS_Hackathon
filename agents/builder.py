@@ -88,6 +88,23 @@ class Builder(Agent):
         # A small model now and then puts a stray character into a checklist box ("- [_ ]"): put the box back.
         return re.sub(r"(?m)^(\s*[-*]) ?\[[^\]A-Za-z0-9]{0,3}\]", r"\1 [ ]", body)
 
+    def _ensure_steps(self, index: int, body: str) -> str:
+        """Last resort, after the model's own revision: if a module still has no numbered list, number its own steps.
+
+        The step lines are the model's text, copied in order from its checklist or bullet list; nothing is added or
+        reworded, and the checklist stays. The repair is logged.
+        """
+        if re.search(r"^\s*\d+\.\s", body, re.MULTILINE):
+            return body
+        items = re.findall(r"(?m)^\s*[-*]\s+\[[ xX]\]\s+(.+)$", body) or re.findall(r"(?m)^\s*[-*]\s+(?!\[)(.+)$", body)
+        if len(items) < 2:
+            return body
+        steps = "**Steps**\n\n" + "\n".join(f"{n}. {t.strip()}" for n, t in enumerate(items[:6], 1)) + "\n"
+        first = re.search(r"(?m)^\s*[-*]\s+", body)
+        decision_log.log("builder", "repair_module_format", run_id=self.run["id"], model=None, cost=0, step="phase3_step2_product.md",
+                         outcome="repaired", detail=f"module {index}: no numbered list; its own {min(len(items), 6)} list items were numbered (text unchanged)")
+        return body[:first.start()] + steps + "\n" + body[first.start():]
+
     def revise(self, index: int, module: dict, body: str, errors: list[str]) -> str:
         """One revision of a module, with the verifier's error list as feedback. Returns the old text if the rewrite is unusable."""
         task = (f"Module {index}: {module['title']} - goal: {module.get('goal', '')}\n\nYOUR DRAFT:\n{body}\n\n"
@@ -134,6 +151,7 @@ class Builder(Agent):
                         if on_progress:
                             on_progress(f"verifier: checking the revised module {i} of {total}")
                         reviews.append(verifier.review(i, m, body, 2))
+            body = self._ensure_steps(i, body)
             parts += [f"## Module {i}: {m['title']}", "", body, ""]
         parts += ["## A note on results", "",
                   "This product gives you a method and templates. Your results depend on your situation and effort; nothing here is a promise of any outcome."]

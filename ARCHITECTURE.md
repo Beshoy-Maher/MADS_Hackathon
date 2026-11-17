@@ -4,6 +4,8 @@
 
 Venture Builder is a pipeline of small, role-named agents run by one orchestrator. A founder brief goes in; six phases run one at a time; after each phase a gate measures the results against thresholds fixed in code **before** the data arrives and recommends **go, repeat, pivot or stop**. The run then pauses until the founder decides. Models only write text (ideas, copy, product content). Every decision that matters (scores, gates, tests, prices, payments, approvals) is deterministic code, so it is reproducible and can't be talked into a different answer. Before each gate, a critic agent **debates** the phase's main outputs with the agents that wrote them; the founder sees what was conceded and what is still open, and the recommendation stays with the code. Each kind of work (writer, fast intake, safety judge, critic) has its own model setting. The default is the local Qwen3-4B model for all of them, so it runs on any laptop; `models-large.env` switches the writer to a 30B mixture-of-experts model and the critic to gpt-oss-20b, a different model family. Guardrails screen the brief, every free-text request and every generated text. Every action is appended to the decision log.
 
+These choices follow published research on multi-agent systems, LLM judges and startup evaluation (MetaGPT, ChatDev, multi-agent debate, LLM-as-a-judge bias, MAST, DIALECTIC, SSFF, Synthetic Founders). [docs/research-basis.md](docs/research-basis.md) maps each choice to its paper and to the file that builds it, and lists what we do not do yet.
+
 ```mermaid
 flowchart TD
     B["Founder brief, JSON or free text"] --> IN["intake.py: brief to fields, missing fields stay missing"]

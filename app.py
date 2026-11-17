@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import threading
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import Body, FastAPI, Form, Header, HTTPException
@@ -23,7 +24,14 @@ import llm
 import orchestrator
 from agents.base import GLOBAL_RULES, load_prompt
 
-app = FastAPI(title="Venture Builder", version="1.0.0")
+@asynccontextmanager
+async def _lifespan(_: FastAPI):
+    # In the background: the dashboard is usable at once, and the model is in memory before the first brief.
+    threading.Thread(target=llm.warm_up, daemon=True).start()
+    yield
+
+
+app = FastAPI(title="Venture Builder", version="1.0.0", lifespan=_lifespan)
 STATIC = config.ROOT / "static"
 BRIEFS = config.ROOT / "briefs"
 

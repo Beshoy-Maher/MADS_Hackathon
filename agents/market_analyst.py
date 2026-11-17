@@ -38,8 +38,8 @@ class MarketAnalyst(Agent):
                 "Write three short Markdown sections: '## Ideal customer profile' (who, situation, trigger moment, what they "
                 "tried), '## What they use today' (existing solutions and their gaps), '## Market size' (only a sourced number "
                 "or the word ASSUMPTION with a way to measure it). Cite claims with the URLs above in [text](url) form, "
-                "otherwise write ASSUMPTION. Max 250 words.")
-        body = self.write(task, fallback, max_tokens=700)
+                "otherwise write ASSUMPTION. Max 150 words in total: short bullets, no introduction.")
+        body = self.write(task, fallback, max_tokens=420)
         md = [f"# Phase 1, step 3: Market definition for '{candidate['title']}'", "", body, "",
               "## Where these people talk (from the evidence)", ""]
         md += [f"- {name}: {n} relevant item(s)" for name, n in communities.most_common(8)] or ["- No communities found (ASSUMPTION)."]

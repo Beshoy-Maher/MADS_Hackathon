@@ -31,11 +31,12 @@ class Interviewer(Agent):
             "Is there anyone else I should talk to about this?",
         ], 1))
         task = (f"Founder brief:\n{brief_summary(self.brief)}\nProduct idea: {candidate['title']}\nProblem: {candidate.get('problem', '')}\n\n"
-                "Write a Mom Test interview guide: 7 numbered questions about the person's past behaviour with this problem "
-                "(no hypothetical 'would you buy' questions, no pitching). Then 'What counts as a strong signal' with 3 bullets. Markdown, max 220 words.")
+                "Write a Mom Test interview guide: 6 numbered questions about the person's past behaviour with this problem, one short "
+                "sentence each (no hypothetical 'would you buy' questions, no pitching). Then 'What counts as a strong signal' with "
+                "3 short bullets. Markdown, max 140 words, no introduction.")
         guide = self.write(task, fallback_questions + "\n\nWhat counts as a strong signal:\n- They already spent money or hours on a workaround.\n"
                                                       "- They ask when they can get it, unprompted.\n- They offer an intro to someone else with the problem.",
-                           max_tokens=600)
+                           max_tokens=400)
         name = self.brief.get("founder_name", "the founder")
         outreach = (f"Hi! I'm {name}. I'm researching how {self.brief.get('target_market', 'people')} deal with "
                     f"{candidate.get('problem', 'this problem').rstrip('.').lower()}. I'm not selling anything. "

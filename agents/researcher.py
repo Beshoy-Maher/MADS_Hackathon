@@ -47,9 +47,10 @@ class Researcher(Agent):
                 "2) Propose 2 alternative digital products that fit this founder's skills, time, budget and values better or "
                 "serve the same people differently. No physical goods, finance/crypto, health or legal advice.\n"
                 "For each, give 1-2 short web search queries (2-4 words each) that would find people discussing the PROBLEM.\n"
+                "Keep it short: title at most 14 words, problem one sentence of at most 20 words, format at most 6 words.\n"
                 'JSON shape: {"candidates": [{"title": "...", "problem": "...", "format": "...", "queries": ["...", "..."]}]} '
                 "with the sharpened founder idea first.")
-        data = self.ask_json(task, fb)
+        data = self.ask_json(task, fb, max_tokens=600)
         cands = data.get("candidates") if isinstance(data.get("candidates"), list) else fb["candidates"]
         clean = []
         for c in cands[:3]:

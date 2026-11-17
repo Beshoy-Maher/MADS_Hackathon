@@ -61,9 +61,9 @@ class Scorer(Agent):
         task = (f"Founder brief:\n{brief_summary(self.brief)}\n\nCandidates:\n" +
                 "\n".join(f"{i}. {c['title']} - {c.get('problem', '')}" for i, c in enumerate(candidates)) +
                 "\n\nFor each candidate, rate from 0.0 to 1.0 how well the founder's CURRENT skills let them build it "
-                "without hiring anyone, and give a one-sentence reason. "
+                "without hiring anyone, and give one reason of at most 18 words. "
                 'JSON: {"skill_match": [numbers in candidate order], "rationale": ["...", ...]}')
-        data = self.ask_json(task, fb)
+        data = self.ask_json(task, fb, max_tokens=300)
         llm_match = data.get("skill_match") if isinstance(data.get("skill_match"), list) else fb["skill_match"]
         rationale = data.get("rationale") if isinstance(data.get("rationale"), list) else fb["rationale"]
         scores = []

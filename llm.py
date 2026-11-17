@@ -98,6 +98,28 @@ def model_status(force: bool = False) -> dict:
     return status
 
 
+def warm_up(wait_seconds: int = 900) -> bool:
+    """Load the local model into memory so the founder's first step does not pay for it.
+
+    Waits until the model has been downloaded, then sends a one-token request. Not counted in STATS: no agent did any work.
+    """
+    if config.LLM_PROVIDER != "ollama":
+        return False
+    deadline = time.time() + wait_seconds
+    while time.time() < deadline:
+        st = model_status(force=True)
+        if st["ready"]:
+            try:
+                httpx.post(f"{config.LLM_BASE_URL}/api/chat", timeout=config.LLM_TIMEOUT_SECONDS, json={
+                    "model": st["model"], "messages": [{"role": "user", "content": "ok"}], "stream": False, "think": False,
+                    "keep_alive": "60m", "options": {"num_predict": 1, "num_ctx": 8192}})
+                return True
+            except Exception:
+                return False
+        time.sleep(5)
+    return False
+
+
 def _cost(prompt_tokens: int, completion_tokens: int) -> float:
     return round((prompt_tokens + completion_tokens) / 1_000_000 * config.LLM_COST_PER_MTOK, 6)
 
@@ -119,6 +141,7 @@ def complete(system: str, user: str, fallback: str, *, json_mode: bool = False, 
                 "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
                 "stream": False,
                 "think": False,
+                "keep_alive": "60m",  # keep the model in memory between steps; reloading it costs many seconds
                 "options": {"temperature": temp, "num_predict": max_tokens, "num_ctx": 8192},
             }
             if json_mode:

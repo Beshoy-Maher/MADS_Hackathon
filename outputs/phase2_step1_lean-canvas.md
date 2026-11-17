@@ -1,44 +1,44 @@
 # Phase 2, step 1: Lean Canvas for 'SQL Interview Prep Workbook for Junior Analysts'
 
 ## Problem
-- ASSUMPTION: Junior data analysts in Egypt and the MENA region may face challenges finding affordable, practical SQL interview prep with real, worked answers.
-- ASSUMPTION: Existing SQL interview resources may not consistently provide complete explanations or be tailored to entry-level candidates.
+- ASSUMPTION: Junior data analysts in Egypt may face challenges accessing tailored SQL interview practice.
+- Existing resources are often incomplete, lack context, or are not tailored to beginner-level candidates.
 
 ## Customer Segments
-- Aspiring data analysts in Egypt and the MENA region
-- Junior data analysts preparing for their first job
-- Students learning data analysis with limited budgets
+- Aspiring data analysts in Egypt
+- Junior data analysts in the MENA region seeking their first job
+- Self-taught data analysts preparing for technical interviews
 
 ## Unique Value Proposition
-A practical, affordable SQL interview workbook with real worked answers, designed specifically for junior analysts in the MENA region.
+A practical, affordable SQL interview workbook with real-world problem-solving walkthroughs designed specifically for junior analysts in Egypt and the MENA region.
 
 ## Solution
-- A digital workbook with 50+ SQL interview questions, each with step-by-step solutions and explanations.
-- ASSUMPTION: The workbook may include real-world scenarios relevant to entry-level roles in the MENA region.
-- Designed for self-paced evening study, with clear, concise language and no fluff.
+- A digital workbook with 30+ SQL interview questions, each with a worked answer and explanation.
+- Focus on common interview patterns seen in local and regional tech companies.
+- Written in plain language with beginner-friendly examples and real data scenarios.
 
 ## Channels
-- Reddit communities (e.g., r/dataanalysis, r/learnprogramming, r/Egypt)
-- LinkedIn groups for data analysts in the MENA region
-- Founder's personal network (colleagues, past mentees, online communities)
+- LinkedIn groups for Egyptian data professionals
+- Reddit communities (e.g., r/dataanalysis, r/learnprogramming)
+- Founder's personal network and mentorship circles
 
 ## Revenue Streams
 - One-time purchase of the digital workbook
 
 ## Cost Structure
-- Minimal: time spent writing and editing (within 10 hrs/week)
-- Small: low-cost tools (e.g., Canva, Google Docs, PDF converter)
-- ASSUMPTION: No significant hosting or platform fees, as it's a static digital product
+- Minimal: time spent writing and editing (10 hrs/week, within budget)
+- Tooling: free or low-cost (e.g., Canva, Google Docs, GitHub Pages)
+- ASSUMPTION: No significant marketing or platform fees required
 
 ## Key Metrics
-- Number of workbook downloads/sales
-- User feedback (e.g., via short survey in the workbook)
-- Time to complete first 10 questions (as proxy for usability)
+- Number of workbooks sold per month
+- Customer feedback on clarity and relevance of solutions
+- Repeat engagement from users in mentorship circles
 
 ## Unfair Advantage
-- Founder’s real-world experience mentoring junior analysts in Egypt
-- Deep understanding of local job market expectations and interview patterns
-- ASSUMPTION: Personal network in the MENA data community gives early access to feedback and distribution
+- ASSUMPTION: The founder has experience supporting junior analysts in Egypt.
+- Deep understanding of local interview expectations and common pitfalls
+- ASSUMPTION: Strong trust within local data analyst communities
 
 Riskiest assumption to test next: that enough of the target customers will leave their email for this product (tested in step 2 and 3 with a landing page).
 

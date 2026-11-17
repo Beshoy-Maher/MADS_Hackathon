@@ -157,7 +157,8 @@ class Builder(Agent):
                   "This product gives you a method and templates. Your results depend on your situation and effort; nothing here is a promise of any outcome."]
         content = "\n".join(parts)
         return self.result("product", "build_product", content,
-                           data={"modules": [m["title"] for m in spec["modules"]], "reviews": reviews if verifier is not None else None})
+                           data={"modules": [m["title"] for m in spec["modules"]], "reviews": reviews if verifier is not None else None},
+                           buyer_facing=True)
 
     def user_guide(self, spec: dict) -> StepResult:
         fallback = "\n".join([
@@ -184,4 +185,4 @@ class Builder(Agent):
         if "## Getting help" not in body:
             body += "\n\n## Getting help\n- Email the founder using the address on your receipt.\n- Refunds: see the refund policy."
         md = f"# User guide: {spec['product_name']}\n\n{body}\n{footer(self.model)}"
-        return self.result("user-guide", "write_user_docs", md)
+        return self.result("user-guide", "write_user_docs", md, buyer_facing=True)

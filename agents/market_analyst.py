@@ -3,7 +3,31 @@ from __future__ import annotations
 
 from collections import Counter
 
+import re
+
 from agents.base import Agent, StepResult, brief_summary, footer
+from tools import evidence_view
+
+
+def label_customer_line(body: str, items: list[dict]) -> str:
+    """The first line of '## Ideal customer profile' (the 'who') is labelled ASSUMPTION unless a fetched item supports it.
+    Display only."""
+    lines = body.splitlines()
+    in_icp = False
+    for i, line in enumerate(lines):
+        if line.strip().lower().startswith("#"):
+            in_icp = "ideal customer" in line.lower()
+            continue
+        if in_icp and line.strip():
+            m = re.match(r"^(\s*(?:[-*]|\d+\.)?\s*(?:\*\*)?(?:who|customer|ideal customer)?\s*(?:\*\*)?\s*:?\s*(?:\*\*)?\s*)(.*)$",
+                         line, re.IGNORECASE)
+            lead, rest = m.group(1), m.group(2)
+            if "ASSUMPTION" not in rest:
+                item, why = evidence_view.support(rest, items)
+                if item is None:
+                    lines[i] = f"{lead}ASSUMPTION ({why}): {rest}"
+            break
+    return "\n".join(lines)
 
 
 class MarketAnalyst(Agent):
@@ -41,6 +65,7 @@ class MarketAnalyst(Agent):
                 "otherwise write ASSUMPTION. Only say what a cited source shows; do not generalise from one item to 'most people'. "
                 "The brief's constraints describe the founder, not the customer. Max 150 words in total: short bullets, no introduction.")
         body = self.write(task, fallback, max_tokens=420)
+        body = label_customer_line(body, ev)
         md = [f"# Phase 1, step 3: Market definition for '{candidate['title']}'", "", body, "",
               "## Where these people talk (from the evidence)", ""]
         md += [f"- {name}: {n} relevant item(s)" for name, n in communities.most_common(8)] or ["- No communities found (ASSUMPTION)."]

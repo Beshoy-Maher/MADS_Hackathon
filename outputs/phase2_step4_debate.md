@@ -3,41 +3,29 @@
 Debated: `phase2_step1_lean-canvas.md`, `phase2_step3_demand-test.md`. Critic (devil's advocate): `gpt-oss:20b` configured; models that took part: `gpt-oss:20b`, `qwen3:30b-a3b-instruct-2507-q4_K_M`.
 The critic quotes the words it disputes (quotes not found in the document are dropped by code). The author concedes with replacement text or defends with a fetched source. A conceded replacement is written into the document only if the quote is found exactly once, it is at most about 3 times as long, and the guardrail scan and claim check leave it unchanged; code-computed lines are never changed. A defence without a fetched source stays open.
 
-**Result: 3 objection(s): 3 fixed, 0 conceded not applied, 0 defended, 0 open.** The debate informs the founder; it does not change the gate's recommendation.
+**Result: 2 objection(s): 2 fixed, 0 conceded not applied, 0 defended, 0 open.** The debate informs the founder; it does not change the gate's recommendation.
 
 ## #1 [medium] FIXED: `phase2_step1_lean-canvas.md`
 
-> Junior data analysts in Egypt and the MENA region lack affordable, practical SQL interview prep with real, worked answers.
+> Junior data analysts in Egypt lack access to realistic SQL interview practice with clear, step-by-step explanations.
 
-**Critic:** The statement claims a lack of affordable, practical SQL interview prep resources in the target market, but no evidence from the fetched URLs supports this assertion. (evidence: ASSUMPTION)
+**Critic:** The statement claims a specific market gap but is not supported by any of the fetched evidence URLs, which only list generic SQL interview resources and do not provide data on Egyptian junior analysts’ access to such practice. (evidence: ASSUMPTION)
 
-**Author (strategist), concede:** The claim about a lack of affordable, practical SQL interview prep resources in the target market is not supported by the evidence. The available resources include multiple GitHub repositories with SQL interview practice, some with worked solutions and explanations.
+**Author (strategist), concede:** The claim about junior data analysts in Egypt lacking access to realistic SQL interview practice is not supported by the evidence URLs, which only list generic resources without regional specificity.
 
-Correction written into `phase2_step1_lean-canvas.md`: ASSUMPTION: Junior data analysts in Egypt and the MENA region may face challenges finding affordable, practical SQL interview prep with real, worked answers.
-
-**Verdict:** correction written into the document
-
-## #2 [medium] FIXED: `phase2_step1_lean-canvas.md`
-
-> Existing resources are often incomplete, lack explanations, or are not tailored to entry-level candidates.
-
-**Critic:** This claim about the shortcomings of current resources is unsupported by any of the provided evidence. (evidence: ASSUMPTION)
-
-**Author (strategist), concede:** The claim that existing resources are often incomplete, lack explanations, or are not tailored to entry-level candidates is not directly supported by the evidence. While some repositories contain solutions, the quality and completeness vary, and no data confirms widespread shortcomings.
-
-Correction written into `phase2_step1_lean-canvas.md`: ASSUMPTION: Existing SQL interview resources may not consistently provide complete explanations or be tailored to entry-level candidates.
+Correction written into `phase2_step1_lean-canvas.md`: ASSUMPTION: Junior data analysts in Egypt may face challenges accessing tailored SQL interview practice.
 
 **Verdict:** correction written into the document
 
-## #3 [medium] FIXED: `phase2_step1_lean-canvas.md`
+## #2 [low] FIXED: `phase2_step1_lean-canvas.md`
 
-> Focus on real-world scenarios relevant to entry-level roles in Egypt and the wider MENA region.
+> Founder’s firsthand experience mentoring junior analysts in Egypt
 
-**Critic:** The assertion that the workbook will focus on real-world scenarios specific to the region is not backed by any evidence. (evidence: ASSUMPTION)
+**Critic:** This is a claim about the founder’s background that is not corroborated by any evidence in the provided URLs or documents. (evidence: ASSUMPTION)
 
-**Author (strategist), concede:** The assertion that the workbook will focus on real-world scenarios specific to the region is not supported by any of the provided evidence, which includes generic SQL practice repositories without regional context.
+**Author (strategist), concede:** The claim about the founder’s firsthand experience mentoring junior analysts in Egypt is not corroborated by any of the provided evidence URLs.
 
-Correction written into `phase2_step1_lean-canvas.md`: ASSUMPTION: The workbook may include real-world scenarios relevant to entry-level roles in the MENA region.
+Correction written into `phase2_step1_lean-canvas.md`: ASSUMPTION: The founder has experience supporting junior analysts in Egypt.
 
 **Verdict:** correction written into the document
 

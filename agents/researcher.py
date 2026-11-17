@@ -6,7 +6,8 @@ GitHub and Stack Exchange. Every item keeps its URL.
 """
 from __future__ import annotations
 
-from agents.base import Agent, StepResult, brief_summary, bullet_sources, footer
+from agents.base import Agent, StepResult, brief_summary, footer
+from tools import evidence_view
 from tools import sources as src
 from tools.text import keywords, short_market, short_query, topic_keywords
 
@@ -29,6 +30,12 @@ def fallback_candidates(brief: dict) -> list[dict]:
          "problem": f"{market} want practical {top_skill} skills for their work.", "format": "self-paced toolkit",
          "queries": [" ".join(topic_keywords(top_skill, 2) + ["beginners"])]},
     ]
+
+
+def evidence_sections_or_none(items: list[dict]) -> list[str]:
+    if not items:
+        return ["- No sources found. Every market statement below is an ASSUMPTION.", ""]
+    return evidence_view.evidence_sections(items, limit=8)
 
 
 class Researcher(Agent):
@@ -102,14 +109,16 @@ class Researcher(Agent):
         md = [f"# Phase 1, step 1: Opportunities for {self.brief.get('founder_name', 'the founder')}", "",
               f"**Starting idea (founder's words):** {self.brief.get('idea', '')}", "",
               "The researcher sharpened the idea, proposed alternatives that fit the founder, and searched public "
-              "discussions for evidence that people have this problem. Every item below links to its source.", ""]
+              "discussions for evidence that people have this problem. Every item below links to its source and shows its date. "
+              "A problem statement no fetched post supports is labelled ASSUMPTION.", ""]
         for i, c in enumerate(cands):
             label = "Sharpened founder idea" if i == 0 else f"Alternative {i}"
-            md += [f"## {label}: {c['title']}", "", f"- Problem: {c['problem'] or 'ASSUMPTION: not stated'}",
+            # Display only: the label and the split never change the candidate, its scores or the gate.
+            md += [f"## {label}: {c['title']}", "", f"- Problem: {evidence_view.labelled(c['problem'], c['evidence'])}",
                    f"- Format: {c['format'] or 'ASSUMPTION: not stated'}",
                    f"- Search queries: {', '.join(c['queries'])}",
-                   f"- Relevant items found: {len(c['evidence'])} (of {c['raw_found']} results)", "", "Evidence:",
-                   bullet_sources(c["evidence"]), ""]
+                   f"- Relevant items found: {len(c['evidence'])} (of {c['raw_found']} results)", ""]
+            md += evidence_sections_or_none(c["evidence"])
         md += ["## Source coverage", ""]
         for name, r in reports[0].items():
             status = f"{r['ok']} queries ok" + (f", error: {r['error']}" if r["error"] else "")

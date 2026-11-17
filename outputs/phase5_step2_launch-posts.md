@@ -1,18 +1,12 @@
 # Phase 5, step 2: Launch posts (drafts)
 
-Each post is written for the founder to publish under their own name, after reading the community's rules. Nothing is posted by the system: each post is an approval-gated action, and posting is STUBBED.
+Each post is written for one community, for the founder to publish under their own name after reading that community's rules. Nothing is posted by the system: each post is an approval-gated action, and posting is STUBBED.
 
-## GitHub Discussions of related open-source projects
+## Hacker News (Show HN)
 
-Hi all, I'm Mariam. I made SQL Interview Prep Workbook for Junior Analysts because junior data analysts in egypt struggle to find affordable, practical sql interview practice with real answers. It's a small digital product. I'd value honest feedback on whether it's useful. Link in comments if the rules allow it.
+Show HN: I made a SQL interview prep workbook for junior data analysts, based on my own experience with technical interviews and the challenges I’ve seen new candidates face. It includes real SQL questions I’ve seen in actual interviews, with step-by-step worked answers that show how to think through each problem. I wrote it to be practical and honest—no fluff, just clear explanations. I’m sharing it at $11.99 because I want it to be affordable for students. I’d appreciate feedback on the structure and clarity of the explanations—especially whether the reasoning in the answers feels accessible to someone just starting out.
 
-Approval: `act_0e0f51cb` (pending)
-
-## Hacker News (Show HN / Ask HN)
-
-Hi all, I'm Mariam. I made SQL Interview Prep Workbook for Junior Analysts because junior data analysts in egypt struggle to find affordable, practical sql interview practice with real answers. It's a small digital product. I'd value honest feedback on whether it's useful. Link in comments if the rules allow it.
-
-Approval: `act_93e06f78` (pending)
+Approval: `act_5cc732c2` (pending)
 
 
 ---

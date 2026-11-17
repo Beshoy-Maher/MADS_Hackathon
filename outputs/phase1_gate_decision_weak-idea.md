@@ -11,19 +11,20 @@ Reasons:
 
 | Check | Passed | Value | Threshold |
 |---|---|---|---|
-| relevant_sources | yes | 11 | 5 |
-| independent_voices | yes | 11 | 4 |
+| relevant_sources | yes | 8 | 5 |
+| independent_voices | yes | 8 | 4 |
 | pain_signals | NO | 1 | 2 |
-| demand_score | NO | 19.0 | 40 |
+| demand_score | NO | 18.6 | 40 |
 | founder_fit | NO | 25.5 | 50 |
-| total_score | NO | 34.0 | 50 |
+| total_score | NO | 30.1 | 50 |
 | allowed_product | yes | ok | not excluded |
 
 Gate type: evidence. Allowed outcomes: go, repeat, pivot, stop. Thresholds are fixed in `gates.py` before the data is seen.
 
-Debate before this gate (`phase1_step6_debate.md`): 1 objection(s): 1 fixed, 0 conceded not applied, 0 defended, 0 open (0 open with high severity). Fixed corrections were written into the documents before this gate was shown. It informs this decision; it does not change the recommendation.
+Debate before this gate (`phase1_step6_debate.md`): 1 objection(s): 0 fixed, 1 conceded not applied, 0 defended, 0 open (0 open with high severity). Fixed corrections were written into the documents before this gate was shown. It informs this decision; it does not change the recommendation.
+- CONCEDED, NOT APPLIED [medium] Unsupported claim; no fetched evidence supports the market size estimate.
 
-**Founder decision: STOP** at 2026-11-17T16:11:40Z.
+**Founder decision: STOP** at 2026-11-17T17:54:09Z.
 
 ---
 Gate logic is deterministic code (no model). Cost: $0.00.

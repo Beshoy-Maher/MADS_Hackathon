@@ -7,27 +7,27 @@
 - Compliments and 'sounds great' are not evidence. Commitments (time, money, intro) are.
 
 ## Interview guide
-1. Tell me about the last time you felt stuck or unmotivated during a long coding session.
-2. What did you do when you noticed your energy or focus slipping?
-3. How have you tried to stay motivated during tough development sprints?
-4. What tools, habits, or rituals have you used to keep going when coding felt draining?
-5. How much time or money have you spent on things meant to boost your motivation?
-6. What’s one thing you’ve kept doing, even when it didn’t seem to help much?
+1. Tell me about the last time you felt mentally drained during a coding session.
+2. What did you do when you noticed your motivation slipping during a long workday?
+3. How have you tried to recharge your energy during stressful development deadlines?
+4. What kinds of short breaks or quick mood boosts have you actually used in the past?
+5. How much time or money have you spent on tools, apps, or content to stay motivated?
+6. What’s one thing you’ve kept using over time to help you stay positive at work?
 
 **What counts as a strong signal:**
-- They describe a specific past behavior (e.g., “I’d take 10-minute walks”)
-- They mention spending time or money on motivation tools
-- They reference a habit they’ve repeated, even if ineffective
+- Used a daily email or notification for motivation
+- Paid for a subscription or tool to stay positive
+- Referred someone to a motivational resource
 
 ## Who to interview
-- 5 to 8 people from: GitHub Discussions of related open-source projects, Hacker News (Show HN / Ask HN).
+- 5 to 8 people from: Hacker News.
 - Recruit only people who opted in. No scraping, no mass messages.
 
 ## Outreach draft (written for the founder to send as themselves)
 
-> Hi! I'm Karim. I'm talking to people about one problem I keep hearing about: "Software developers struggle to stay motivated during long coding sessions." If that sounds familiar, could I ask you about your own experience in a 15-minute call? I'm not selling anything. Thank you either way.
+> Hi! I'm Karim. I'm talking to people about one problem I keep hearing about: "Developers feel burnt out and need quick positivity breaks." If that sounds familiar, could I ask you about your own experience in a 15-minute call? I'm not selling anything. Thank you either way.
 
-Status: waiting for founder approval (action `act_b800a98b`). Sending is STUBBED: after approval the message is saved to the outbox and the founder sends it personally.
+Status: waiting for founder approval (action `act_ca809d01`). Sending is STUBBED: after approval the message is saved to the outbox and the founder sends it personally.
 
 ## Interview results
 

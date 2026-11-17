@@ -15,10 +15,9 @@ Reasons:
 
 Gate type: evidence. Allowed outcomes: go, repeat, pivot, stop. Thresholds are fixed in `gates.py` before the data is seen.
 
-Debate before this gate (`phase6_step4_debate.md`): 3 objection(s): 2 fixed, 0 conceded not applied, 0 defended, 1 open (0 open with high severity). Fixed corrections were written into the documents before this gate was shown. It informs this decision; it does not change the recommendation.
-- OPEN [low] While the statement may be true, it is not supported by any evidence in the fetched list; the claim is presented as fact without documentation.
+Debate before this gate (`phase6_step4_debate.md`): 0 objection(s): 0 fixed, 0 conceded not applied, 0 defended, 0 open (0 open with high severity). Fixed corrections were written into the documents before this gate was shown. It informs this decision; it does not change the recommendation.
 
-**Founder decision: REPEAT** at 2026-11-17T16:16:03Z. Note: Keep operating; review after 14 days of real sales data.
+**Founder decision: REPEAT** at 2026-11-17T17:58:32Z. Note: Keep operating; review after 14 days of real sales data.
 
 ---
 Gate logic is deterministic code (no model). Cost: $0.00.

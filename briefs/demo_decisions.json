@@ -1,13 +1,21 @@
 {
-  "weak_founder": [
-    {"decision": "accept", "default_action": "reject", "action_note": "Not contacting anyone: the evidence says stop."}
-  ],
-  "strong_founder": [
-    {"decision": "accept", "default_action": "approve"},
-    {"decision": "go", "default_action": "approve", "note": "Founder override: build the MVP in parallel with the waitlist test, accepting the risk; re-check demand before launch."},
-    {"decision": "accept", "default_action": "approve"},
-    {"decision": "accept", "default_action": "approve"},
-    {"decision": "accept", "default_action": "approve", "actions": {"launch post: hackernews": "reject"}, "action_note": "Reviewed by founder."},
-    {"decision": "accept", "default_action": "approve", "note_if_accepted": "Keep operating; review after 14 days of real sales data."}
-  ]
+  "weak_founder": {
+    "1": {"decision": "accept", "default_action": "reject", "action_note": "Not contacting anyone: the evidence says stop."}
+  },
+  "strong_founder": {
+    "1": {"decision": "accept", "default_action": "approve"},
+    "2": {"decision": "go", "default_action": "approve", "note": "Founder override: build the MVP in parallel with the waitlist test, accepting the risk; re-check demand before launch."},
+    "3": {"decision": "accept", "default_action": "approve"},
+    "4": {"decision": "accept", "default_action": "approve"},
+    "5": {"decision": "accept", "default_action": "approve", "actions": {"launch post: hackernews": "reject"}, "action_note": "Reviewed by founder."},
+    "6": {"decision": "accept", "default_action": "approve", "note_if_accepted": "Keep operating; review after 14 days of real sales data."}
+  },
+  "designer_founder": {
+    "1": {"decision": "accept", "default_action": "approve", "action_note": "Reviewed by founder."},
+    "2": {"decision": "accept", "default_action": "approve", "action_note": "Reviewed by founder."},
+    "3": {"decision": "accept", "default_action": "approve", "action_note": "Reviewed by founder."},
+    "4": {"decision": "accept", "default_action": "approve", "action_note": "Reviewed by founder."},
+    "5": {"decision": "accept", "default_action": "approve", "action_note": "Reviewed by founder."},
+    "6": {"decision": "accept", "default_action": "approve", "action_note": "Reviewed by founder."}
+  }
 }

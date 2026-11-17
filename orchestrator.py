@@ -360,7 +360,8 @@ def _phase6(run: dict) -> gates.GateResult:
     m = Analyst(run).metrics(0, run["ctx"].get("mock_sales", {}), wl)
     _record_step(run, 6, 2, m)
     g = gates.operate_gate(real_buyers=0, refund_rate=None, waitlist=wl.get("count"), attempt=run["attempts"].get("6", 1))
-    memo = Analyst(run).pivot_memo(_chosen(run), g, run["gates"])
+    memo = Analyst(run).pivot_memo(_chosen(run), g, run["gates"], real_buyers=0, refund_rate=None, waitlist=wl,
+                                   mock_sales=run["ctx"].get("mock_sales", {}))
     _record_step(run, 6, 3, memo)
     return g
 
@@ -549,26 +550,49 @@ def decide_action(run_id: str, action_id: str, approve: bool, actor: str, note: 
     return run
 
 
+def _apply_decision(run_id: str, run: dict, d: dict) -> dict:
+    """At a gate: settle pending approval items, then make the founder's call given in advance.
+    "accept" follows the recommendation; any other allowed outcome is an override and carries the note."""
+    for a in approval.pending(run):
+        choice = d.get("actions", {}).get(a["target"], d.get("default_action"))
+        if choice in ("approve", "reject"):
+            try:
+                run = decide_action(run_id, a["id"], choice == "approve", approval.FOUNDER, d.get("action_note", ""))
+            except approval.BrokenPromise:
+                run = load(run_id)  # stays pending: the launch gate shows it and the founder decides
+    if run["status"] != "awaiting_founder":
+        return run
+    g = current_gate(run)
+    choice = g["recommendation"] if d["decision"] == "accept" else d["decision"]
+    if choice not in g["allowed"]:
+        choice = g["recommendation"]
+    note = d.get("note", "") if choice != g["recommendation"] else d.get("note_if_accepted", d.get("note", ""))
+    return decide(run_id, choice, approval.FOUNDER, note)
+
+
 def run_to_gate_with(run_id: str, decisions: list[dict]) -> dict:
-    """Drive a run with a list of founder decisions given in advance (used by the demo script)."""
+    """Drive a run with a list of founder decisions given in advance, one per gate in order (used by tests)."""
     run = load(run_id)
     for d in decisions:
         run = advance(run_id)
-        for a in approval.pending(run):
-            choice = d.get("actions", {}).get(a["target"], d.get("default_action"))
-            if choice in ("approve", "reject"):
-                try:
-                    run = decide_action(run_id, a["id"], choice == "approve", approval.FOUNDER, d.get("action_note", ""))
-                except approval.BrokenPromise:
-                    run = load(run_id)  # stays pending: the launch gate shows it and the founder decides
+        run = _apply_decision(run_id, run, d)
+        if run["status"] != "ready":
+            break
+    return run
+
+
+def run_with_phase_decisions(run_id: str, by_phase: dict, default: dict | None = None, max_gates: int = 20) -> dict:
+    """Drive a run with founder decisions keyed by PHASE (used by the demo script), so an unexpected REPEAT does not
+    shift later decisions onto the wrong gate. A recommended REPEAT that is accepted reruns the phase with the same
+    decision; the gates themselves cap the repeats (gates.MAX_ATTEMPTS)."""
+    default = default or {"decision": "accept", "default_action": "reject"}
+    run = load(run_id)
+    for _ in range(max_gates):
+        run = advance(run_id)
         if run["status"] != "awaiting_founder":
             break
-        g = current_gate(run)
-        choice = g["recommendation"] if d["decision"] == "accept" else d["decision"]
-        if choice not in g["allowed"]:
-            choice = g["recommendation"]
-        note = d.get("note", "") if choice != g["recommendation"] else d.get("note_if_accepted", d.get("note", ""))
-        run = decide(run_id, choice, approval.FOUNDER, note)
-        if run["status"] in ("stopped", "completed", "monitoring"):
+        d = by_phase.get(str(current_gate(run)["phase"]), default)
+        run = _apply_decision(run_id, run, d)
+        if run["status"] != "ready":
             break
     return run

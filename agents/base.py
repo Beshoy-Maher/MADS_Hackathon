@@ -88,13 +88,16 @@ class Agent:
         return urls
 
     def result(self, name: str, action: str, content: str, *, ext: str = "md", data: dict | None = None,
-               sources: list[str] | None = None) -> StepResult:
+               sources: list[str] | None = None, buyer_facing: bool = False) -> StepResult:
+        """buyer_facing=True for text the buyer or a visitor reads (product, user guide, launch posts): a link that was
+        never fetched becomes its plain anchor text, with no checker marker in the text."""
         if ext == "md":
             # Every agent's text is checked: links that were never fetched are removed, unsourced claims are labelled.
             # Research agents get the full check (any statistic); the others the light one (citations, market trends).
             from tools import claims
             allowed = self.evidence_urls() | set(sources or [])
-            content, report = claims.check(content, allowed, mode="full" if self.check_claims else "light")
+            content, report = claims.check(content, allowed, mode="full" if self.check_claims else "light",
+                                           buyer_facing=buyer_facing)
             if self.check_claims or report["relabelled"] or report["removed_links"]:
                 content = content.rstrip() + "\n" + claims.footer_note(report) + "\n"
             data = dict(data or {}, claim_check=report)
@@ -108,18 +111,31 @@ class Agent:
 
 
 # -- formatting helpers shared by agents -----------------------------------
-PLACE_NAMES = {"hackernews": "Hacker News (Show HN / Ask HN)", "github": "GitHub Discussions of related open-source projects"}
+PLACE_NAMES = {"hackernews": "Hacker News"}
+LAUNCH_NAMES = {"hackernews": "Hacker News (Show HN)"}
+# Evidence sources that are not places to post: Stack Exchange does not allow promotion, and GitHub issues and
+# discussions belong to someone else's repository.
+NOT_A_PLACE = {"stackexchange", "github"}
+# Communities whose rules allow posting about your own work. Hacker News has Show HN; these subreddits exist for it.
+# Any other subreddit found in the evidence is a place to listen and talk, not to launch.
+SELF_PROMOTION_OK = {"hackernews", "r/sideproject", "r/alphaandbetausers", "r/imadethis", "r/roastmystartup", "r/showmeyourproject"}
 
 
 def community_places(communities: dict, limit: int = 4) -> list[str]:
     """Where the founder can talk to these people. Evidence sources are not all places to post:
-    Stack Exchange does not allow promotion, so it is left out; subreddits keep their names."""
+    Stack Exchange does not allow promotion and GitHub is someone else's repository, so both are left out;
+    subreddits keep their names."""
     out = []
     for name in communities:
-        if name == "stackexchange":
+        if name in NOT_A_PLACE:
             continue
         out.append(PLACE_NAMES.get(name, name))
     return out[:limit]
+
+
+def launch_places(communities: dict, limit: int = 3) -> list[str]:
+    """Where a launch post may go: only communities found in the evidence whose rules allow posting about your own work."""
+    return [LAUNCH_NAMES.get(n, n) for n in communities if n.lower() in SELF_PROMOTION_OK and n not in NOT_A_PLACE][:limit]
 
 
 def _fmt(n) -> str:

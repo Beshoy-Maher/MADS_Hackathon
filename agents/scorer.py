@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import guardrails
 from agents.base import Agent, StepResult, brief_summary, budget_text, footer, hours_text
+from tools import evidence_view
 from tools.sources import Evidence, engagement_score
 from tools.text import keywords
 
@@ -88,11 +89,19 @@ class Scorer(Agent):
         md += ["", "## Why", ""]
         for i, s in enumerate(scores):
             md.append(f"- **{s['title'][:80]}**: {s['rationale'] or 'No rationale.'} (skill match {s['skill_match']})")
-        md += ["", "## How the scores are calculated", "", FORMULA, "",
+        # Display only: the evidence behind each row, split by kind. The table above is computed before this and is unchanged.
+        md += ["", "## Evidence behind each candidate", ""]
+        shown: list[str] = []
+        for i, c in enumerate(candidates):
+            problem, existing = evidence_view.split_evidence(c.get("evidence", []))
+            md += [f"### {('Founder idea: ' if i == 0 else f'Alt {i}: ') + c['title'][:80]}", ""]
+            md += evidence_view.evidence_sections(c.get("evidence", []), limit=4)
+            shown += [e["url"] for e in (problem[:4] + existing[:4])]
+        md += ["## How the scores are calculated", "", FORMULA, "",
                "Founder fit uses the brief: skills, " f"{hours_text(self.brief)}, {budget_text(self.brief)}. "
                + ("A value that is not given counts as 0 in founder fit; it is not replaced by a typical figure. "
                   if self.brief.get("hours_per_week") is None or self.brief.get("budget_usd") is None else "") +
                "Engagement counts are public numbers from the linked sources; "
                "they show interest, not guaranteed buyers (ASSUMPTION that interest relates to demand).",
-               footer(self.model, [])]
-        return self.result("scorecard", "score_ideas", "\n".join(md), data={"scores": scores})
+               footer(self.model, shown)]
+        return self.result("scorecard", "score_ideas", "\n".join(md), data={"scores": scores}, sources=shown)

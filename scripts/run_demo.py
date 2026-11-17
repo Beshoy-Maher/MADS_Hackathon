@@ -5,9 +5,10 @@
 * strong_founder: a promising idea, driven through all six phases.
 * weak_founder:   a weak idea; the evidence gate recommends STOP.
 * excluded_founder: a crypto-signals idea; refused by the guardrails.
+* designer_founder: a brief the pipeline was not tuned on; every recommendation is accepted, whatever it is.
 
-The founder's choices at each gate are read from briefs/demo_decisions.json
-(the demo stands in for a founder clicking the buttons). Outputs are copied
+The founder's choices at each gate are read from briefs/demo_decisions.json,
+keyed by phase (the demo stands in for a founder clicking the buttons). Outputs are copied
 to outputs/ and the run's decision log to decision_log.json. Nothing here is
 written by hand.
 """
@@ -29,7 +30,8 @@ import config  # noqa: E402
 import llm  # noqa: E402
 import orchestrator  # noqa: E402
 
-RUNS = [("weak_founder", "_weak-idea"), ("excluded_founder", "_excluded-idea"), ("strong_founder", "")]
+RUNS = [("weak_founder", "_weak-idea"), ("excluded_founder", "_excluded-idea"), ("designer_founder", "_designer-idea"),
+        ("strong_founder", "")]
 
 
 def main() -> int:
@@ -46,7 +48,8 @@ def main() -> int:
     for name, suffix in RUNS:
         brief = json.loads((ROOT / "briefs" / f"{name}.json").read_text())
         run = orchestrator.create_run(brief, slug=brief.get("slug"))
-        run = orchestrator.run_to_gate_with(run["id"], decisions.get(name, [{"decision": "accept", "default_action": "reject"}]))
+        # Decisions are keyed by phase: an unexpected REPEAT reruns that phase and never shifts a later decision.
+        run = orchestrator.run_with_phase_decisions(run["id"], decisions.get(name, {}))
         src = orchestrator.run_dir(run["id"]) / "outputs"
         for f in sorted(src.iterdir()):
             if suffix and f.name == "payment_test_log.md":

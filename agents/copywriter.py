@@ -12,7 +12,7 @@ import html
 
 import approval
 from tools.text import wrong_money
-from agents.base import Agent, StepResult, brief_summary, community_places, footer
+from agents.base import Agent, StepResult, brief_summary, footer, launch_places
 
 PAGE_CSS = """body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:720px;margin:40px auto;padding:0 16px;color:#1d2433;line-height:1.55}
 h1{font-size:2rem;line-height:1.2}.sub{font-size:1.15rem;color:#4a5568}.card{border:1px solid #e2e8f0;border-radius:12px;padding:16px 20px;margin:18px 0}
@@ -43,16 +43,19 @@ class Copywriter(Agent):
         out = {k: data.get(k) or fb[k] for k in fb}
         if not isinstance(out["bullets"], list):
             out["bullets"] = fb["bullets"]
-        # Scan every field.
+        # Scan every field. The page is read by visitors: a link that was never fetched becomes its plain text.
         from guardrails import scan_output
+        from tools import claims
+        allowed = self.evidence_urls()
         for k in ("headline", "subheadline", "who_for", "cta"):
+            out[k], _ = claims.strip_unverified(str(out[k]), allowed)
             s = scan_output(str(out[k]))
             if s.violations:
                 self.violations += s.violations
                 out[k] = s.text or fb[k]
         clean_bullets = []
         for b in out["bullets"][:4]:
-            s = scan_output(str(b))
+            s = scan_output(claims.strip_unverified(str(b), allowed)[0])
             self.violations += s.violations
             if s.text.strip():
                 clean_bullets.append(s.text)
@@ -110,36 +113,99 @@ class Copywriter(Agent):
                                       {"file": "phase5_step1_store-page.html"}, agent=self.role)
         return self.result("store-page", "open_store_page", page, ext="html", data={"copy": c, "publish_action": act["id"]})
 
-    def launch_posts(self, candidate: dict, communities: dict, price: float | None = None) -> StepResult:
-        places = community_places(communities, 3) or ["the founder's own network"]
+    def _one_post(self, place: str, candidate: dict, price: float | None, avoid: list[str] | None = None) -> str | None:
+        """One post, written for this one community. None when no model answered: posts are never filled from a template."""
+        import llm
+        from guardrails import scan_output
+        from tools import claims
         name = self.brief.get("founder_name", "the founder")
-        fb_posts = {p: (f"Hi all, I'm {name}. I made {candidate['title']} because {candidate.get('problem', 'I kept seeing this problem').rstrip('.').lower()}. "
-                        "It's a small digital product. I'd value honest feedback on whether it's useful. Link in comments if the rules allow it.")
-                    for p in places}
-        task = (f"Founder brief:\n{brief_summary(self.brief)}\nProduct: {candidate['title']}\n\n"
-                f"Facts: it is a paid digital download{f' at ${price}' if price else ''}, not free and not open source. "
-                f"Write one short launch post for each place: {places}. Written in first person by {name}, honest, "
-                "follows community self-promotion rules, asks for feedback, no hype, no urgency, no claims of results. "
-                'JSON: {"posts": {"<place>": "<post>"}}')
-        data = self.ask_json(task, {"posts": fb_posts}, max_tokens=700)
-        posts = data.get("posts") if isinstance(data.get("posts"), dict) else fb_posts
+        rules = {"Hacker News (Show HN)": "Show HN rules: the title starts with 'Show HN:', the text says what you made and why, "
+                                         "plainly, for a technical audience, and invites criticism. No marketing language."}
+        task = (f"Founder brief:\n{brief_summary(self.brief)}\nProduct: {candidate['title']}\nFormat: {candidate.get('format', '')}\n"
+                f"Facts: it is a paid digital download{f' at ${price}' if price else ''}, not free and not open source.\n\n"
+                f"Write ONE short launch post (60-120 words) for {place} only. {rules.get(place, 'Follow that community’s rules for sharing your own work.')} "
+                f"Write it as {name}, in first person, in their own plain voice: why they made it, from their own skills and "
+                "experience in the brief, what is inside, and one specific question asking for feedback. Your own sentences: do not "
+                "copy the problem statement or the brief word for word, no greeting formula like 'Hi all', no hype, no urgency, "
+                "no claims of results, no statistics, no links. Do not state how many questions, modules, templates or pages "
+                "it has, and claim only the experience the brief states. Plain text only, no heading.")
+        if avoid:
+            task += "\n\nThese sentences are already used in another post; do not use them or anything close to them:\n" + "\n".join(f"- {a}" for a in avoid)
+        res = llm.complete(self.system(), task, "", max_tokens=400)
+        self._track(res)
+        if not res.model or not res.text.strip():
+            return None
+        scan = scan_output(res.text.strip())
+        self.violations += scan.violations
+        text, _ = claims.strip_unverified(scan.text, self.evidence_urls())
+        if price:  # the only dollar amount a launch post may state is the price the pricing rule set
+            for bad in wrong_money(text, [price]):
+                text = text.replace(bad, f"${price}")
+            # The price is one number: "$11.99 or less", "from $11.99", "$11.99 and up" make it vague, so the hedge goes.
+            text = re.sub(rf"(\${re.escape(str(price))})\s*(?:or (?:less|lower|under|so|more)|and (?:up|under|below)|\+)", r"\1", text)
+            text = re.sub(rf"\b(?:from|starting (?:at|from)|as low as|only|just|under|up to)\s+(\${re.escape(str(price))})", r"\1", text,
+                          flags=re.IGNORECASE)
+        return text.strip()
+
+    def launch_posts(self, candidate: dict, communities: dict, price: float | None = None) -> StepResult:
+        places = launch_places(communities)
         md = ["# Phase 5, step 2: Launch posts (drafts)", "",
-              "Each post is written for the founder to publish under their own name, after reading the community's rules. "
-              "Nothing is posted by the system: each post is an approval-gated action, and posting is STUBBED.", ""]
+              "Each post is written for one community, for the founder to publish under their own name after reading that "
+              "community's rules. Nothing is posted by the system: each post is an approval-gated action, and posting is STUBBED.", ""]
+        if not places:
+            md += ["## No launch place found in the research", "",
+                   "None of the communities found in the evidence allow posting about your own work, so no launch post was drafted. "
+                   "Start with your own network instead: people you know who fit the customer profile, in your own words.", "",
+                   footer(None)]
+            return self.result("launch-posts", "write_launch_posts", "\n".join(md), data={"post_actions": [], "notes": []},
+                               buyer_facing=True)
+        posts: dict[str, str] = {}
+        notes: list[str] = []
+        problem = candidate.get("problem", "")
+        for place in places:
+            text = self._one_post(place, candidate, price)
+            if text is None:
+                notes.append(f"{place}: no model answered, so no post was written (posts are never filled from a template).")
+                continue
+            clash = shared_sentences(text, list(posts.values())) + pasted_lines(text, problem)
+            if clash:
+                text = self._one_post(place, candidate, price, avoid=clash)
+                if text is None or shared_sentences(text, list(posts.values())) or pasted_lines(text, problem):
+                    notes.append(f"{place}: dropped. After one rewrite it still repeated a sentence of another post or the "
+                                 "problem statement, so it was not kept.")
+                    continue
+            posts[place] = text
         ids = []
-        for place, post in list(posts.items())[:4]:
-            from guardrails import scan_output
-            s = scan_output(str(post))
-            self.violations += s.violations
-            if price:  # the only dollar amount a launch post may state is the price the pricing rule set
-                for bad in wrong_money(s.text, [price]):
-                    s.text = s.text.replace(bad, f"${price}")
-                # The price is one number: "$11.99 or less", "from $11.99", "$11.99 and up" make it vague, so the hedge goes.
-                s.text = re.sub(rf"(\${re.escape(str(price))})\s*(?:or (?:less|lower|under|so|more)|and (?:up|under|below)|\+)", r"\1", s.text)
-                s.text = re.sub(rf"\b(?:from|starting (?:at|from)|as low as|only|just|under|up to)\s+(\${re.escape(str(price))})", r"\1", s.text,
-                                flags=re.IGNORECASE)
-            act = approval.request_action(self.run, "publish", f"launch post: {place}", f"Post in {place}", {"text": s.text}, agent=self.role)
+        for place, text in posts.items():
+            act = approval.request_action(self.run, "publish", f"launch post: {place}", f"Post in {place}", {"text": text}, agent=self.role)
             ids.append(act["id"])
-            md += [f"## {place}", "", s.text, "", f"Approval: `{act['id']}` (pending)", ""]
+            md += [f"## {place}", "", text, "", f"Approval: `{act['id']}` (pending)", ""]
+        if notes:
+            md += ["## Notes", ""] + [f"- {n}" for n in notes] + [""]
         md.append(footer(self.model))
-        return self.result("launch-posts", "write_launch_posts", "\n".join(md), data={"post_actions": ids})
+        return self.result("launch-posts", "write_launch_posts", "\n".join(md), data={"post_actions": ids, "notes": notes},
+                           buyer_facing=True)
+
+
+def _sentences(text: str) -> list[str]:
+    parts = re.split(r"(?<=[.!?])\s+|\n+", text or "")
+    return [p.strip() for p in parts if re.sub(r"\W+", "", p)]
+
+
+def _norm_sentence(s: str) -> str:
+    return " ".join(re.sub(r"[^\w$.]+", " ", s.lower()).replace(".", " ").split())
+
+
+def shared_sentences(text: str, others: list[str]) -> list[str]:
+    """Sentences of `text` that also appear (same words, any case or punctuation) in one of `others`."""
+    seen = {_norm_sentence(s) for o in others for s in _sentences(o)}
+    return [s for s in _sentences(text) if _norm_sentence(s) in seen]
+
+
+def pasted_lines(text: str, problem: str, window: int = 8) -> list[str]:
+    """Sentences that paste the research's problem statement (any run of `window` of its words in a row)."""
+    words = _norm_sentence(problem).split()
+    if len(words) < window:
+        return []
+    grams = {" ".join(words[i:i + window]) for i in range(len(words) - window + 1)}
+    return [s for s in _sentences(text) if any(g in _norm_sentence(s) for g in grams)]

@@ -1,20 +1,22 @@
 # Phase 1, step 3: Market definition for 'Daily dev motivation via email'
 
 ## Ideal customer profile
-- Software developers facing burnout during long coding sessions.
-- Trigger: feeling stuck, overwhelmed, or demotivated mid-task.
-- Tried: public GitHub repos with developer quotes [ruyonga/dev-quotes](https://github.com/ruyonga/dev-quotes), [henriquealho/Programming-Quotes](https://github.com/henriquealho/Programming-Quotes), or tweet-based tips [hpolatyuruk/daily-developer-tips](https://github.com/hpolatyuruk/daily-developer-tips).
+- ASSUMPTION (no fetched post describes this): Software developers seeking quick positivity breaks during coding sessions.
+- Trigger: Feeling burnt out or stuck on a bug, often during long work hours.
+- Tried: Random internet quotes, social media, or dev-focused apps for morale boosts.
+- Evidence: [Ask HN: Daily motivation screen theme for Android](https://news.ycombinator.com/item?id=22865790) shows interest in daily motivational content tailored to developers.
 
 ## What they use today
-- Existing solutions include public GitHub repos with curated quotes or automated tweet scripts.
-- Gaps: not delivered daily via email, lack personalization, no consistent UX or design quality.
+- Existing solutions: GitHub repos like [ruyonga/dev-quotes](https://github.com/ruyonga/dev-quotes) and [henriquealho/Programming-Quotes](https://github.com/henriquealho/Programming-Quotes) offer curated quote collections.
+- Gaps: No consistent daily delivery via email; most are static or app-based, not automated or personalized.
+- Evidence: [Diego620/Quote-App](https://github.com/Diego620/Quote-App) and [afreenkhatoon01/Task-1-of-Web-development-Internship](https://github.com/afreenkhatoon01/Task-1-of-Web-development-Internship) show simple web-based quote tools, not email-driven.
 
 ## Market size
-ASSUMPTION: Market size could be measured by counting active software developers on platforms like GitHub or Stack Overflow, then estimating interest in daily motivational content through engagement with related repositories.
+ASSUMPTION: Could be measured via developer survey data or email list growth in dev communities like HN or Reddit’s r/programming.
 
 ## Where these people talk (from the evidence)
 
-- github: 10 relevant item(s)
+- github: 7 relevant item(s)
 - hackernews: 1 relevant item(s)
 
 ---

@@ -167,12 +167,85 @@ def test_user_guide_has_no_invented_email_or_sources(monkeypatch):
 
 @pytest.mark.parametrize("hedged", ["$11.99 or less", "from $11.99", "only $11.99", "$11.99 and up", "starting at $11.99"])
 def test_launch_posts_state_the_price_as_one_number(monkeypatch, hedged):
+    import llm
     from agents.copywriter import Copywriter
     run = orchestrator.create_run(STRONG)
-    monkeypatch.setattr(Copywriter, "ask_json",
-                        lambda self, task, fb, max_tokens=700: {"posts": {"r/learnsql": f"I made a workbook. It costs {hedged}."}})
-    res = Copywriter(run).launch_posts({"title": "SQL workbook"}, {"r/learnsql": {}}, 11.99)
+    monkeypatch.setattr(llm, "complete", lambda *a, **k: llm.LLMResult(text=f"I made a workbook. It costs {hedged}.", model="fake-model"))
+    res = Copywriter(run).launch_posts({"title": "SQL workbook"}, {"hackernews": 3}, 11.99)
     assert "It costs $11.99." in res.content
+
+
+def test_identical_launch_posts_are_not_committed(monkeypatch):
+    """Every community gets its own post; a post that repeats another post's sentence is rewritten once, then dropped."""
+    import approval
+    import llm
+    from agents.copywriter import Copywriter
+    run = orchestrator.create_run(STRONG)
+    calls = []
+    def same(*a, **k):
+        calls.append(a[1])
+        return llm.LLMResult(text="I built a SQL workbook from my own interview notes. What would you add?", model="fake-model")
+    monkeypatch.setattr(llm, "complete", same)
+    res = Copywriter(run).launch_posts({"title": "SQL workbook", "problem": "x"}, {"hackernews": 3, "r/SideProject": 2}, 11.99)
+    assert len(calls) == 3  # one post per community, plus one rewrite of the post that matched
+    assert "already used in another post" not in calls[0] and "already used in another post" in calls[2]
+    assert len(res.data["post_actions"]) == 1 and len(approval.pending(run)) == 1
+    assert res.content.count("I built a SQL workbook") == 1
+    assert "r/SideProject: dropped" in res.content
+
+
+def test_launch_post_rewritten_once_when_it_repeats_a_sentence(monkeypatch):
+    import llm
+    from agents.copywriter import Copywriter, shared_sentences
+    run = orchestrator.create_run(STRONG)
+    texts = iter(["Show HN: my SQL workbook. I wrote it after mentoring juniors.",
+                  "I wrote it after mentoring juniors. Feedback welcome.",
+                  "Side project: forty SQL questions with answers. Which topic is missing?"])
+    monkeypatch.setattr(llm, "complete", lambda *a, **k: llm.LLMResult(text=next(texts), model="fake-model"))
+    res = Copywriter(run).launch_posts({"title": "SQL workbook", "problem": "x"}, {"hackernews": 3, "r/SideProject": 2}, None)
+    assert len(res.data["post_actions"]) == 2 and not res.data["notes"]
+    posts = [run["pending_actions"][-2]["payload"]["text"], run["pending_actions"][-1]["payload"]["text"]]
+    assert not shared_sentences(posts[1], [posts[0]])
+
+
+def test_launch_posts_never_paste_the_problem_statement(monkeypatch):
+    import llm
+    from agents.copywriter import Copywriter
+    run = orchestrator.create_run(STRONG)
+    problem = "Junior data analysts in Egypt struggle to find affordable, practical SQL interview practice with real answers."
+    pasted = ("Hi all, I'm Mariam. I made SQL Workbook because junior data analysts in egypt struggle to find affordable, "
+              "practical sql interview practice with real answers.")
+    monkeypatch.setattr(llm, "complete", lambda *a, **k: llm.LLMResult(text=pasted, model="fake-model"))
+    res = Copywriter(run).launch_posts({"title": "SQL Workbook", "problem": problem}, {"hackernews": 3}, None)
+    assert "struggle to find affordable" not in res.content and not res.data["post_actions"]
+
+
+def test_launch_posts_are_not_filled_from_a_template_without_a_model():
+    from agents.copywriter import Copywriter
+    run = orchestrator.create_run(STRONG)
+    res = Copywriter(run).launch_posts({"title": "SQL Workbook", "problem": "Juniors struggle with SQL interviews."}, {"hackernews": 3}, None)
+    assert not res.data["post_actions"] and "no model answered" in res.content
+    assert "Hi all" not in res.content
+
+
+def test_github_is_never_a_launch_place(monkeypatch):
+    import llm
+    from agents.base import community_places, launch_places
+    from agents.copywriter import Copywriter
+    found = {"github": 11, "hackernews": 11, "stackexchange": 3, "r/learnsql": 2}
+    assert launch_places(found) == ["Hacker News (Show HN)"]
+    assert not any("github" in p.lower() or "stack" in p.lower() for p in community_places(found))
+    run = orchestrator.create_run(STRONG)
+    monkeypatch.setattr(llm, "complete", lambda *a, **k: llm.LLMResult(text="Show HN: a small SQL workbook I wrote.", model="fake-model"))
+    res = Copywriter(run).launch_posts({"title": "SQL Workbook", "problem": "x"}, found, None)
+    assert "GitHub" not in res.content and "## Hacker News (Show HN)" in res.content
+
+
+def test_no_launch_place_suggests_the_founders_own_network():
+    from agents.copywriter import Copywriter
+    run = orchestrator.create_run(STRONG)
+    res = Copywriter(run).launch_posts({"title": "SQL Workbook", "problem": "x"}, {"github": 10, "stackexchange": 2}, None)
+    assert not res.data["post_actions"] and "own network" in res.content and "GitHub" not in res.content
 
 
 def test_demand_plan_keeps_only_researched_places_that_allow_promotion(monkeypatch):
@@ -208,3 +281,80 @@ def test_builder_numbers_its_own_steps_as_a_last_resort():
     assert "- [ ] Read the question twice" in out  # the checklist stays
     assert Builder(run)._ensure_steps(4, "1. One\n2. Two\n- [ ] Done") == "1. One\n2. Two\n- [ ] Done"
     assert any(e["action"] == "repair_module_format" for e in decision_log.read(run_id=run["id"]))
+
+
+def test_buyer_facing_text_keeps_anchor_text_and_has_no_checker_marker():
+    from tools import claims
+    text = ("1. Review job postings (e.g., from [LinkedIn](https://linkedin.example/jobs) or [Wuzzuf](https://wuzzuf.example)).\n"
+            "2. Test each query in an online tool like [DB Fiddle](https://dbfiddle.example). Docs: https://made.up/x\n"
+            "3. Keep [this one](https://example.org/real).")
+    out, report = claims.check(text, {"https://example.org/real"}, mode="light", buyer_facing=True)
+    assert claims.MARKER not in out and "made.up" not in out and "linkedin.example" not in out
+    assert "(e.g., from LinkedIn or Wuzzuf)." in out and "like DB Fiddle." in out
+    assert "[this one](https://example.org/real)" in out
+    assert report["removed_links"] == 4
+    assert "4 link(s) not found in the fetched evidence removed" in claims.footer_note(report)
+    # Research outputs keep the marker.
+    research, _ = claims.check(text, {"https://example.org/real"}, mode="full")
+    assert claims.MARKER in research
+
+
+def test_product_guide_and_posts_have_no_checker_marker(monkeypatch):
+    import llm
+    from agents.base import Agent
+    from agents.copywriter import Copywriter
+    run = orchestrator.create_run(STRONG)
+    body = "Use [Wuzzuf](https://wuzzuf.example) to read postings. More at https://invented.example/page"
+    for name in ("product", "user-guide", "launch-posts"):
+        res = Agent(run).result(name, "x", body, buyer_facing=True)
+        assert "(unverified link removed)" not in res.content and "Use Wuzzuf to read postings." in res.content
+        assert "2 link(s) not found" in res.content
+    research = Agent(run).result("market", "x", body)
+    assert "(unverified link removed)" in research.content
+    monkeypatch.setattr(llm, "complete", lambda *a, **k: llm.LLMResult(text="Show HN: I list postings from [Wuzzuf](https://wuzzuf.example).", model="m"))
+    posts = Copywriter(run).launch_posts({"title": "W", "problem": "x"}, {"hackernews": 2}, None)
+    assert "(unverified link removed)" not in posts.content and "from Wuzzuf." in posts.content
+    assert "(unverified link removed)" not in run["pending_actions"][-1]["payload"]["text"]
+
+
+def test_landing_and_store_pages_have_no_checker_marker(monkeypatch):
+    from agents.copywriter import Copywriter
+    run = orchestrator.create_run(STRONG)
+    copy = {"headline": "SQL workbook", "subheadline": "Questions like those on [Wuzzuf](https://wuzzuf.example)",
+            "bullets": ["Answers checked in https://invented.example", "Forty questions"], "who_for": "Juniors", "cta": "Get it"}
+    monkeypatch.setattr(Copywriter, "ask_json", lambda self, task, fb, max_tokens=500: dict(copy))
+    lp = Copywriter(run).landing_page({"title": "SQL workbook", "problem": "p"}, {})
+    sp = Copywriter(run).store_page({"title": "SQL workbook", "problem": "p"}, {}, {"price_usd": 9}, "phase4_step2_policies.md")
+    for page in (lp.content, sp.content):
+        assert "unverified" not in page and "invented.example" not in page and "wuzzuf.example" not in page
+        assert "Questions like those on Wuzzuf" in page
+
+
+def test_unexpected_phase1_repeat_does_not_shift_the_phase2_decision(monkeypatch):
+    """Demo decisions are keyed by phase: a REPEAT nobody planned reruns Phase 1, and Phase 2 still gets its own decision."""
+    import gates
+    plan = json.loads((ROOT / "briefs" / "demo_decisions.json").read_text())["strong_founder"]
+    real = gates.evidence_gate
+
+    def repeat_first(scores, attempt=1, sources_ok=True):
+        g = real(scores, attempt, sources_ok)
+        if attempt == 1:
+            g.recommendation, g.reasons = gates.REPEAT, ["forced for the test"]
+        return g
+    monkeypatch.setattr(gates, "evidence_gate", repeat_first)
+    run = orchestrator.create_run(STRONG)
+    run = orchestrator.run_with_phase_decisions(run["id"], plan)
+    p1 = [(g["recommendation"], g["founder_decision"]) for g in run["gates"] if g["phase"] == 1]
+    p2 = [g for g in run["gates"] if g["phase"] == 2]
+    assert p1 == [("repeat", "repeat"), ("go", "go")]
+    assert p2[0]["recommendation"] == "repeat" and p2[0]["founder_decision"] == "go"
+    assert p2[0]["note"].startswith("Founder override")
+    assert not any(g["note"].startswith("Founder override") for g in run["gates"] if g["phase"] != 2)
+    assert {g["phase"] for g in run["gates"]} == {1, 2, 3, 4, 5, 6}
+
+
+def test_demo_decisions_are_keyed_by_phase_and_never_override_the_designer():
+    plan = json.loads((ROOT / "briefs" / "demo_decisions.json").read_text())
+    assert all(set(v) <= {"1", "2", "3", "4", "5", "6"} for v in plan.values())
+    overrides = {(f, p) for f, v in plan.items() for p, d in v.items() if d["decision"] != "accept"}
+    assert overrides == {("strong_founder", "2")}

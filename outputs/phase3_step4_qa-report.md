@@ -10,8 +10,8 @@
 | no_placeholder_text | PASS | 0 | 0 |
 | user_guide_has_usage_and_support | PASS | True | sections present |
 | product_in_allowed_category | PASS | True | True |
-| readable_sentence_length | PASS | 13.8 | <= 28 words |
-| deliverable_package_builds | PASS | sha256:b13a03aba0be53fa | non-empty |
+| readable_sentence_length | PASS | 11.8 | <= 28 words |
+| deliverable_package_builds | PASS | sha256:467f837b64c40878 | non-empty |
 | verifier_last_pass_has_no_errors | PASS | open errors: 0 | every module reviewed, 0 open errors |
 | product_is_original | PASS | name clashes: 0, copied passages: 0 | 0 name clashes, 0 runs of 12+ words copied from a source |
 
@@ -30,8 +30,8 @@ Each module is reviewed once; a module with errors is revised once by the builde
 
 ## Originality (code check, no model)
 
-- Product name **SQL Interview Prep Workbook for Junior Analysts** compared with 23 existing product name(s) found in the evidence: no clash.
-- Product text compared with 30 fetched source(s) for runs of 12+ identical words: no copied passage.
+- Product name **SQL Interview Prep Workbook for Junior Analysts** compared with 28 existing product name(s) found in the evidence: no clash.
+- Product text compared with 40 fetched source(s) for runs of 12+ identical words: no copied passage.
 - Scope: only the fetched titles and snippets are compared, not the full pages behind the links.
 
 ---

@@ -369,3 +369,12 @@ def test_reasoning_model_with_an_empty_answer_is_asked_once_more(monkeypatch):
     monkeypatch.setattr(llm.httpx, "post", post)
     text, _, _ = llm._ollama_chat("gpt-oss:20b", "s", "u", True, 900, 0.2)
     assert text == '{"objections": []}' and len(calls) == 2 and calls[1] > calls[0]
+
+
+def test_phase5_corrections_reach_the_approval_queue_and_the_copy():
+    payload = {"text": "I see a lot of interest in SQL prep, and many analysts struggle."}
+    copy = {"bullets": ["Tailored to questions asked in Egypt & MENA.", "15 questions"], "who_for": "junior analysts"}
+    assert critic_mod.mirror_correction(payload, "I see a lot of interest in SQL prep", "I see some discussion of SQL prep") == 1
+    assert payload["text"] == "I see some discussion of SQL prep, and many analysts struggle."
+    assert critic_mod.mirror_correction(copy, "Tailored to questions asked in Egypt &amp; MENA.", "Practical SQL questions.") == 1
+    assert copy["bullets"][0] == "Practical SQL questions." and copy["bullets"][1] == "15 questions"

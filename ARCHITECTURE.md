@@ -23,7 +23,7 @@ flowchart LR
     G3 -->|go| P4[4 Commercial setup<br/>pricing, policy writer]
     G3 -->|repeat| P3
     P4 --> G4{Founder gate}
-    G4 -->|go| P5[5 Launch<br/>copywriter, launcher]
+    G4 -->|go| P5[5 Launch<br/>copywriter, launcher, promise checker]
     P5 --> G5{Launch gate}
     G5 -->|go| P6[6 Operate and learn<br/>support, analyst]
     P6 --> G6{Persevere / pivot gate}
@@ -75,7 +75,8 @@ Layers
 - **Tools:** local model; in-memory SQLite (`sqlite3`) to execute SQL examples; deterministic test suite in `agents/qa.py`.
 - **Method:** *Build the product (Core):* the builder writes an MVP spec sized to the founder's hours (3-4 modules, out-of-scope list, acceptance criteria), then the product itself: per module an intro, numbered steps, a worked example, a checklist and common mistakes; then a user guide (how to use, what you need, getting help, refunds). Founder feedback from a "repeat" decision is fed into the rebuild.
 - **Verifier:** after each module is written, the verifier lists its factual errors: wrong statements, code that would not run, invented facts. Every error must quote the wrong words; an error whose quote is not in the module is dropped, so the reviewer cannot invent one. SQL code blocks are also executed in an in-memory SQLite database whose tables and columns are inferred from the example; syntax errors and misused aggregates are reported, and a statement whose schema cannot be inferred is skipped silently. A query written outside a code block is executed too. Code also reports slips a reader would trip over, such as a number split in two in a table, a broken checklist box, or a module with no numbered steps or no checklist. If a module still has no numbered list after its revision, the builder numbers the module's own list items as a last resort: the text is not changed, the checklist stays, and the repair is logged as `builder`, `repair_module_format`. A module with errors is revised by the builder once, with the error list as feedback, and reviewed a second time. There is no second revision. Each review is logged as agent `verifier`, action `review_module`; each revision as `builder`, `revise_module`. Without a model only the SQL check runs, and the report says so.
-- **QA:** 11 deterministic tests: all modules present, >= 120 words each, numbered steps, checklists, no income promises / fake proof / urgency, no placeholder text, user guide sections, allowed category, readable sentence length, package builds (hash), and no errors left open by the verifier's last review of any module.
+- **QA:** 12 deterministic tests: all modules present, >= 120 words each, numbered steps, checklists, no income promises / fake proof / urgency, no placeholder text, user guide sections, allowed category, readable sentence length, package builds (hash), no errors left open by the verifier's last review of any module, and originality.
+- **Originality guard** (`tools/originality.py`, code, no model): the product must not copy the sources read in Phase 1 or take an existing product's name. Every run of 12 or more identical words shared with a fetched title or snippet is reported with the source's link; a product name the same as, or nearly the same as (similarity >= 0.85), a GitHub repository or Show HN launch found in the evidence is a clash. Either one fails the `product_is_original` test, so the build gate does not pass. A well-known brand inside the name ("templates for Figma") is a warning only, because describing compatibility is fair use of a name. Limit: only the fetched titles and snippets (up to 240 characters) are compared, not the full pages behind the links.
 - **Output:** `phase3_step1_spec.md`, `phase3_step2_product.md`, `phase3_step3_user-guide.md`, `phase3_step4_qa-report.md`, `phase3_step5_debate.md`, `phase3_gate_decision.md`.
 
 ### Phase 4: Commercial setup (Core step: set the price and policies)
@@ -87,10 +88,13 @@ Layers
 
 ### Phase 5: Launch (Core steps: open the store; deliver automatically)
 
-- **Agents:** `copywriter`, `launcher`.
+- **Agents:** `copywriter`, `launcher`, `promise_checker`.
 - **Tools:** `payments.py` (MOCKED provider), `webhooks.py`, `delivery.py`, `refunds.py`, `reconcile.py`, `approval.py`.
 - **Method:** *Open the store (Core):* store page with price, contents, refund terms and a MOCKED checkout button; launch posts per community, written in the founder's voice for them to post. Each page and post is an approval-gated action; after approval it goes to the outbox (STUBBED), never to the internet. *Deliver automatically (Core):* the launcher runs the full sale-to-cash flow against the MOCKED provider with two test buyers and checks 11 properties (see [Sale to cash](#sale-to-cash)).
-- **Output:** `phase5_step1_store-page.html`, `phase5_step2_launch-posts.md`, `phase5_step3_delivery-test.md`, `payment_test_log.md`, `phase5_step4_debate.md`, `phase5_gate_decision.md`.
+- **Promise checker:** the store page and posts are written from the plan (the Lean Canvas), the product in Phase 3, and the two can drift apart. Before the founder approves anything, every promise on the store page and in each launch post is checked against what exists. Code checks the price (Phase 4), the refund days (policy and `refunds.py`), "free" claims, delivery promises (the delivery test above), the number of modules and the number of labelled questions, exercises or examples. For any other promise the model may only quote the product; code keeps the quote only if it is in the product word for word. Verdicts: **kept**, **broken** (code found a contradiction; only code can give this verdict) or **unverifiable** (for the founder to confirm, reword or remove). The result is attached to each item in the approval queue, and `approval.py` refuses to approve an item with a broken promise: the founder rejects it and repeats the phase. The checker never rewrites the page and never changes a gate.
+- **Output:** `phase5_step1_store-page.html`, `phase5_step2_launch-posts.md`, `phase5_step3_delivery-test.md`, `phase5_step4_promise-check.md`, `payment_test_log.md`, `phase5_step5_debate.md`, `phase5_gate_decision.md`.
+- **Order:** in Phase 5 the debate runs before the promise checker (its file is numbered step 5 because the promise check keeps step 4). A correction the debate writes into the store page or a post is also applied to the pending approval item and to the copy the promise checker reads, so the founder approves, and the checker checks, the corrected text.
+
 
 ### Phase 6: Operate and learn
 
@@ -124,7 +128,7 @@ After a phase's steps and before its gate is shown, `orchestrator._debate` hands
 | 2 | Lean Canvas (strategist), demand test (analyst) | `phase2_step4_debate.md` |
 | 3 | MVP spec, product (builder) | `phase3_step5_debate.md` |
 | 4 | pricing (pricing), policies (policy_writer) | `phase4_step3_debate.md` |
-| 5 | store page, launch posts (copywriter) | `phase5_step4_debate.md` |
+| 5 | store page, launch posts (copywriter); runs before the promise checker | `phase5_step5_debate.md` |
 | 6 | persevere-or-pivot memo (analyst); the critic argues for the **opposite** decision | `phase6_step4_debate.md` |
 
 ```
@@ -210,7 +214,8 @@ brief (JSON/text) -> intake -> run state  data/runs/<id>/state.json   (git-ignor
                    decision log: critic/debate_challenge, <author>/debate_response, <author>/apply_debate_correction, critic/debate_verdict
   each model call -> role (writer / fast / judge / critic) -> its model, or the next one if it cannot load
   every action -> decision log  (timestamp, agent, action, sources[], model, cost, approved_by, + run_id, outcome)
-  outbound drafts -> approval queue (run state) -> founder Approve -> outbox.jsonl (STUBBED)
+  store page + posts + product + price + delivery test -> promise checker -> verdict on each approval item
+  outbound drafts -> approval queue (run state) -> founder Approve (refused if a promise is broken) -> outbox.jsonl (STUBBED)
   waitlist form -> data/runs/<id>/waitlist.json (consented emails, local only) -> demand gate
   public APIs -> cache data/cache (24h) -> evidence with URLs -> scores -> gates
 scripts/run_demo.py -> copies the demo runs to outputs/ and their log to decision_log.json
@@ -235,6 +240,8 @@ Personal data: only consented waitlist emails, stored locally and never logged. 
 | Interview notes: commitments vs. compliments, quotes checked against the founder's pasted notes | Built |
 | Debate before each gate: critic vs. authors, quotes checked in code, open objections on the gate card | Built |
 | One model per role with hand-over to the next model when one cannot load | Built |
+| Promise checker: store page and posts matched to the product, price, refund policy and delivery test; broken promises block approval | Built. Without a model, promises that need a quote stay unverifiable |
+| Originality guard: copied passages and name clashes against the fetched evidence | Built. Compares fetched titles and snippets only, not full pages; licences of reused code are not checked yet |
 
 ## Roadmap
 

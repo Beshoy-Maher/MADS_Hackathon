@@ -46,8 +46,20 @@ def cmd_run(args) -> int:
             print(f"\n  APPROVAL NEEDED [{a['kind']}] {a['target']}: {a['description']}")
             if a["payload"].get("message") or a["payload"].get("text"):
                 print("   ", (a["payload"].get("message") or a["payload"].get("text"))[:500])
+            pc = a["payload"].get("promise_check")
+            if pc:
+                print(f"    promise check: {pc['kept']} kept, {pc['broken']} broken, {pc['unverifiable']} unverifiable")
+                for x in pc.get("broken_items", []) + pc.get("unverifiable_items", []):
+                    print("     -", x)
             ch = _ask("  Approve?", ("approve", "reject"))
-            run = orchestrator.decide_action(run["id"], a["id"], ch == "approve", approval.FOUNDER)
+            try:
+                run = orchestrator.decide_action(run["id"], a["id"], ch == "approve", approval.FOUNDER)
+            except approval.BrokenPromise as e:
+                print("   ", e)
+                if _ask("  It can only be rejected now. Reject it, or leave it pending?", ("reject", "leave")) == "reject":
+                    run = orchestrator.decide_action(run["id"], a["id"], False, approval.FOUNDER, "rejected: broken promise")
+                else:
+                    run = orchestrator.load(run["id"])
         g = orchestrator.current_gate(run)
         print(f"\n  GATE {g['gate']}: system recommends {g['recommendation'].upper()}" + (f" -> {g['pivot_to']}" if g.get("pivot_to") else ""))
         for r in g["reasons"]:

@@ -156,6 +156,8 @@ def decide_action(run_id: str, action_id: str, payload: dict = Body(...), x_foun
         run = orchestrator.decide_action(run_id, action_id, bool(payload.get("approve")), approval.FOUNDER, payload.get("note", ""))
     except KeyError:
         raise HTTPException(404, "action not found")
+    except (ValueError, approval.ApprovalRequired) as e:  # e.g. a broken promise: the item must be fixed, not approved
+        raise HTTPException(400, str(e))
     return {"ok": True, "actions": run["pending_actions"]}
 
 

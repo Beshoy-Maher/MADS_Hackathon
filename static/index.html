@@ -175,9 +175,10 @@ async function render() {
   }
   const acts = v.actions;
   if (acts.length) {
-    html += `<div class="card"><h2>Approval queue <span class="small muted">(nothing is published, sent or refunded without you)</span></h2><table>
+    html += `<div class="card"><h2>Approval queue <span class="small muted">(nothing is published, sent or refunded without you)</span></h2>${actError ? `<p class="bad small">${esc(actError)}</p>` : ""}<table>
       ${acts.map(a => `<tr><td><span class="badge ${a.kind === "refund" ? "bad" : "warn"}">${esc(a.kind)}</span></td><td><b>${esc(a.target)}</b><br><span class="muted small">${esc(a.description)}</span>
-      ${a.payload && (a.payload.message || a.payload.text) ? `<pre>${esc(a.payload.message || a.payload.text)}</pre>` : ""}</td>
+      ${a.payload && (a.payload.message || a.payload.text) ? `<pre>${esc(a.payload.message || a.payload.text)}</pre>` : ""}
+      ${a.payload && a.payload.promise_check ? promiseLine(a.payload.promise_check) : ""}</td>
       <td>${a.status === "pending" ? `<button class="go" onclick="act('${a.id}',true)">Approve</button> <button class="stop" onclick="act('${a.id}',false)">Reject</button>` :
         `<span class="badge ${a.status === "approved" ? "ok" : "bad"}">${esc(a.status)}</span>${a.executed ? `<div class="small mock">sent to outbox (STUBBED)</div>` : ""}`}</td></tr>`).join("")}</table></div>`;
   }
@@ -213,7 +214,19 @@ async function saveNotes() {
   try { await api(`/api/runs/${current}/interview-notes`, {method: "POST", body: JSON.stringify({notes})}); $("#notes").value = ""; await render(); view("phase1_step5_interview-notes.md"); }
   catch (e) { alertBox(e); $("#notesMsg").textContent = ""; }
 }
-async function act(id, approve) { await api(`/api/runs/${current}/actions/${id}`, {method: "POST", body: JSON.stringify({approve})}); render(); }
+let actError = "";
+async function act(id, approve) {
+  actError = "";
+  try { await api(`/api/runs/${current}/actions/${id}`, {method: "POST", body: JSON.stringify({approve})}); }
+  catch (e) { actError = e.message; }
+  render();
+}
+// The promise checker's result for an item, shown beside Approve / Reject.
+function promiseLine(pc) {
+  const items = (pc.broken_items || []).map(x => `<li class="bad">BROKEN: ${esc(x)}</li>`).concat((pc.unverifiable_items || []).map(x => `<li>Unverifiable: ${esc(x)}</li>`));
+  return `<div class="small"><b>Promise check:</b> ${pc.kept} kept, <span class="${pc.broken ? "bad" : ""}">${pc.broken} broken</span>, ${pc.unverifiable} unverifiable
+    ${pc.broken ? `<b class="bad">(cannot be approved until fixed)</b>` : ""} (${esc(pc.file)})${items.length ? `<ul>${items.join("")}</ul>` : ""}</div>`;
+}
 async function view(name) {
   viewerRun = current;
   const url = `/api/runs/${current}/outputs/${encodeURIComponent(name)}`;

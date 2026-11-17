@@ -25,6 +25,10 @@ class ApprovalRequired(PermissionError):
     """Raised when something tries to go out without founder approval."""
 
 
+class BrokenPromise(ValueError):
+    """Raised when the founder tries to approve an item the promise checker found a broken promise in."""
+
+
 def _now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
@@ -66,6 +70,13 @@ def decide_action(run: dict, action_id: str, approve: bool, actor: str, note: st
     a = find_action(run, action_id)
     if a["status"] != "pending":
         return a
+    broken = (a.get("payload") or {}).get("promise_check") or {}
+    if approve and broken.get("broken"):
+        # A false promise to customers is never published, even with a click: the item has to be fixed first.
+        decision_log.log("approval", f"blocked_broken_promise:{a['kind']}", run_id=run["id"], target=a["target"],
+                         action_id=action_id, outcome="blocked")
+        raise BrokenPromise(f"'{a['target']}' makes {broken['broken']} broken promise(s): "
+                            + "; ".join(broken.get("broken_items", []))[:300] + ". Reject it and repeat the phase with a fix.")
     a["status"] = "approved" if approve else "rejected"
     a["decided_at"] = _now()
     a["note"] = note

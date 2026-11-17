@@ -10,11 +10,13 @@ import re
 import guardrails
 from agents.base import Agent, StepResult, footer
 from agents.verifier import all_errors, last_passes
+from tools import originality
 
 PLACEHOLDERS = re.compile(r"(lorem ipsum|\bTODO\b|\bTBD\b|\[insert|xx+x|<placeholder>)", re.IGNORECASE)
 
 
-def run_tests(product_md: str, guide_md: str, modules: list[str], product_title: str, reviews: list[dict] | None = None) -> list[dict]:
+def run_tests(product_md: str, guide_md: str, modules: list[str], product_title: str, reviews: list[dict] | None = None,
+              originality_result: dict | None = None) -> list[dict]:
     results = []
     sections = re.split(r"^## Module \d+: ", product_md, flags=re.MULTILINE)[1:]
     results.append({"name": "all_modules_present", "passed": len(sections) == len(modules) and len(modules) >= 3,
@@ -52,6 +54,11 @@ def run_tests(product_md: str, guide_md: str, modules: list[str], product_title:
             value += "; model review not available, SQL check only"
     results.append({"name": "verifier_last_pass_has_no_errors", "passed": reviewed and not open_errors, "value": value,
                     "threshold": "every module reviewed, 0 open errors"})
+    if originality_result is not None:
+        n, c = originality_result["name"], originality_result["copy"]
+        results.append({"name": "product_is_original", "passed": originality_result["passed"],
+                        "value": f"name clashes: {len(n['clashes'])}, copied passages: {len(c['passages'])}",
+                        "threshold": f"0 name clashes, 0 runs of {c['min_words']}+ words copied from a source"})
     return results
 
 
@@ -85,14 +92,18 @@ class QA(Agent):
 
     def run_step(self, product_md: str, guide_md: str, modules: list[str], product_title: str,
                  reviews: list[dict] | None = None) -> StepResult:
-        results = run_tests(product_md, guide_md, modules, product_title, reviews)
+        evidence = [e for c in self.run.get("ctx", {}).get("candidates", []) for e in c.get("evidence", [])]
+        orig = originality.check(product_md, product_title, evidence)
+        results = run_tests(product_md, guide_md, modules, product_title, reviews, originality_result=orig)
         passed = sum(r["passed"] for r in results)
         md = [f"# Phase 3, step 4: MVP test report ({passed}/{len(results)} passed)", "",
               "| Test | Result | Value | Threshold |", "|---|---|---|---|"]
         for r in results:
             md.append(f"| {r['name']} | {'PASS' if r['passed'] else 'FAIL'} | {r['value']} | {r['threshold']} |")
-        md += ["", "These checks are deterministic code in `agents/qa.py`, not model opinions. The last one counts the errors "
-               "the verifier agent left open; the verifier's own findings are listed below."]
+        md += ["", "These checks are deterministic code in `agents/qa.py` and `tools/originality.py`, not model opinions. "
+               "`verifier_last_pass_has_no_errors` counts the errors the verifier agent left open; `product_is_original` "
+               "compares the product with the sources read in Phase 1. Details of both are below."]
         md += review_section(reviews)
+        md += originality.report_lines(orig)
         md.append(footer(next((r["model"] for r in reviews or [] if r.get("model")), None)))
-        return self.result("qa-report", "test_mvp", "\n".join(md), data={"tests": results})
+        return self.result("qa-report", "test_mvp", "\n".join(md), data={"tests": results, "originality": orig})

@@ -33,7 +33,7 @@ DOC_CHARS = 3500
 # Which steps of each phase are debated, and the debate's own step number (after the phase's other steps;
 # phase 1 step 5 is kept for the founder's interview notes).
 DEBATED_STEPS = {1: [1, 3], 2: [1, 3], 3: [1, 2], 4: [1, 2], 5: [1, 2], 6: [3]}
-DEBATE_STEP = {1: 6, 2: 4, 3: 5, 4: 3, 5: 4, 6: 4}
+DEBATE_STEP = {1: 6, 2: 4, 3: 5, 4: 3, 5: 5, 6: 4}  # phase 5: step 4 is the promise check
 SEVERITIES = ("high", "medium", "low")
 FIXED, NOT_APPLIED, DEFENDED, OPEN = "fixed", "conceded, not applied", "defended", "open"
 STATUSES = (FIXED, NOT_APPLIED, DEFENDED, OPEN)
@@ -84,6 +84,32 @@ def doc_text(raw: str, limit: int = DOC_CHARS, html: bool = False) -> str:
     t = re.sub(r"[ \t]+", " ", t)
     t = re.sub(r"\n{3,}", "\n\n", t).strip()
     return t[:limit]
+
+
+def mirror_correction(obj, quote: str, fix: str) -> int:
+    """Apply a written correction to text held outside the file (an approval item's payload, the store page's copy),
+    so what the founder approves and what the promise checker reads match the corrected document. Returns hits."""
+    import html as _html
+    rx = _quote_rx(_html.unescape(quote))
+    new_text = _html.unescape(fix)
+    hits = 0
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            if isinstance(v, str):
+                new, n = rx.subn(lambda _m: new_text, v, count=1)
+                if n:
+                    obj[k], hits = new, hits + n
+            else:
+                hits += mirror_correction(v, quote, fix)
+    elif isinstance(obj, list):
+        for i, v in enumerate(obj):
+            if isinstance(v, str):
+                new, n = rx.subn(lambda _m: new_text, v, count=1)
+                if n:
+                    obj[i], hits = new, hits + n
+            else:
+                hits += mirror_correction(v, quote, fix)
+    return hits
 
 
 def summary_line(s: dict) -> str:

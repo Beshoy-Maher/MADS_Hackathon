@@ -82,7 +82,7 @@ An **orchestrator** (`orchestrator.py`) runs the six phases in order. Each phase
 
 ## Demo video
 
-Demo video (3 minutes): https://drive.google.com/file/d/1_flIP4f2UaXU5lvi1eR81f5lqV7ubHwC/view?usp=sharing
+Demo video: https://drive.google.com/file/d/1_flIP4f2UaXU5lvi1eR81f5lqV7ubHwC/view?usp=sharing
 
 ## What our system will NOT do
 

@@ -15,22 +15,40 @@ _NOUNS = (r"questions?|exercises?|examples?|problems?|queries|pages?|templates?|
           r"lessons?|units?|videos?|layouts?|screens?|files?|case studies|case study|prompts?|drills?|answers?")
 # "15 SQL interview questions" -> "SQL interview questions": the number goes, the noun stays.
 COUNT = re.compile(rf"\b{_NUM}\+?\s+((?:[A-Za-z][\w-]*\s+){{0,3}}?)({_NOUNS})\b", re.IGNORECASE)
-PAGE_ADJ = re.compile(rf"\b{_NUM}[- ]page\b\s*", re.IGNORECASE)
+# "a 45-page workbook", "a 40-question workbook" -> "a workbook".
+PAGE_ADJ = re.compile(rf"\b{_NUM}[- ](?:page|question|exercise|example|problem|module|lesson|chapter|template|worksheet)\b\s*", re.IGNORECASE)
 # "(PDF, 45 pages)" or "(45 pages)": the whole parenthetical goes.
 PAREN_COUNT = re.compile(rf"\s*\([^()]*\b(?:{_NUM}\s+pages?|pdf)\b[^()]*\)", re.IGNORECASE)
-PDF_WORD = re.compile(r"\bPDF\s+(?=[a-z])", re.IGNORECASE)
+# "PDF workbook" -> "workbook"; a bare "PDF" becomes "file", so no sentence loses its noun ("It's a with ...").
+PDF_ADJ = re.compile(r"\b(?:downloadable\s+)?PDF\s+(?=(?:workbook|guide|book|ebook|file|download|version|pack|document|template|format)s?\b)",
+                     re.IGNORECASE)
+PDF_WORD = re.compile(r"\b(?:downloadable\s+)?PDF\b", re.IGNORECASE)
 
 EXPERIENCE = re.compile(r"\b(i(?:'|’)?ve (?:seen|been|faced|hired|interviewed|used|met|helped|worked)|i have (?:seen|been|faced|hired|interviewed)|"
                         r"who(?:'|’)?s been|who has been|been through|in my (?:own )?(?:experience|career|years|interviews)|"
                         r"from (?:my|personal) experience|i (?:hired|interviewed|failed|struggled)|when i was (?:a|an|looking|job)|"
-                        r"actual interviews|real interviews i)\b", re.IGNORECASE)
+                        r"actual interviews|real interviews i|i(?:'|’)?ve (?:encountered|run into|come across|dealt with|gone through|faced)|"
+                        r"i (?:encountered|ran into|came across|went through|wish (?:something|this|i had|there was))|"
+                        r"when i (?:was starting|started|first started|began)|starting out|"
+                        r"(?:struggles?|problems?|challenges?|pain) you (?:faced|had|went through)|you(?:'|’)?ve (?:faced|been through)|"
+                        r"when you were (?:a|an|starting|junior|new))\b", re.IGNORECASE)
 
 COVERT = re.compile(r"\b(subtl\w*|covert\w*|disguis\w*|without (?:saying|disclosing|mentioning|revealing)|pretend\w*|"
                     r"limited[- ]time|for a limited|only \w+ (?:spots?|copies|seats?) (?:left|available)|hurry|act now|"
                     r"before it(?:'|’)?s gone|countdown|scarcity|in exchange for (?:sharing|referr\w*|inviting)|"
                     rf"(?:share|send) (?:the link |it )?(?:with|to) {_NUM} (?:peers?|friends?|people|colleagues)|"
+                    r"(?:comment|repl|respond|answer|engag)\w*\b[^.\n]{0,80}\b(?:link\w*|mention\w*|plug\w*|promot\w*|drop\w*)\b[^.\n]{0,40}\b(?:waitlist|workbook|product|page|pack|template)|"
                     r"your (?:own )?(?:journey|story) as an?|as if you (?:were|are)|astroturf\w*|sock ?puppet\w*)\b",
                     re.IGNORECASE)
+
+GROUP_PLACE = re.compile(r"\b(facebook|linkedin|discord|slack|telegram|whatsapp|twitter|instagram|tiktok|behance|dribbble|"
+                         r"quora|medium|youtube|product hunt|indie hackers)\b(?:\s+\w+){0,3}?\s+(groups?|communit\w*|servers?|channels?|"
+                         r"forums?|pages?)\b", re.IGNORECASE)
+# Advice to stop or pause selling: only the gate (code) can recommend that.
+PAUSE = re.compile(r"\b(?:pause|halt|stop|suspend|freeze|shut down|pull)\w*\s+(?:the |all |your |any )?(?:launch\w*|sales?|selling|store|product)\b",
+                   re.IGNORECASE)
+_DANGLING = re.compile(r"^(?:since then|despite this|however|still|yet|but|nevertheless|that said|even so|because of this|"
+                       r"as a result|in addition|also|moreover|furthermore|therefore|thus|so|and),?\s+", re.IGNORECASE)
 
 _END = re.compile(r"[.!?…)\"'”’»]\s*$")
 _SENT = re.compile(r"(?<=[.!?])\s+")
@@ -47,7 +65,8 @@ def strip_counts(text: str) -> tuple[str, int]:
     t = drop(PAREN_COUNT, "", text or "")
     t = drop(PAGE_ADJ, "", t)
     t = drop(COUNT, lambda m: m.group(1) + m.group(2), t)
-    t = drop(PDF_WORD, "", t)
+    t = drop(PDF_ADJ, "", t)
+    t = drop(PDF_WORD, "file", t)
     t = re.sub(r"\s{2,}", " ", t).strip()
     if t[:1].islower() and (text or "")[:1].isupper():
         t = t[0].upper() + t[1:]
@@ -82,6 +101,29 @@ def drop_covert_lines(text: str) -> tuple[str, int]:
     lines = (text or "").splitlines()
     keep = [l for l in lines if not COVERT.search(l)]
     return "\n".join(keep), len(lines) - len(keep)
+
+
+def unresearched_places(text: str, found: set[str]) -> bool:
+    """True when a line names a group or community on a platform the research did not find."""
+    return any(m.group(1).lower() not in " ".join(found).lower() for m in GROUP_PLACE.finditer(text or ""))
+
+
+def fix_punctuation(text: str) -> str:
+    """'evidence., meaning' -> 'evidence, meaning'; 'data..' -> 'data.'"""
+    t = re.sub(r"\.\s*([,;:])", r"\1", text or "")
+    return re.sub(r"(?<!\.)\.\.(?!\.)", ".", t)
+
+
+def clean_memo(text: str, recommendation: str) -> str:
+    """The memo's reasoning: no dangling opener, no broken punctuation, no advice that contradicts the gate, no cut-off end."""
+    t = fix_punctuation(text)
+    sents = [s for s in _SENT.split(t.strip()) if s]
+    if recommendation.lower() != "stop":
+        sents = [s for s in sents if not PAUSE.search(s)]
+    t = " ".join(sents)
+    t = _DANGLING.sub("", t)
+    t = t[:1].upper() + t[1:]
+    return complete_sentences(t)
 
 
 def complete_sentences(text: str) -> str:

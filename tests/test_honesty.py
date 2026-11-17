@@ -116,3 +116,42 @@ def test_canvas_lists_no_channel_outside_the_evidence(monkeypatch):
     run = orchestrator.create_run(STRONG)
     res = Strategist(run).run_step({"title": "SQL workbook"}, {"communities": {"hackernews": 3, "github": 5}}, {})
     assert "r/UXDesign" not in res.content and "Founder's own network" in res.content
+
+
+# Second round: failures found in the rerun on 683edb8.
+def test_count_and_format_removal_keeps_the_sentence_whole():
+    assert honesty.strip_counts("It’s a PDF with real SQL questions.")[0] == "It’s a file with real SQL questions."
+    assert honesty.strip_counts("It’s a 40-question workbook.")[0] == "It’s a workbook."
+    assert honesty.strip_counts("A PDF workbook for analysts.")[0] == "A workbook for analysts."
+
+
+def test_more_experience_cues_are_caught():
+    for s in ("It has real SQL questions I’ve encountered, each with a worked answer.",
+              "I wish something like this existed when I was starting out.",
+              "- Share the exact struggles you faced as a junior designer."):
+        assert honesty.unbacked_experience(s, BRIEF), s
+
+
+def test_memo_is_cleaned_against_the_gate():
+    raw = ("Since then, no real buyers have made purchases, as verified by the absence of data in the provided evidence., "
+           "meaning there’s no verified signal of market interest. The founder should pause the launch and test demand first. "
+           "Keep the store page live and review the real numbers.")
+    out = honesty.clean_memo(raw, "repeat")
+    assert out.startswith("No real buyers") and "., " not in out and "pause the launch" not in out
+    assert out.endswith("review the real numbers.")
+    assert honesty.clean_memo("Pause the launch now.", "stop") == "Pause the launch now."
+
+
+def test_demand_plan_drops_unresearched_groups_and_comment_plugging():
+    assert honesty.unresearched_places("- Post in a Facebook group for Egyptian designers.", {"hacker news"})
+    assert not honesty.unresearched_places("- Share it with people you know on LinkedIn.", {"hacker news"})
+    assert honesty.drop_covert_lines("- Comment on other people's Hacker News posts, linking to the waitlist.")[1] == 1
+
+
+def test_debate_correction_cannot_break_punctuation_or_add_a_pause(tmp_path):
+    from agents.critic import _apply_problem
+    doc = tmp_path / "memo.md"
+    doc.write_text("## Reasoning\nThere is no data in the provided evidence, meaning there is no signal.\n", encoding="utf-8")
+    assert "punctuation" in _apply_problem("in the provided evidence", "in the provided evidence.", doc, set())
+    assert "only the gate" in _apply_problem("meaning there is no signal", "so pause the launch until there is a signal", doc, set())
+    assert "experience" in _apply_problem("meaning there is no signal", "which I've encountered before", doc, set())

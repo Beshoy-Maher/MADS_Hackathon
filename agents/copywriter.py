@@ -149,7 +149,8 @@ class Copywriter(Agent):
                 "experience in the brief, what is inside, and one specific question asking for feedback. Your own sentences: do not "
                 "copy the problem statement or the brief word for word, no greeting formula like 'Hi all', no hype, no urgency, "
                 "no claims of results, no statistics, no links. Do not state how many questions, modules, templates or pages "
-                "it has, and claim only the experience the brief states. Plain text only, no heading.")
+                "it has, and claim only the experience the brief states: do not say you have seen, encountered or used these questions, "
+                "or what you wished for when starting out. Plain text only, no heading.")
         if avoid:
             task += "\n\nThese sentences are already used in another post; do not use them or anything close to them:\n" + "\n".join(f"- {a}" for a in avoid)
         res = llm.complete(self.system(), task, "", max_tokens=400)

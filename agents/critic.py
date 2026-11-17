@@ -190,6 +190,15 @@ def _apply_problem(quote: str, fix: str, path, allowed: set[str]) -> str:
         return "the replacement text is already in the document (it would repeat a sentence)"
     if guardrails.scan_output(fix).violations:
         return "the guardrail scan would remove part of the replacement"
+    from tools import honesty
+    if honesty.fix_punctuation(new_line) != new_line and honesty.fix_punctuation(line) == line:
+        return "the replacement would leave broken punctuation (a full stop in the middle of a sentence)"
+    if honesty.PAUSE.search(fix) and not honesty.PAUSE.search(span):
+        return "the replacement advises stopping or pausing; only the gate can recommend that"
+    if honesty.EXPERIENCE.search(fix) and not honesty.EXPERIENCE.search(span):
+        return "the replacement claims experience for the founder"
+    if honesty.COVERT.search(fix) and not honesty.COVERT.search(span):
+        return "the replacement adds covert promotion or urgency"
     checked, _ = claims.check(fix, allowed, mode="light")
     if checked.strip() != fix.strip():
         return "the claim check would change the replacement (an unsourced figure or a link that was never fetched)"

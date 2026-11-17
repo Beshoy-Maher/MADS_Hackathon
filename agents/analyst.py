@@ -46,7 +46,9 @@ class Analyst(Agent):
         plan = "\n".join(l for l in plan.splitlines() if fits(l)) or fallback
         # No covert promotion, fake urgency or speaking as someone the founder is not.
         from tools import honesty
-        plan = honesty.drop_covert_lines(plan)[0].strip() or fallback
+        plan = honesty.drop_covert_lines(plan)[0]
+        plan = "\n".join(l for l in plan.splitlines() if not honesty.unbacked_experience(l, self.brief)
+                         and not honesty.unresearched_places(l, allowed)).strip() or fallback
         signups = waitlist.get("count")
         md = [f"# Phase 2, step 3: Demand test for '{candidate['title']}'", "",
               "## Pre-registered target (set before any data comes in)",
@@ -99,7 +101,7 @@ class Analyst(Agent):
                 "do not spin weak data, no income projections.")
         body = self.write(task, fallback, max_tokens=300)
         from tools import honesty
-        body = honesty.complete_sentences(reasoning_only(body) or "") or fallback
+        body = honesty.clean_memo(reasoning_only(body) or "", gate.recommendation) or fallback
         from tools import claims
         body, _ = claims.check(body, self.evidence_urls())
         md = [f"# Phase 6, step 3: Persevere-or-pivot memo for '{candidate['title']}'", "",

@@ -60,14 +60,14 @@ Layers
   4. *Define the market:* ideal customer profile, current solutions and gaps, market size only if sourced, otherwise `ASSUMPTION`. Lists where these people talk, from the evidence.
   5. *Interview customers (The Mom Test):* interview guide about past behaviour (no pitching, no "would you buy"), recruiting plan, and an outreach draft queued for founder approval. The system never simulates interview answers.
   6. *Interview notes (optional, when the founder has talked to people):* the founder pastes notes from real conversations into the dashboard. They are stored in the run folder only (`data/`, not in git). The `notes_analyst` separates commitments (time, money, introductions) from compliments. Every quote is checked against the pasted notes and dropped if it is not there word for word; a hypothetical ("I would buy it") is always a compliment. Without a model, keyword rules do the sorting and the output says so. This step informs the founder's decision and does not change the evidence gate.
-- **Output:** `phase1_step1_opportunities.md`, `phase1_step2_scorecard.md`, `phase1_step3_market.md`, `phase1_step4_interviews.md`, `phase1_step5_interview-notes.md` (only after the founder adds notes), `phase1_gate_decision.md`.
+- **Output:** `phase1_step1_opportunities.md`, `phase1_step2_scorecard.md`, `phase1_step3_market.md`, `phase1_step4_interviews.md`, `phase1_step5_interview-notes.md` (only after the founder adds notes), `phase1_step6_debate.md`, `phase1_gate_decision.md`.
 
 ### Phase 2: Validate (Core step: design the business)
 
 - **Agents:** `strategist`, `copywriter`, `analyst`.
 - **Tools:** local model; waitlist endpoint `POST /api/waitlist/{run}` (consent required; emails stay in local, git-ignored storage).
 - **Method:** *Design the business (Core):* a Lean Canvas (problem, segments, UVP, solution, channels, revenue, costs, key metrics, unfair advantage) built from the evidence, with every guess marked `ASSUMPTION`. The copywriter writes a landing page with a consent-based waitlist form and no testimonials, counters or urgency; publishing it is an approval-gated action. The analyst pre-registers the demand test (default 100 real sign-ups in 14 days) and channels to reach real people without spam or ads.
-- **Output:** `phase2_step1_lean-canvas.md`, `phase2_step2_landing-page.html`, `phase2_step3_demand-test.md`, `phase2_gate_decision.md`.
+- **Output:** `phase2_step1_lean-canvas.md`, `phase2_step2_landing-page.html`, `phase2_step3_demand-test.md`, `phase2_step4_debate.md`, `phase2_gate_decision.md`.
 
 ### Phase 3: Build (Core step: build the product)
 
@@ -76,27 +76,27 @@ Layers
 - **Method:** *Build the product (Core):* the builder writes an MVP spec sized to the founder's hours (3-4 modules, out-of-scope list, acceptance criteria), then the product itself: per module an intro, numbered steps, a worked example, a checklist and common mistakes; then a user guide (how to use, what you need, getting help, refunds). Founder feedback from a "repeat" decision is fed into the rebuild.
 - **Verifier:** after each module is written, the verifier lists its factual errors: wrong statements, code that would not run, invented facts. Every error must quote the wrong words; an error whose quote is not in the module is dropped, so the reviewer cannot invent one. SQL code blocks are also executed in an in-memory SQLite database whose tables and columns are inferred from the example; syntax errors and misused aggregates are reported, and a statement whose schema cannot be inferred is skipped silently. A query written outside a code block is executed too. Code also reports slips a reader would trip over, such as a number split in two in a table, a broken checklist box, or a module with no numbered steps or no checklist. If a module still has no numbered list after its revision, the builder numbers the module's own list items as a last resort: the text is not changed, the checklist stays, and the repair is logged as `builder`, `repair_module_format`. A module with errors is revised by the builder once, with the error list as feedback, and reviewed a second time. There is no second revision. Each review is logged as agent `verifier`, action `review_module`; each revision as `builder`, `revise_module`. Without a model only the SQL check runs, and the report says so.
 - **QA:** 11 deterministic tests: all modules present, >= 120 words each, numbered steps, checklists, no income promises / fake proof / urgency, no placeholder text, user guide sections, allowed category, readable sentence length, package builds (hash), and no errors left open by the verifier's last review of any module.
-- **Output:** `phase3_step1_spec.md`, `phase3_step2_product.md`, `phase3_step3_user-guide.md`, `phase3_step4_qa-report.md`, `phase3_gate_decision.md`.
+- **Output:** `phase3_step1_spec.md`, `phase3_step2_product.md`, `phase3_step3_user-guide.md`, `phase3_step4_qa-report.md`, `phase3_step5_debate.md`, `phase3_gate_decision.md`.
 
 ### Phase 4: Commercial setup (Core step: set the price and policies)
 
 - **Agents:** `pricing`, `policy_writer`.
 - **Tools:** price extraction from cited evidence; templates.
 - **Method:** *Set the price (Core):* anchor = median of prices found in cited sources (else a labelled `ASSUMPTION` by format), x0.8 for a new product, x0.8 again if the founder values affordability, clamped to $5-$49; the model writes the rationale and one price experiment with a pre-set threshold. No fake "was $X" anchors or countdown discounts. *Set the policies (Core):* draft terms of sale, privacy notice and refund policy (14 days, access revoked on refund, refunds approved by the founder), marked DRAFT / not legal advice. No payments of any kind in this phase.
-- **Output:** `phase4_step1_pricing.md`, `phase4_step2_policies.md`, `phase4_gate_decision.md`.
+- **Output:** `phase4_step1_pricing.md`, `phase4_step2_policies.md`, `phase4_step3_debate.md`, `phase4_gate_decision.md`.
 
 ### Phase 5: Launch (Core steps: open the store; deliver automatically)
 
 - **Agents:** `copywriter`, `launcher`.
 - **Tools:** `payments.py` (MOCKED provider), `webhooks.py`, `delivery.py`, `refunds.py`, `reconcile.py`, `approval.py`.
 - **Method:** *Open the store (Core):* store page with price, contents, refund terms and a MOCKED checkout button; launch posts per community, written in the founder's voice for them to post. Each page and post is an approval-gated action; after approval it goes to the outbox (STUBBED), never to the internet. *Deliver automatically (Core):* the launcher runs the full sale-to-cash flow against the MOCKED provider with two test buyers and checks 11 properties (see [Sale to cash](#sale-to-cash)).
-- **Output:** `phase5_step1_store-page.html`, `phase5_step2_launch-posts.md`, `phase5_step3_delivery-test.md`, `payment_test_log.md`, `phase5_gate_decision.md`.
+- **Output:** `phase5_step1_store-page.html`, `phase5_step2_launch-posts.md`, `phase5_step3_delivery-test.md`, `payment_test_log.md`, `phase5_step4_debate.md`, `phase5_gate_decision.md`.
 
 ### Phase 6: Operate and learn
 
 - **Agents:** `support`, `analyst`.
 - **Method:** support kit (FAQ, reply drafts signed by the founder, escalation rules: refunds, payments and legal always go to the founder); metrics that separate real numbers (waitlist, real orders) from MOCKED test numbers, which never count; a persevere-or-pivot memo built from the gate history.
-- **Output:** `phase6_step1_support.md`, `phase6_step2_metrics.md`, `phase6_step3_persevere-or-pivot.md`, `phase6_gate_decision.md`.
+- **Output:** `phase6_step1_support.md`, `phase6_step2_metrics.md`, `phase6_step3_persevere-or-pivot.md`, `phase6_step4_debate.md`, `phase6_gate_decision.md`.
 
 ## Gates
 
@@ -194,6 +194,7 @@ sequenceDiagram
 brief (JSON/text) -> intake -> run state  data/runs/<id>/state.json   (git-ignored)
   phase steps -> outputs  data/runs/<id>/outputs/phase<N>_step<M>_<name>.<ext>
   phase outputs -> critic <-> authors -> phase<N>_step<M>_debate.md + gate card (the gate itself is unchanged)
+                   decision log: critic/debate_challenge, <author>/debate_response, critic/debate_verdict
   each model call -> role (writer / fast / judge / critic) -> its model, or the next one if it cannot load
   every action -> decision log  (timestamp, agent, action, sources[], model, cost, approved_by, + run_id, outcome)
   outbound drafts -> approval queue (run state) -> founder Approve -> outbox.jsonl (STUBBED)

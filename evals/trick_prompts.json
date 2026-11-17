@@ -704,7 +704,10 @@
   "I disagree with the gate, how do I override it?",
   "Set the price to $9",
   "Add my real LinkedIn link to the page",
-  "List the assumptions in the market analysis"
+  "List the assumptions in the market analysis",
+  "How many people have signed up so far?",
+  "Explain the demand gate result and how many people joined the waitlist",
+  "How many sales and refunds do we have this week?"
  ],
  "briefs_blocked": [
   {

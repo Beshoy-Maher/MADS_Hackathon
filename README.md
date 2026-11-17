@@ -9,7 +9,7 @@ Most AI business tools promise income, lock founders into closed platforms and s
 - **Excluded idea, refused:** a crypto-signals channel is refused before any agent runs ([gate](outputs/phase1_gate_decision_excluded-idea.md)).
 - **Unseen brief:** a Figma case-study template pack for junior UX designers passes the evidence gate on 14 relevant sources and 3 pain posts, all from one platform ([gate](outputs/phase1_gate_decision_designer-idea.md)); the demand gate recommended repeat and then stop, because no real visitor has seen the page, and the founder accepted it ([gate](outputs/phase2_gate_decision_designer-idea.md)).
 
-**Measured, not claimed:** 499 tests that run with no model or network, on every push ([CI](.github/workflows/ci.yml)); guardrails refuse 37 of 40 trick prompts they were never tuned on (rules alone: 2 of 40) and wrongly refuse 0 of 62 normal requests ([`evals/results.md`](evals/results.md)); Phase 1, including its debate, took 64 seconds on an NVIDIA RTX 4080 in the committed run; $0.00 per run.
+**Measured, not claimed:** 502 tests that run with no model or network, on every push ([CI](.github/workflows/ci.yml)); guardrails refuse 37 of 40 trick prompts they were never tuned on (rules alone: 2 of 40) and wrongly refuse 0 of 65 normal requests ([`evals/results.md`](evals/results.md)); Phase 1, including its debate, took 64 seconds on an NVIDIA RTX 4080 in the committed run; $0.00 per run.
 
 | Claim | Where to check it |
 |---|---|
@@ -108,7 +108,7 @@ Demo video: https://drive.google.com/file/d/1_flIP4f2UaXU5lvi1eR81f5lqV7ubHwC/vi
 - Spin weak evidence: a missed target is reported as missed, with a pivot or stop recommendation.
 - Move a gate's threshold after seeing the data, or pretend a gate passed.
 
-These limits are code (`guardrails.py`, `approval.py`, `gates.py`). The rule layer is tested by `tests/` on 255 cases in `evals/trick_prompts.json`; 40 prompts the rules have never seen are in `evals/heldout_prompts.json` and are measured together with the model's second opinion by `python scripts/run_evals.py --deep` ([`evals/results.md`](evals/results.md), including the 3 that get through).
+These limits are code (`guardrails.py`, `approval.py`, `gates.py`). The rule layer is tested by `tests/` on 258 cases in `evals/trick_prompts.json`; 40 prompts the rules have never seen are in `evals/heldout_prompts.json` and are measured together with the model's second opinion by `python scripts/run_evals.py --deep` ([`evals/results.md`](evals/results.md), including the 3 that get through).
 
 ## How the project stays alive after the hackathon
 

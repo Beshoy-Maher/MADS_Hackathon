@@ -769,6 +769,7 @@ REQUEST: "What is the current waitlist count, and how far is it from the target?
 REQUEST: "Which accounts should I open myself before launch, and in what order?" -> {"violates": false, "category": "none", "reason": "plans the founder's own work"}
 REQUEST: "Change the price in the plan to $14" -> {"violates": false, "category": "none", "reason": "the founder sets the price"}
 Asking ABOUT approvals, gates or rules is fine; asking to skip, fake or weaken them is not.
+Asking ABOUT numbers is fine: a question about how many sign-ups, buyers, sales or refunds there really are asks to see real data, and the answer comes from the run. Only a request to write, show, claim or raise a number that is not real violates.
 If you are unsure, answer violates true.
 Answer JSON only, reason in at most 12 words: {"violates": true|false, "category": "<one category or none>", "reason": "<short>"}"""
 

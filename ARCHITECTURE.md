@@ -46,7 +46,7 @@ Layers
 
 ### Phase 1: Discover (Core step: find opportunities)
 
-- **Agents:** `intake`, `researcher`, `scorer`, `market_analyst`, `interviewer`.
+- **Agents:** `intake`, `researcher`, `scorer`, `market_analyst`, `interviewer`, `notes_analyst`.
 - **Tools:** local model; Hacker News Algolia API, Reddit public JSON, GitHub search (repositories + issues), Stack Exchange API; `guardrails.screen_brief`.
 - **Method:**
   1. *Intake* turns a JSON or free-text brief into fields (idea, skills, budget, hours/week, market, values) and refuses excluded products before any agent runs.
@@ -54,7 +54,8 @@ Layers
   3. *Score vs. alternatives:* fixed formulas: demand (log-scaled engagement + pain posts), willingness to pay, competition (popular existing solutions), founder fit (skill match, hours, budget), total. The model only rates skill match, averaged with keyword overlap.
   4. *Define the market:* ideal customer profile, current solutions and gaps, market size only if sourced, otherwise `ASSUMPTION`. Lists where these people talk, from the evidence.
   5. *Interview customers (The Mom Test):* interview guide about past behaviour (no pitching, no "would you buy"), recruiting plan, and an outreach draft queued for founder approval. The system never simulates interview answers.
-- **Output:** `phase1_step1_opportunities.md`, `phase1_step2_scorecard.md`, `phase1_step3_market.md`, `phase1_step4_interviews.md`, `phase1_gate_decision.md`.
+  6. *Interview notes (optional, when the founder has talked to people):* the founder pastes notes from real conversations into the dashboard. They are stored in the run folder only (`data/`, not in git). The `notes_analyst` separates commitments (time, money, introductions) from compliments. Every quote is checked against the pasted notes and dropped if it is not there word for word; a hypothetical ("I would buy it") is always a compliment. Without a model, keyword rules do the sorting and the output says so. This step informs the founder's decision and does not change the evidence gate.
+- **Output:** `phase1_step1_opportunities.md`, `phase1_step2_scorecard.md`, `phase1_step3_market.md`, `phase1_step4_interviews.md`, `phase1_step5_interview-notes.md` (only after the founder adds notes), `phase1_gate_decision.md`.
 
 ### Phase 2: Validate (Core step: design the business)
 
@@ -179,10 +180,11 @@ Personal data: only consented waitlist emails, stored locally and never logged. 
 | Payment provider / checkout | **MOCKED** |
 | Publishing pages and posts, sending outreach, delivery emails | **STUBBED** (outbox) |
 | Public hosting of the waitlist page | **STUBBED** (form works on the local app) |
-| Customer interviews | **STUBBED** (guide and outreach built; answers come from the founder) |
+| Customer interviews | **STUBBED** (guide and outreach built; the conversations are the founder's own) |
+| Interview notes: commitments vs. compliments, quotes checked against the founder's pasted notes | Built |
 
 ## Roadmap
 
-1. **Next 2 weeks:** interview-notes analysis (founder pastes real notes, agent extracts commitments vs. compliments); Arabic-language outputs; more evidence sources (Product Hunt, YouTube comments via public APIs).
+1. **Next 2 weeks:** interview commitments as an input the founder can weigh at the evidence gate; Arabic-language outputs; more evidence sources (Product Hunt, YouTube comments via public APIs).
 2. **Next 2 months:** payment-provider adapter in test mode behind the same webhook/delivery code; publishing adapters (static hosting, social) that still require founder approval per item.
 3. **Later:** multi-founder hosting, plug-in agents, a shared library of guardrail trick prompts contributed by users.

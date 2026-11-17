@@ -166,12 +166,23 @@ async function render() {
       <td>${a.status === "pending" ? `<button class="go" onclick="act('${a.id}',true)">Approve</button> <button class="stop" onclick="act('${a.id}',false)">Reject</button>` :
         `<span class="badge ${a.status === "approved" ? "ok" : "bad"}">${esc(a.status)}</span>${a.executed ? `<div class="small mock">sent to outbox (STUBBED)</div>` : ""}`}</td></tr>`).join("")}</table></div>`;
   }
+  if (r.researched) {
+    const n = r.interview_notes;
+    const keep = $("#notes") ? $("#notes").value : "";
+    html += `<div class="card"><h2>Interview notes <span class="small muted">(from your real conversations; stored on this machine only)</span></h2>
+      <p class="small muted">Paste what people actually said. An agent separates commitments (time, money, introductions) from compliments and quotes only your notes. It never writes an answer for anyone.</p>
+      <textarea id="notes" rows="5" style="width:100%" placeholder="e.g. Ahmed: showed me his spreadsheet and booked a second call for Thursday. Sara: said it sounds great.">${esc(keep)}</textarea>
+      <div class="row" style="margin-top:8px"><button onclick="saveNotes()" ${r.status === "running" ? "disabled" : ""}>Analyse notes</button>
+      <span id="notesMsg" class="small muted">${n ? `Last analysis: ${n.commitments} commitment(s), ${n.compliments} compliment(s). See phase1_step5_interview-notes.md below.` : "No notes added yet."}</span></div></div>`;
+  }
   html += `<div class="card"><h2>Outputs</h2><div class="row small">${v.outputs.map(o => `<button onclick="view('${esc(o)}')">${esc(o)}</button>`).join("") || `<span class="muted">None yet.</span>`}</div><div id="viewer"></div></div>`;
   html += `<div class="card"><h2>Decision log <span class="small muted">(${v.log.length} entries, every agent action)</span></h2><div style="max-height:360px;overflow:auto"><table>
     <tr><th>Time</th><th>Agent</th><th>Action</th><th>Model</th><th>Sources</th><th>Approved by</th><th>Outcome</th></tr>
     ${v.log.slice().reverse().map(e => `<tr><td>${esc(e.timestamp.slice(11, 19))}</td><td>${esc(e.agent)}</td><td>${esc(e.action)}</td><td>${esc(e.model || "none")}</td><td>${e.sources.length}</td><td>${esc(e.approved_by || "")}</td><td>${esc(e.outcome || "")}</td></tr>`).join("")}
   </table></div></div>`;
   const viewer = ($("#viewer") && viewerRun === current) ? $("#viewer").innerHTML : "";
+  const typing = document.activeElement && document.activeElement.id === "notes";
+  if (typing) return;  // do not redraw (and lose the cursor) while the founder is typing notes
   $("#main").innerHTML = html;
   if (viewer) $("#viewer").innerHTML = viewer;
 }
@@ -180,6 +191,12 @@ async function decide(d) {
   const note = $("#note") ? $("#note").value : "";
   try { await api(`/api/runs/${current}/decide`, {method: "POST", body: JSON.stringify({decision: d, note})}); } catch (e) { alertBox(e) }
   render();
+}
+async function saveNotes() {
+  const notes = $("#notes").value.trim(); if (!notes) return;
+  $("#notesMsg").textContent = "Reading the notes...";
+  try { await api(`/api/runs/${current}/interview-notes`, {method: "POST", body: JSON.stringify({notes})}); $("#notes").value = ""; await render(); view("phase1_step5_interview-notes.md"); }
+  catch (e) { alertBox(e); $("#notesMsg").textContent = ""; }
 }
 async function act(id, approve) { await api(`/api/runs/${current}/actions/${id}`, {method: "POST", body: JSON.stringify({approve})}); render(); }
 async function view(name) {

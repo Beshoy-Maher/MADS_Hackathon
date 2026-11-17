@@ -28,6 +28,7 @@ from agents.copywriter import Copywriter
 from agents.interviewer import Interviewer
 from agents.launcher import Launcher
 from agents.market_analyst import MarketAnalyst
+from agents.notes_analyst import MAX_NOTES_CHARS, NotesAnalyst
 from agents.policy_writer import PolicyWriter
 from agents.pricing import Pricing
 from agents.qa import QA
@@ -182,6 +183,39 @@ def add_waitlist_signup(run_id: str, email: str, consent: bool) -> int:
     p.write_text(json.dumps(data), encoding="utf-8")
     decision_log.log("landing_page", "waitlist_signup", run_id=run_id, detail="real sign-up via form (email not logged)")
     return len(data["signups"])
+
+
+# --------------------------------------------------------------- interview notes
+def interview_notes(run_id: str) -> str:
+    p = run_dir(run_id) / "interview_notes.txt"
+    return p.read_text(encoding="utf-8") if p.exists() else ""
+
+
+def save_interview_notes(run_id: str, notes: str, actor: str) -> dict:
+    """The founder pastes notes from real interviews. They stay in the run folder (data/ is git-ignored) and are
+    analysed into phase1_step5_interview-notes.md. Only the founder can add them; the system never writes notes itself."""
+    if actor != approval.FOUNDER:
+        raise approval.ApprovalRequired("only the founder can add interview notes")
+    notes = guardrails.redact_secrets((notes or "").strip())[:MAX_NOTES_CHARS]
+    if len(notes.split()) < 5:
+        raise ValueError("paste the notes from at least one real conversation")
+    lock = _locks.setdefault(run_id, threading.Lock())
+    if not lock.acquire(blocking=False):
+        raise ValueError("a phase is running; add the notes when it has finished")
+    try:
+        run = load(run_id)
+        if not run["ctx"].get("candidates"):
+            raise ValueError("run phase 1 first: the notes are read against the idea it researched")
+        (run_dir(run_id) / "interview_notes.txt").write_text(notes, encoding="utf-8")
+        res = NotesAnalyst(run).run_step(notes, _chosen(run)["title"])
+        run["ctx"]["interview_notes"] = {"commitments": len(res.data["commitments"]), "compliments": len(res.data["compliments"]),
+                                         "at": _now()}
+        _record_step(run, 1, 5, res)
+        decision_log.log("founder", "add_interview_notes", run_id=run_id, approved_by=approval.FOUNDER,
+                         detail=f"{len(notes.split())} words of interview notes added (text not logged)")
+        return run
+    finally:
+        lock.release()
 
 
 # --------------------------------------------------------------- phases

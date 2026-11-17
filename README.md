@@ -25,6 +25,7 @@ Then open **http://localhost:8000**. Pick a sample founder (or paste any brief) 
 | 1 Discover | Define the market (ICP, current solutions, sourced or `ASSUMPTION`) | **Working** |
 | 1 Discover | Mom Test interview guide and outreach draft | **Working** |
 | 1 Discover | Sending outreach / running interviews | **STUBBED** (founder sends; answers are never simulated) |
+| 1 Discover | Interview notes pasted by the founder: commitments vs. compliments, quoting only the notes | **Working** |
 | 1 Gate | Evidence gate with pre-set thresholds, recommends STOP on weak evidence | **Working** |
 | 2 Validate | Lean Canvas | **Working** |
 | 2 Validate | Landing page with consent-based waitlist form | **Working** |
@@ -81,6 +82,6 @@ These limits are code (`guardrails.py`, `approval.py`, `gates.py`). The rule lay
 ## How the project stays alive after the hackathon
 
 - **Maintainers:** The Overfitters team maintains the repository; contributions are reviewed through pull requests.
-- **Roadmap:** real payment-provider adapter in test mode, hosted landing pages with founder approval, interview notes analysis, more evidence sources, and Arabic-first outputs. See the roadmap in [ARCHITECTURE.md](ARCHITECTURE.md#roadmap).
+- **Roadmap:** real payment-provider adapter in test mode, hosted landing pages with founder approval, more evidence sources, and Arabic-first outputs. See the roadmap in [ARCHITECTURE.md](ARCHITECTURE.md#roadmap).
 - **Community:** MIT-licensed; new agents, evidence sources and guardrail tests are easy to add (one file each). Trick prompts from users become new tests.
 - **Funding:** the software stays free and fully featured. Possible support: university and incubator partnerships, open-source grants, and optional paid hosting or setup help for founders who don't want to self-host. Core features are never paywalled.

@@ -58,7 +58,8 @@ def _founder_only(token: str | None) -> None:
 def _view(run: dict) -> dict:
     return {
         "run": {k: run[k] for k in ("id", "status", "phase", "created", "updated", "brief", "original_idea", "screening", "attempts")}
-               | {"progress": run.get("progress"), "warnings": run.get("warnings", [])},
+               | {"progress": run.get("progress"), "warnings": run.get("warnings", []),
+                  "interview_notes": run["ctx"].get("interview_notes"), "researched": bool(run["ctx"].get("candidates"))},
         "error": run.get("error"),
         "phases": orchestrator.PHASES,
         "gates": run["gates"],
@@ -159,6 +160,24 @@ def output(run_id: str, name: str):
         return HTMLResponse(path.read_text(encoding="utf-8"),
                             headers={"Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'"})
     return PlainTextResponse(path.read_text(encoding="utf-8"))
+
+
+@app.get("/api/runs/{run_id}/interview-notes")
+def get_interview_notes(run_id: str):
+    return {"notes": orchestrator.interview_notes(run_id)}
+
+
+@app.post("/api/runs/{run_id}/interview-notes")
+def add_interview_notes(run_id: str, payload: dict = Body(...), x_founder_token: str | None = Header(None)):
+    """The founder pastes notes from real interviews; an agent separates commitments from compliments."""
+    _founder_only(x_founder_token)
+    try:
+        run = orchestrator.save_interview_notes(run_id, str(payload.get("notes", "")), approval.FOUNDER)
+    except KeyError:
+        raise HTTPException(404, "run not found")
+    except (ValueError, approval.ApprovalRequired) as e:
+        raise HTTPException(400, str(e))
+    return {"ok": True, "output": "phase1_step5_interview-notes.md", "summary": run["ctx"]["interview_notes"]}
 
 
 @app.post("/api/waitlist/{run_id}", response_class=HTMLResponse)

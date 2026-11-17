@@ -28,6 +28,7 @@ CLAIM_RX = re.compile(
 LIGHT_RX = re.compile(
     r"(\(source[:s]?|\bsource:|\baccording to\b|\bstudies (show|suggest)|\bresearch (shows|suggests)|\bsurveys? (show|found)|\breports? (show|that)"
     r"|\bstatistics\b|\b(market|industry) (is worth|size of|is growing|grew)\b|\bCAGR\b|\b\d+(\.\d+)?\s?(million|billion)\b"
+    r"|\b(is|are) (often|usually|typically|generally|commonly|widely) (costly|expensive|pricey|unaffordable|scarce|hard to (find|get|afford)|underpaid|overpriced)\b"
     r"|\b\d+(\.\d+)?\s?%\s+of\s+(people|companies|employers|recruiters|students|users|analysts|customers|developers|founders)\b"
     r"|\b(growing|rising|increasing|expanding|booming)\s+(fast|rapidly|quickly|steadily)\b|\b(is|are|has|have|shows?|sees?|with|there'?s)\s+(a\s+)?(high|huge|strong|growing|rising|massive)\s+demand\b"
     r"|\bin[- ]demand\b|\bmost (employers|companies|recruiters)\b)",

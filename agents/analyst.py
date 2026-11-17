@@ -6,8 +6,13 @@ never counted as real.
 """
 from __future__ import annotations
 
+import re
+
 import gates
 from agents.base import Agent, StepResult, brief_summary, community_places, footer
+
+
+NO_PROMOTION = re.compile(r"\b(stack ?overflow|stack ?exchange|stackexchange)\b", re.IGNORECASE)
 
 
 class Analyst(Agent):
@@ -30,6 +35,14 @@ class Analyst(Agent):
         plan, _ = claims.check(plan, self.evidence_urls())
         # A bullet that still leans on a link the checker removed says nothing the founder can use.
         plan = "\n".join(l for l in plan.splitlines() if "(unverified link removed)" not in l) or fallback
+        # Only places found in the research, and never a site that forbids self-promotion (Stack Overflow and Stack Exchange).
+        allowed = {c.lower() for c in channels}
+        def fits(line: str) -> bool:
+            if NO_PROMOTION.search(line):
+                return False
+            subs = {m.lower() for m in re.findall(r"\br/\w+", line)}
+            return not subs or subs <= allowed
+        plan = "\n".join(l for l in plan.splitlines() if fits(l)) or fallback
         signups = waitlist.get("count")
         md = [f"# Phase 2, step 3: Demand test for '{candidate['title']}'", "",
               "## Pre-registered target (set before any data comes in)",

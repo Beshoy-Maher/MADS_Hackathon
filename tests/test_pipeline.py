@@ -173,3 +173,20 @@ def test_launch_posts_state_the_price_as_one_number(monkeypatch, hedged):
                         lambda self, task, fb, max_tokens=700: {"posts": {"r/learnsql": f"I made a workbook. It costs {hedged}."}})
     res = Copywriter(run).launch_posts({"title": "SQL workbook"}, {"r/learnsql": {}}, 11.99)
     assert "It costs $11.99." in res.content
+
+
+def test_demand_plan_keeps_only_researched_places_that_allow_promotion(monkeypatch):
+    from agents.analyst import Analyst
+    run = orchestrator.create_run(STRONG)
+    plan = ("- Post weekly in r/learnsql with a short tip.\n- Answer questions on Stack Overflow and link the workbook.\n"
+            "- Share it in r/dataisbeautiful threads.\n- Ask the people you interviewed whether they want to be notified.")
+    monkeypatch.setattr(Analyst, "write", lambda self, task, fb, max_tokens=400: plan)
+    res = Analyst(run).demand_plan({"title": "SQL workbook"}, {"r/learnsql": {}, "stackexchange": {}}, {})
+    assert "r/learnsql" in res.content and "interviewed" in res.content
+    assert "Stack Overflow" not in res.content and "dataisbeautiful" not in res.content
+
+
+def test_unsourced_generalisations_in_pricing_text_are_labelled():
+    from tools import claims
+    out, _ = claims.check("Data tools are often costly for students in the region. The price is $11.99.", set(), mode="light")
+    assert "ASSUMPTION (unverified): Data tools are often costly" in out and "The price is $11.99." in out

@@ -1,6 +1,7 @@
-import pytest
 """Smoke test of all six phases, the STOP path and the decision log."""
 import json
+
+import pytest
 import re
 
 import decision_log

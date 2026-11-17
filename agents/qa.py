@@ -9,11 +9,12 @@ import re
 
 import guardrails
 from agents.base import Agent, StepResult, footer
+from agents.verifier import all_errors, last_passes
 
 PLACEHOLDERS = re.compile(r"(lorem ipsum|\bTODO\b|\bTBD\b|\[insert|xx+x|<placeholder>)", re.IGNORECASE)
 
 
-def run_tests(product_md: str, guide_md: str, modules: list[str], product_title: str) -> list[dict]:
+def run_tests(product_md: str, guide_md: str, modules: list[str], product_title: str, reviews: list[dict] | None = None) -> list[dict]:
     results = []
     sections = re.split(r"^## Module \d+: ", product_md, flags=re.MULTILINE)[1:]
     results.append({"name": "all_modules_present", "passed": len(sections) == len(modules) and len(modules) >= 3,
@@ -39,18 +40,59 @@ def run_tests(product_md: str, guide_md: str, modules: list[str], product_title:
     results.append({"name": "readable_sentence_length", "passed": avg <= 28, "value": round(avg, 1), "threshold": "<= 28 words"})
     results.append({"name": "deliverable_package_builds", "passed": len(product_md) > 500,
                     "value": "sha256:" + hashlib.sha256(product_md.encode()).hexdigest()[:16], "threshold": "non-empty"})
+    # The verifier's last review of every module must be free of errors (one revision is allowed before it).
+    final = last_passes(reviews or [])
+    open_errors = {r["module"]: all_errors(r) for r in final if all_errors(r)}
+    reviewed = len(final) == len(modules) and bool(modules)
+    if not reviewed:
+        value = f"{len(final)} of {len(modules)} modules reviewed"
+    else:
+        value = f"open errors: {sum(len(v) for v in open_errors.values())}" + (f" (modules {sorted(open_errors)})" if open_errors else "")
+        if not any(r.get("model") for r in final):
+            value += "; model review not available, SQL check only"
+    results.append({"name": "verifier_last_pass_has_no_errors", "passed": reviewed and not open_errors, "value": value,
+                    "threshold": "every module reviewed, 0 open errors"})
     return results
+
+
+def review_section(reviews: list[dict] | None) -> list[str]:
+    """What the verifier found, per module: first pass, whether the builder revised, and what is still open."""
+    if not reviews:
+        return []
+    md = ["", "## Module review (verifier)", "",
+          "Each module is reviewed once; a module with errors is revised once by the builder and reviewed again. "
+          "SQL code blocks are executed in an in-memory SQLite database.", "",
+          "| Module | Errors on first review | Revised | Open errors after last review | SQL statements executed | Reviewed by |",
+          "|---|---|---|---|---|---|"]
+    final = {r["module"]: r for r in last_passes(reviews)}
+    for r in [x for x in reviews if x["pass"] == 1]:
+        last = final[r["module"]]
+        who = f"`{last['model']}` + SQLite" if last.get("model") else "SQLite only (no model available)"
+        md.append(f"| {r['module']}. {r['title'][:60]} | {len(all_errors(r))} | {'yes' if last['pass'] > 1 else 'no'} | "
+                  f"{len(all_errors(last))} | {last['sql_executed']} | {who} |")
+    found = [(r, e) for r in reviews if r["pass"] == 1 for e in all_errors(r)]
+    if found:
+        md += ["", "Errors found on the first review (given to the builder as feedback):"]
+        md += [f"- Module {r['module']}: {e}" for r, e in found]
+    still = [(r, e) for r in final.values() for e in all_errors(r)]
+    if still:
+        md += ["", "Still open after the last review:"] + [f"- Module {r['module']}: {e}" for r, e in still]
+    return md
 
 
 class QA(Agent):
     role = "qa"
 
-    def run_step(self, product_md: str, guide_md: str, modules: list[str], product_title: str) -> StepResult:
-        results = run_tests(product_md, guide_md, modules, product_title)
+    def run_step(self, product_md: str, guide_md: str, modules: list[str], product_title: str,
+                 reviews: list[dict] | None = None) -> StepResult:
+        results = run_tests(product_md, guide_md, modules, product_title, reviews)
         passed = sum(r["passed"] for r in results)
         md = [f"# Phase 3, step 4: MVP test report ({passed}/{len(results)} passed)", "",
               "| Test | Result | Value | Threshold |", "|---|---|---|---|"]
         for r in results:
             md.append(f"| {r['name']} | {'PASS' if r['passed'] else 'FAIL'} | {r['value']} | {r['threshold']} |")
-        md += ["", "These checks are deterministic code in `agents/qa.py`, not model opinions.", footer(None)]
+        md += ["", "These checks are deterministic code in `agents/qa.py`, not model opinions. The last one counts the errors "
+               "the verifier agent left open; the verifier's own findings are listed below."]
+        md += review_section(reviews)
+        md.append(footer(next((r["model"] for r in reviews or [] if r.get("model")), None)))
         return self.result("qa-report", "test_mvp", "\n".join(md), data={"tests": results})

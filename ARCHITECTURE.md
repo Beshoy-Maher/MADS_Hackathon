@@ -65,9 +65,11 @@ Layers
 
 ### Phase 3: Build (Core step: build the product)
 
-- **Agents:** `builder`, `qa`.
-- **Tools:** local model; deterministic test suite in `agents/qa.py`.
-- **Method:** *Build the product (Core):* the builder writes an MVP spec sized to the founder's hours (3-4 modules, out-of-scope list, acceptance criteria), then the product itself: per module an intro, numbered steps, a worked example, a checklist and common mistakes; then a user guide (how to use, what you need, getting help, refunds). Founder feedback from a "repeat" decision is fed into the rebuild. The QA agent runs 10 tests: all modules present, >= 120 words each, numbered steps, checklists, no income promises / fake proof / urgency, no placeholder text, user guide sections, allowed category, readable sentence length, package builds (hash).
+- **Agents:** `builder`, `verifier`, `qa`.
+- **Tools:** local model; in-memory SQLite (`sqlite3`) to execute SQL examples; deterministic test suite in `agents/qa.py`.
+- **Method:** *Build the product (Core):* the builder writes an MVP spec sized to the founder's hours (3-4 modules, out-of-scope list, acceptance criteria), then the product itself: per module an intro, numbered steps, a worked example, a checklist and common mistakes; then a user guide (how to use, what you need, getting help, refunds). Founder feedback from a "repeat" decision is fed into the rebuild.
+- **Verifier:** after each module is written, the verifier lists its factual errors: wrong statements, code that would not run, invented facts. Every error must quote the wrong words; an error whose quote is not in the module is dropped, so the reviewer cannot invent one. SQL code blocks are also executed in an in-memory SQLite database whose tables and columns are inferred from the example; syntax errors and misused aggregates are reported, and a statement whose schema cannot be inferred is skipped silently. A module with errors is revised by the builder once, with the error list as feedback, and reviewed a second time. There is no second revision. Each review is logged as agent `verifier`, action `review_module`; each revision as `builder`, `revise_module`. Without a model only the SQL check runs, and the report says so.
+- **QA:** 11 deterministic tests: all modules present, >= 120 words each, numbered steps, checklists, no income promises / fake proof / urgency, no placeholder text, user guide sections, allowed category, readable sentence length, package builds (hash), and no errors left open by the verifier's last review of any module.
 - **Output:** `phase3_step1_spec.md`, `phase3_step2_product.md`, `phase3_step3_user-guide.md`, `phase3_step4_qa-report.md`, `phase3_gate_decision.md`.
 
 ### Phase 4: Commercial setup (Core step: set the price and policies)
@@ -99,7 +101,7 @@ Every phase ends with a gate. Thresholds live in `gates.THRESHOLDS`, are fixed b
 | Scope check (before 1) | founder | only for an idea close to an excluded category (money, health, legal): nothing is researched or written until the founder confirms it gives no advice | **go** (confirmed, logged) / **pivot** (reword; the new idea is screened again) / **stop** |
 | 1 Evidence | evidence | >= 5 relevant sources, >= 4 independent voices, >= 2 pain posts, demand >= 40, founder fit >= 50, total >= 50, allowed category | **go** if all pass; **pivot** to an alternative that passes; **repeat** with broader queries if no candidate has enough evidence either way (or sources were unreachable); otherwise **stop** |
 | 2 Demand | evidence | Lean Canvas complete; real waitlist sign-ups vs. pre-registered target (default 100 in 14 days) | **go** at target; **repeat** while the window is open or the test hasn't run; **pivot/stop** below 50% at the end |
-| 3 Build | tests | all 10 MVP tests pass | **go** / **repeat** (rebuild with feedback) |
+| 3 Build | tests | all 11 MVP tests pass, including no errors left open by the verifier | **go** / **repeat** (rebuild with feedback) |
 | 4 Commercial | founder | price with rationale, three policies drafted, no guardrail violations left | **go** / **repeat** |
 | 5 Launch | founder | sale-to-cash tests pass; every page/post approved or rejected | **go** / **repeat** |
 | 6 Operate | evidence | >= 10 real buyers to judge; refund rate < 15% | **go** (persevere) / **repeat** (keep operating, review later) / **pivot** |
@@ -171,6 +173,7 @@ Personal data: only consented waitlist emails, stored locally and never logged. 
 | Orchestrator, six phases, gates, founder decisions, approval queue | Built |
 | Guardrails (briefs, requests, outputs), trick-prompt tests | Built |
 | Evidence research on public APIs, scoring, market definition | Built |
+| Module verifier: model review with quoted errors, one revision, SQL examples executed in SQLite | Built (reviews facts the model knows; it does not look anything up online) |
 | Lean Canvas, landing page, product build, QA tests, pricing, policy drafts, store page, posts, support, metrics, memo | Built |
 | Webhooks, idempotent delivery, refunds with approval, reconciliation | Built (against a MOCKED provider) |
 | Payment provider / checkout | **MOCKED** |

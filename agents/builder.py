@@ -6,6 +6,7 @@ worksheets), and a user guide. The QA agent then tests it.
 """
 from __future__ import annotations
 
+import decision_log
 from agents.base import Agent, StepResult, brief_summary, footer
 from tools.text import keywords
 
@@ -77,24 +78,63 @@ class Builder(Agent):
         md.append(footer(self.model))
         return self.result("spec", "write_mvp_spec", "\n".join(md), data={"spec": spec})
 
-    def build(self, candidate: dict, spec: dict, feedback: str = "") -> StepResult:
+    @staticmethod
+    def _clean(body: str) -> str:
+        # Keep the product's heading structure: drop any top-level heading the model added.
+        return "\n".join(l for l in body.splitlines() if not l.startswith("# ")).strip()
+
+    def revise(self, index: int, module: dict, body: str, errors: list[str]) -> str:
+        """One revision of a module, with the verifier's error list as feedback. Returns the old text if the rewrite is unusable."""
+        task = (f"Module {index}: {module['title']} - goal: {module.get('goal', '')}\n\nYOUR DRAFT:\n{body}\n\n"
+                "A reviewer found these errors in the draft:\n" + "\n".join(f"- {e}" for e in errors) + "\n\n"
+                "Rewrite the whole module with every listed error fixed. If you cannot fix a statement, remove it. Change nothing else: "
+                "keep the intro, the numbered steps, the worked example, the checklist with '- [ ]' items and 'Common mistakes'. "
+                "Any SQL must be standard SQL that runs in SQLite. 220-320 words, Markdown, no top-level heading. "
+                "No promises of results, no testimonials, no medical/financial/legal advice.")
+        revised = self._clean(self.write(task, body, max_tokens=700))
+        usable = len(revised.split()) >= 120
+        decision_log.log("builder", "revise_module", run_id=self.run["id"], model=self.model, cost=0, step="phase3_step2_product.md",
+                         outcome="revised" if usable and revised != body else "unchanged",
+                         detail=f"module {index}: one revision with {len(errors)} error(s) from the verifier as feedback")
+        return revised if usable else body
+
+    def build(self, candidate: dict, spec: dict, feedback: str = "", verifier=None, on_progress=None) -> StepResult:
         parts = [f"# {spec['product_name']}", "",
                  f"A practical {spec['format']} for {self.brief.get('target_market', 'you')}. Made by {self.brief.get('founder_name', 'the founder')}.", "",
                  "## Contents"] + [f"{i}. {m['title']}" for i, m in enumerate(spec["modules"], 1)] + [""]
+        reviews: list[dict] = []
+        total = len(spec["modules"])
         for i, m in enumerate(spec["modules"], 1):
+            if on_progress:
+                on_progress(f"builder: writing module {i} of {total}")
             task = (f"Product: {spec['product_name']} for {self.brief.get('target_market', '')}.\nModule {i}: {m['title']} - goal: {m.get('goal', '')}\n"
                     f"{('Founder feedback to apply: ' + feedback) if feedback else ''}\n"
                     "Write this module's content for the buyer: a short intro, 4-6 numbered steps with concrete instructions, "
                     "one worked example, a checklist with '- [ ]' items, and 'Common mistakes'. 220-320 words, Markdown, "
-                    "no top-level heading. No promises of results, no testimonials, no medical/financial/legal advice.")
-            body = self.write(task, _fallback_module_text(m, candidate, self.brief), max_tokens=700)
-            # Keep the product's heading structure: drop any top-level heading the model added.
-            body = "\n".join(l for l in body.splitlines() if not l.startswith("# ")).strip()
+                    "no top-level heading. Only state facts you are sure of; any SQL must be standard SQL that runs in SQLite. "
+                    "No promises of results, no testimonials, no medical/financial/legal advice.")
+            body = self._clean(self.write(task, _fallback_module_text(m, candidate, self.brief), max_tokens=700))
+            if verifier is not None:
+                if on_progress:
+                    on_progress(f"verifier: checking module {i} of {total} for factual errors")
+                review = verifier.review(i, m, body, 1)
+                reviews.append(review)
+                errors = review["errors"] + review["sql_errors"]
+                if errors:  # one revision at most, then one last review
+                    if on_progress:
+                        on_progress(f"builder: revising module {i} of {total} ({len(errors)} error(s) found)")
+                    revised = self.revise(i, m, body, errors)
+                    if revised != body:
+                        body = revised
+                        if on_progress:
+                            on_progress(f"verifier: checking the revised module {i} of {total}")
+                        reviews.append(verifier.review(i, m, body, 2))
             parts += [f"## Module {i}: {m['title']}", "", body, ""]
         parts += ["## A note on results", "",
                   "This product gives you a method and templates. Your results depend on your situation and effort; nothing here is a promise of any outcome."]
         content = "\n".join(parts)
-        return self.result("product", "build_product", content, data={"modules": [m["title"] for m in spec["modules"]]})
+        return self.result("product", "build_product", content,
+                           data={"modules": [m["title"] for m in spec["modules"]], "reviews": reviews if verifier is not None else None})
 
     def user_guide(self, spec: dict) -> StepResult:
         fallback = "\n".join([

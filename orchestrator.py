@@ -35,6 +35,7 @@ from agents.researcher import Researcher
 from agents.scorer import Scorer
 from agents.strategist import Strategist
 from agents.support import Support
+from agents.verifier import Verifier
 from tools.text import slug as make_slug
 
 PHASES = {
@@ -241,13 +242,14 @@ def _phase3(run: dict) -> gates.GateResult:
     _record_step(run, 3, 1, sp)
     feedback = run["ctx"].get("feedback", {}).get("3", "")
     _progress(run, "builder: writing the product, module by module (the longest step)")
-    prod = Builder(run).build(cand, sp.data["spec"], feedback)
+    # Each module is reviewed by the verifier; a module with errors is revised once and reviewed again.
+    prod = Builder(run).build(cand, sp.data["spec"], feedback, verifier=Verifier(run), on_progress=lambda t: _progress(run, t))
     _record_step(run, 3, 2, prod)
     _progress(run, "builder: writing the user guide")
     guide = Builder(run).user_guide(sp.data["spec"])
     _record_step(run, 3, 3, guide)
     _progress(run, "qa: running the MVP tests")
-    qa = QA(run).run_step(prod.content, guide.content, prod.data["modules"], sp.data["spec"]["product_name"])
+    qa = QA(run).run_step(prod.content, guide.content, prod.data["modules"], sp.data["spec"]["product_name"], prod.data.get("reviews"))
     _record_step(run, 3, 4, qa)
     return gates.build_gate(qa.data["tests"], run["attempts"].get("3", 1))
 

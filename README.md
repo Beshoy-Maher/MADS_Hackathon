@@ -30,8 +30,8 @@ Then open **http://localhost:8000**. Pick a sample founder (or paste any brief) 
 | 2 Validate | Landing page with consent-based waitlist form | **Working** |
 | 2 Validate | Publishing the landing page to a public URL | **STUBBED** (approval-gated, saved to outbox) |
 | 2 Gate | Demand gate (pre-registered sign-up target, counts only real sign-ups) | **Working** |
-| 3 Build | MVP spec, product content, user guide | **Working** |
-| 3 Gate | Automated MVP tests (10 checks); gate needs all to pass | **Working** |
+| 3 Build | MVP spec, product content, user guide; verifier reviews each module (facts, SQL run in SQLite), one revision | **Working** |
+| 3 Gate | Automated MVP tests (11 checks, one of them: the verifier left no error open); gate needs all to pass | **Working** |
 | 4 Commercial | Price from sourced comparables (rule-based), draft terms / privacy / refund policy | **Working** |
 | 5 Launch | Store page and launch posts (drafts in the founder's voice) | **Working** |
 | 5 Launch | Publishing store page and posts | **STUBBED** (approval-gated, saved to outbox) |

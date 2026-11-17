@@ -43,14 +43,14 @@ Then open **http://localhost:8000**, pick a sample founder (or paste any brief) 
 | 1 Discover | Mom Test interview guide; founder's real notes sorted into commitments vs. compliments | **Working** |
 | 1 Discover | Sending outreach / running interviews | **STUBBED** (the founder does it; answers are never simulated) |
 | 1 Gate | Evidence gate with pre-set thresholds, recommends STOP on weak evidence | **Working** |
-| 2 Validate | Lean Canvas (channels only from the evidence); landing page with a consent-based waitlist form; demand-test plan without covert promotion or fake urgency | **Working** |
+| 2 Validate | Lean Canvas; landing page with a consent-based waitlist form; demand-test plan | **Working** |
 | 2 Validate | Publishing the landing page | **STUBBED** (approval-gated, saved to outbox) |
 | 2 Gate | Demand gate: pre-registered sign-up target, real sign-ups only | **Working** |
 | 3 Build | MVP spec, product, user guide; verifier (facts, SQL run in SQLite); originality guard | **Working** |
 | 3 Gate | 12 deterministic MVP tests, all must pass | **Working** |
 | 4 Commercial | Rule-based price from sourced comparables; draft terms, privacy and refund policy | **Working** |
-| 4 Commercial | Unit economics: what each sale keeps after fees and refunds, how many sales cover the budget (and the founder's time, if an hourly rate is given), a warning when that is more than the demand target; arithmetic only, no forecast | **Working** (fee and refund rate are labelled assumptions) |
-| 5 Launch | Store page and launch posts in the founder's voice; code removes counts, formats and founder experience the product or brief cannot back; promise checker | **Working** |
+| 4 Commercial | Unit economics: what each sale keeps and how many sales cover the budget; arithmetic only, no forecast | **Working** (fee and refund rate labelled `ASSUMPTION`) |
+| 5 Launch | Store page and launch posts for the founder to post; unbacked claims removed by code; promise checker | **Working** |
 | 5 Launch | Publishing the store page and posts | **STUBBED** (approval-gated, saved to outbox) |
 | 5 Launch | Checkout and payment provider | **MOCKED** (no payments of any kind) |
 | 5 Launch | Automatic delivery, idempotent webhooks, refunds revoke access, reconciliation | **Working** (against the MOCKED provider) |
@@ -88,7 +88,7 @@ flowchart TD
 
 ## Cost per run
 
-**About $0.00 per run** (local models; ~74k tokens and 53 model calls for all four demo founders in the committed run; research APIs are free). `decision_log.json` counts agent actions, not calls, so it has 67 entries with a model: the product is one entry for several calls, while each debate transcript (10) and each applied debate correction (8) is an entry that names its model without a new call. The dashboard header shows the running cost.
+**About $0.00 per run** (local models; ~74k tokens and 53 model calls for all four demo founders in the committed run; research APIs are free). The dashboard header shows the running cost; how the decision log counts model entries: [docs/models.md](docs/models.md#cost-per-run).
 
 ## Demo video
 

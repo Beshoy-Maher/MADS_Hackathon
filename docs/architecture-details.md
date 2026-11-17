@@ -2,6 +2,11 @@
 
 The key design is in [ARCHITECTURE.md](../ARCHITECTURE.md). This page holds the full detail of the parts that are summarised there: the debate before each gate, the safety layers, the module verifier, the originality guard and the promise checker.
 
+## Evidence display
+
+- The opportunities file and the scorecard show each candidate's evidence in two lists, people describing the problem (Hacker News, Reddit, Stack Exchange posts, GitHub issues) and existing solutions (repositories), each item dated; a problem statement or ideal-customer line no fetched item supports, and any place name no fetched item mentions, is labelled `ASSUMPTION` (display only: scores and gate are unchanged).
+- In the product, user guide, pages and launch posts a link that was never fetched becomes its plain anchor text and a bare unfetched URL is removed, so the buyer never sees a checker marker; the footer still counts the removed links.
+
 ## Debate before each gate
 
 After a phase's steps and before its gate is shown, `orchestrator._debate` hands the phase's main documents to the critic (`agents/critic.py`, `prompts/critic.md`).

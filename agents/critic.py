@@ -126,6 +126,8 @@ def _apply_problem(quote: str, fix: str, path, allowed: set[str]) -> str:
         return "the replacement would change the document's structure"
     if _PLACEHOLDER.search(fix):
         return "the replacement contains placeholder text"
+    if _norm(fix) in _norm(raw):
+        return "the replacement text is already in the document (it would repeat a sentence)"
     if guardrails.scan_output(fix).violations:
         return "the guardrail scan would remove part of the replacement"
     checked, _ = claims.check(fix, allowed, mode="light")

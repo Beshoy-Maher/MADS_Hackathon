@@ -331,3 +331,9 @@ def test_placeholder_replacement_is_not_applied(tmp_path):
     path = _doc_file(tmp_path, "They often feel unprepared in interviews.\n")
     assert "placeholder" in critic_mod._apply_problem("They often feel unprepared", "Placeholder: some feel unprepared",
                                                       str(path), set())
+
+
+def test_correction_that_would_repeat_a_sentence_is_not_applied(tmp_path):
+    path = _doc_file(tmp_path, "<li>Built for junior analysts.</li>\n<li>Tailored to questions asked in MENA.</li>\n")
+    assert "already in the document" in critic_mod._apply_problem("Tailored to questions asked in MENA.",
+                                                                  "Built for junior analysts.", str(path), set())

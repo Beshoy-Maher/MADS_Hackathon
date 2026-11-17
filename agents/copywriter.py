@@ -65,15 +65,13 @@ class Copywriter(Agent):
         from tools import honesty
         removed = 0
         for k in ("headline", "subheadline", "who_for"):
-            t, a = honesty.strip_counts(str(out[k]))
-            t, b = honesty.strip_experience(t, self.brief)
-            removed += a + b
+            t, n = honesty.clean_copy(str(out[k]), self.brief)
+            removed += n
             out[k] = t or honesty.strip_counts(str(fb[k]))[0]
         bullets = []
         for b0 in out["bullets"]:
-            t, a = honesty.strip_counts(str(b0))
-            t, b = honesty.strip_experience(t, self.brief)
-            removed += a + b
+            t, n = honesty.clean_copy(str(b0), self.brief)
+            removed += n
             if t.strip():
                 bullets.append(t)
         out["bullets"] = bullets or [honesty.strip_counts(str(x))[0] for x in fb["bullets"]]
@@ -167,9 +165,12 @@ class Copywriter(Agent):
             text = re.sub(rf"\b(?:from|starting (?:at|from)|as low as|only|just|under|up to)\s+(\${re.escape(str(price))})", r"\1", text,
                           flags=re.IGNORECASE)
         from tools import honesty
-        text, _ = honesty.strip_counts(text)
-        text, _ = honesty.strip_experience(text, self.brief)
-        return honesty.complete_sentences(text).strip()
+        cleaned, _ = honesty.clean_copy(text, self.brief)
+        cleaned = honesty.complete_sentences(cleaned).strip()
+        # Show HN needs its title: if the filter removed the sentence that carried it, the title is the product's name.
+        if text.lstrip().lower().startswith("show hn:") and not cleaned.lower().startswith("show hn:"):
+            cleaned = f"Show HN: {candidate['title']}\n\n{cleaned}".strip()
+        return cleaned
 
     def launch_posts(self, candidate: dict, communities: dict, price: float | None = None) -> StepResult:
         places = launch_places(communities)

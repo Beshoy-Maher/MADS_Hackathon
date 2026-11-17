@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass, field
 
 import config
@@ -131,6 +132,27 @@ def community_places(communities: dict, limit: int = 4) -> list[str]:
             continue
         out.append(PLACE_NAMES.get(name, name))
     return out[:limit]
+
+
+def subreddits_found(text: str, communities) -> bool:
+    """True unless the text names a subreddit that is not among the communities found in the evidence."""
+    found = {str(n).lower() for n in communities}
+    subs = {m.lower() for m in re.findall(r"\br/\w+", str(text))}
+    return not subs or subs <= found
+
+
+_OWN_CHANNEL = re.compile(r"\b(?:own|personal|founder(?:'|’)?s?)\b.{0,20}\bnetwork\b|\blanding page\b|\bwaitlist\b", re.IGNORECASE)
+
+
+def researched_channel(text: str, communities) -> bool:
+    """A channel may be a community found in the evidence (by its key or place name) or the founder's own network /
+    landing page. Anything else (an invented LinkedIn group, Discord server, subreddit) is not from the research."""
+    s = str(text).lower()
+    if not subreddits_found(s, communities):
+        return False
+    keys = [str(n).lower() for n in communities if str(n).lower() not in NOT_A_PLACE]
+    names = set(keys) | {p.lower().split(" (")[0] for p in community_places(dict.fromkeys(keys), 20)}
+    return any(n and n in s for n in names) or bool(_OWN_CHANNEL.search(s))
 
 
 def launch_places(communities: dict, limit: int = 3) -> list[str]:

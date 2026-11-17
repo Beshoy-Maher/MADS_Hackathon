@@ -14,7 +14,8 @@ _NUM = r"(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|f
 _NOUNS = (r"questions?|exercises?|examples?|problems?|queries|pages?|templates?|worksheets?|challenges?|modules?|chapters?|"
           r"lessons?|units?|videos?|layouts?|screens?|files?|case studies|case study|prompts?|drills?|answers?")
 # "15 SQL interview questions" -> "SQL interview questions": the number goes, the noun stays.
-COUNT = re.compile(rf"\b{_NUM}\+?\s+((?:[A-Za-z][\w-]*\s+){{0,3}}?)({_NOUNS})\b", re.IGNORECASE)
+_COUNT_NUM = _NUM.replace("|one|", "|")  # "one" is not a count claim: "no one", "one question per day"
+COUNT = re.compile(rf"\b{_COUNT_NUM}\+?\s+((?:[A-Za-z][\w-]*\s+){{0,3}}?)({_NOUNS})\b", re.IGNORECASE)
 PAGE_ADJ = re.compile(rf"\b{_NUM}[- ]page\b\s*", re.IGNORECASE)
 # "(PDF, 45 pages)" or "(45 pages)": the whole parenthetical goes.
 PAREN_COUNT = re.compile(rf"\s*\([^()]*\b(?:{_NUM}\s+pages?|pdf)\b[^()]*\)", re.IGNORECASE)
@@ -23,7 +24,8 @@ PDF_WORD = re.compile(r"\bPDF\s+(?=[a-z])", re.IGNORECASE)
 EXPERIENCE = re.compile(r"\b(i(?:'|’)?ve (?:seen|been|faced|hired|interviewed|used|met|helped|worked)|i have (?:seen|been|faced|hired|interviewed)|"
                         r"who(?:'|’)?s been|who has been|been through|in my (?:own )?(?:experience|career|years|interviews)|"
                         r"from (?:my|personal) experience|i (?:hired|interviewed|failed|struggled)|when i was (?:a|an|looking|job)|"
-                        r"actual interviews|real interviews i)\b", re.IGNORECASE)
+                        r"actual interviews|real interviews i|based on my (?:own )?experience|my (?:own )?experience (?:with|as|in)|i saw|"
+                        r"when i (?:started|began)|i wish i(?:'|’)?d had|i wish i had had)\b", re.IGNORECASE)
 
 COVERT = re.compile(r"\b(subtl\w*|covert\w*|disguis\w*|without (?:saying|disclosing|mentioning|revealing)|pretend\w*|"
                     r"limited[- ]time|for a limited|only \w+ (?:spots?|copies|seats?) (?:left|available)|hurry|act now|"
@@ -73,9 +75,23 @@ def unbacked_experience(sentence: str, brief: dict) -> bool:
 
 
 def strip_experience(text: str, brief: dict) -> tuple[str, int]:
-    sents = _SENT.split((text or "").strip())
-    keep = [s for s in sents if not unbacked_experience(s, brief)]
-    return " ".join(keep).strip(), len(sents) - len(keep)
+    # Split keeping each sentence's separator, so paragraph breaks survive.
+    parts = re.split(r"((?<=[.!?])\s+)", (text or "").strip())
+    out, removed = [], 0
+    for i in range(0, len(parts), 2):
+        sent, sep = parts[i], parts[i + 1] if i + 1 < len(parts) else ""
+        if unbacked_experience(sent, brief):
+            removed += 1
+            continue
+        out.append(sent + sep)
+    return "".join(out).strip(), removed
+
+
+def clean_copy(text: str, brief: dict) -> tuple[str, int]:
+    """Sales copy: counts and formats the product cannot back, then experience the brief does not state."""
+    t, a = strip_counts(text)
+    t, b = strip_experience(t, brief)
+    return t, a + b
 
 
 def drop_covert_lines(text: str) -> tuple[str, int]:
@@ -89,5 +105,5 @@ def complete_sentences(text: str) -> str:
     t = (text or "").rstrip()
     if not t or _END.search(t):
         return t
-    cut = max(t.rfind(". "), t.rfind("! "), t.rfind("? "), t.rfind(".\n"))
-    return t[:cut + 1].rstrip() if cut > 0 else t
+    ends = [m.start() for m in re.finditer(r"[.!?](?=\s)", t)]
+    return t[:ends[-1] + 1].rstrip() if ends else t

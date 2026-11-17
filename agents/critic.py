@@ -152,7 +152,11 @@ _LINE_PREFIX = re.compile(r"^\s*(\d+[.)]|- \[[ xX]\]|[-*+]|#+|>)?\s*")
 _PLACEHOLDER = re.compile(r"placeholder|lorem ipsum|\bTODO\b|\bTBD\b|\[insert|\[your |XXX", re.I)
 
 
-def _apply_problem(quote: str, fix: str, path, allowed: set[str]) -> str:
+# Sales copy that went through tools/honesty.py: a correction must pass the same filters.
+_SALES_COPY = ("store-page", "launch-posts", "landing-page")
+
+
+def _apply_problem(quote: str, fix: str, path, allowed: set[str], brief: dict | None = None) -> str:
     """Why a conceded replacement must not be written into the document, or "" if it is safe."""
     from tools import claims
     if not path or not Path(path).exists():
@@ -184,6 +188,10 @@ def _apply_problem(quote: str, fix: str, path, allowed: set[str]) -> str:
         return "the replacement would change the document's structure"
     if "ASSUMPTION" in span and "ASSUMPTION" not in fix:
         return "the replacement would remove an ASSUMPTION label"
+    if any(k in str(path) for k in _SALES_COPY):
+        from tools import honesty
+        if honesty.clean_copy(fix, brief or {})[0].strip() != fix.strip():
+            return "the replacement adds a count, a format or experience the brief does not state"
     if _PLACEHOLDER.search(fix):
         return "the replacement contains placeholder text"
     if _norm(fix) in _norm(raw):
@@ -342,7 +350,7 @@ class Critic(Agent):
     # -------------------------------------------------------------- apply a conceded correction
     def _apply(self, o: dict, doc: dict, allowed: set[str], model: str | None, phase: int) -> None:
         """Write a conceded replacement into the step's output file, only if every check passes. Sets o["status"]."""
-        reason = _apply_problem(o["quote"], o["fix"], doc.get("path"), allowed)
+        reason = _apply_problem(o["quote"], o["fix"], doc.get("path"), allowed, self.brief)
         if reason:
             o["status"], o["verdict"] = NOT_APPLIED, "not applied: " + reason
             return

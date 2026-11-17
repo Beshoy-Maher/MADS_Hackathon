@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import re
 
-from agents.base import Agent, StepResult, brief_summary, budget_text, footer, hours_text
+from agents.base import Agent, StepResult, brief_summary, budget_text, footer, hours_text, researched_channel
 
 BOXES = ["problem", "customer_segments", "unique_value_proposition", "solution", "channels",
          "revenue_streams", "cost_structure", "key_metrics", "unfair_advantage"]
@@ -38,16 +38,12 @@ class Strategist(Agent):
                 "channels: only the communities listed in the evidence and the founder's own network.")
         data = self.ask_json(task, fb, max_tokens=900)
         canvas = {k: data.get(k) or fb[k] for k in BOXES}
-        # Channels: only places found in the research. A subreddit (or Reddit) that is not in the evidence is dropped.
-        found = {str(n).lower() for n in market.get("communities", {})}
-        def researched(item) -> bool:
-            s = str(item).lower()
-            subs = set(re.findall(r"\br/\w+", s))
-            if subs and not subs <= found:
-                return False
-            return not ("reddit" in s and not any(f.startswith("r/") or "reddit" in f for f in found))
-        if isinstance(canvas.get("channels"), list):
-            canvas["channels"] = [c for c in canvas["channels"] if researched(c)] or fb["channels"]
+        # Channels: only communities found in the research, the founder's own network and the landing page.
+        ch = canvas.get("channels")
+        if isinstance(ch, str):  # a single string is split into items, so it is filtered too
+            ch = [c.strip() for c in re.split(r"[;,\n]", ch) if c.strip()]
+        if isinstance(ch, list):
+            canvas["channels"] = [c for c in ch if researched_channel(c, market.get("communities", {}))] or fb["channels"]
         complete = all(canvas[k] for k in BOXES)
         md = [f"# Phase 2, step 1: Lean Canvas for '{candidate['title']}'", ""]
         for k in BOXES:

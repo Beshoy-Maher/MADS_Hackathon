@@ -9,7 +9,7 @@ from __future__ import annotations
 import re
 
 import gates
-from agents.base import Agent, StepResult, brief_summary, community_places, footer
+from agents.base import Agent, StepResult, brief_summary, community_places, footer, subreddits_found
 
 
 # Sites that forbid self-promotion, and someone else's repository (GitHub issues and discussions).
@@ -41,8 +41,7 @@ class Analyst(Agent):
         def fits(line: str) -> bool:
             if NO_PROMOTION.search(line):
                 return False
-            subs = {m.lower() for m in re.findall(r"\br/\w+", line)}
-            return not subs or subs <= allowed
+            return subreddits_found(line, allowed)
         plan = "\n".join(l for l in plan.splitlines() if fits(l)) or fallback
         # No covert promotion, fake urgency or speaking as someone the founder is not.
         from tools import honesty

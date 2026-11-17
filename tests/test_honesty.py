@@ -116,3 +116,51 @@ def test_canvas_lists_no_channel_outside_the_evidence(monkeypatch):
     run = orchestrator.create_run(STRONG)
     res = Strategist(run).run_step({"title": "SQL workbook"}, {"communities": {"hackernews": 3, "github": 5}}, {})
     assert "r/UXDesign" not in res.content and "Founder's own network" in res.content
+
+
+# ------------------------------------------------------------- review fixes
+REVIEW_BRIEF = {"constraints": "Works full time as a data analyst; can work evenings only.", "skills": ["SQL"]}
+
+
+def test_more_experience_phrasings_are_removed():
+    from tools import honesty
+    for s in ("I made it based on my own experience with technical interviews.", "It covers the challenges I saw new candidates face.",
+              "I wish I'd had this when I started."):
+        assert honesty.strip_experience(s, REVIEW_BRIEF) == ("", 1)
+
+
+def test_one_is_not_a_count_and_paragraphs_survive():
+    from tools import honesty
+    assert honesty.strip_counts("No one answers for you; answer one question per day.")[0] == "No one answers for you; answer one question per day."
+    assert honesty.strip_experience("A workbook.\n\nI wrote it for juniors.", REVIEW_BRIEF)[0] == "A workbook.\n\nI wrote it for juniors."
+    assert honesty.complete_sentences("Is it useful?\nI made it because the") == "Is it useful?"
+
+
+def test_show_hn_title_survives_the_experience_filter(monkeypatch):
+    import llm
+    import orchestrator
+    from agents.copywriter import Copywriter
+    run = orchestrator.create_run({"idea": "SQL workbook for junior analysts", "founder_name": "M", **REVIEW_BRIEF})
+    text = "Show HN: a SQL workbook I wrote after I've seen juniors fail.\n\nIt has worked answers. What would you add?"
+    monkeypatch.setattr(llm, "complete", lambda *a, **k: llm.LLMResult(text=text, model="m"))
+    post = Copywriter(run)._one_post("Hacker News (Show HN)", {"title": "SQL Workbook"}, None)
+    assert post.startswith("Show HN: SQL Workbook") and "I've seen" not in post and "What would you add?" in post
+
+
+def test_debate_correction_cannot_add_a_count_to_sales_copy(tmp_path):
+    from agents.critic import _apply_problem
+    page = tmp_path / "phase5_step1_store-page.html"
+    page.write_text("<li>SQL interview questions with worked answers.</li>")
+    assert "count" in _apply_problem("SQL interview questions with worked answers.",
+                                     "Contains 15 SQL interview questions with answers.", page, set(), REVIEW_BRIEF)
+
+
+def test_lean_canvas_channels_only_from_the_research(monkeypatch):
+    import orchestrator
+    from agents.strategist import Strategist
+    run = orchestrator.create_run({"idea": "Figma templates for junior designers", "founder_name": "L"})
+    monkeypatch.setattr(Strategist, "ask_json", lambda self, task, fb, max_tokens=900: dict(
+        fb, channels="Reddit (r/UXDesign), LinkedIn groups for designers; Hacker News (Show HN); Founder's own network"))
+    res = Strategist(run).run_step({"title": "Figma templates", "problem": "p"}, {"communities": {"hackernews": 2, "github": 5}}, {})
+    ch = res.data["canvas"]["channels"]
+    assert ch == ["Hacker News (Show HN)", "Founder's own network"]

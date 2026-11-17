@@ -82,6 +82,19 @@ def main() -> int:
     check(any("_gate_" in p.name for p in outs), "outputs/ has a gate decision")
     check(any("_gate_" in p.name and "STOP" in p.read_text(encoding="utf-8") for p in outs), "outputs/ shows a STOP recommendation")
     check((ROOT / "outputs" / "payment_test_log.md").exists(), "outputs/payment_test_log.md exists")
+    # outputs/ must come from the code as it is now: no code change committed after the last demo run.
+    def last_commit(*paths: str) -> int:
+        r = subprocess.run(["git", "-C", str(ROOT), "log", "-1", "--format=%ct", "--", *paths], capture_output=True, text=True)
+        return int(r.stdout.strip() or 0)
+    code_paths = ["agents", "orchestrator.py", "gates.py", "guardrails.py", "prompts", "tools", "llm.py", "approval.py",
+                  "payments.py", "delivery.py", "refunds.py", "webhooks.py", "reconcile.py", "decision_log.py"]
+    out_t, code_t = last_commit("outputs", "decision_log.json"), last_commit(*code_paths)
+    dirty = subprocess.run(["git", "-C", str(ROOT), "status", "--porcelain", "--", *code_paths],
+                           capture_output=True, text=True).stdout.strip()
+    check(out_t >= code_t and not dirty, "outputs/ and decision_log.json are not older than the code (rerun scripts/run_demo.py after code changes)")
+    expected = {"phase4_step4_unit-economics.md", "phase4_step5_debate.md"} if (ROOT / "agents" / "economist.py").exists() else set()
+    missing = sorted(n for n in expected if not any(p.name.startswith(n.rsplit(".", 1)[0].rsplit("_", 1)[0]) for p in outs))
+    check(not missing, f"outputs/ has every step the code writes ({missing})")
     big = [p.name for p in outs if p.stat().st_size > 200_000]
     check(not big, f"output files are small ({big})")
 

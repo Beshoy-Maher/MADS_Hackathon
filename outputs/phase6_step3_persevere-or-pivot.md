@@ -24,7 +24,7 @@
 Both lists are built by code from the gate history and the real numbers. MOCKED test orders (2) are excluded.
 
 ## Reasoning
-No buyers have made purchases, and there is no measurable waitlist data because the landing page has not launched. Without real transaction or sign-up data, there is no evidence that demand exists beyond the initial assumption. The lack of measurable outcomes means the product has not passed the sale-to-cash test. The founder should repeat the demand test with a live landing page and real tracking before proceeding.
+No real buyers have made purchases, and no waitlist sign-ups have been tracked, meaning there’s no verified signal of market interest. Without real transaction data or user engagement, the product’s demand remains unproven. The recommendation to repeat is consistent with the lack of real-world validation despite prior go-ahead decisions.
 
 ## What would change the decision
 - 10 or more real buyers, with a refund rate under 15%: the operate gate can then recommend persevering (or a pivot, if refunds are high).

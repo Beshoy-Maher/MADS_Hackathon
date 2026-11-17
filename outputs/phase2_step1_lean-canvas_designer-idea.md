@@ -1,43 +1,43 @@
 # Phase 2, step 1: Lean Canvas for 'Figma case study templates for junior designers'
 
 ## Problem
-- Junior designers lack clear, professional templates to structure their case studies.
-- Presenting design work effectively is a barrier to landing their first job.
+- Junior designers lack clear, professional templates to present their case studies effectively in job applications.
+- Many struggle to structure their work in a way that highlights impact and process, leading to weaker portfolio presentations.
 
 ## Customer Segments
-- Junior UX designers in Egypt and the Gulf
-- Freelance designers transitioning to full-time roles
-- Design students preparing job applications
+- Junior UX designers in Egypt and the Gulf region
+- Freelance designers in Alexandria seeking their first full-time job
+- Design students transitioning into professional roles
 
 ## Unique Value Proposition
-A simple, honest Figma template pack tailored for junior designers in Egypt and the Gulf, built with local context and minimal friction.
+A simple, honest Figma template pack designed specifically for junior designers to clearly and professionally present their case studies with minimal effort.
 
 ## Solution
-- A Figma template pack with pre-designed case study layouts for portfolio presentation.
-- Templates optimized for clarity and ease of use, reflecting the founder’s freelance UX experience.
-- Designed with a minimalist aesthetic aligned with the founder’s values.
+- A curated Figma template pack with pre-built, easy-to-customize case study pages
+- Templates focused on clarity and storytelling, aligned with honest, simple design values
+- Optimized for quick setup and use by designers with limited time and experience
 
 ## Channels
-- LinkedIn groups for Egyptian and Gulf designers
-- Founder’s personal network (freelance UX community in Alexandria)
+- LinkedIn groups for Egyptian and Gulf UX designers
+- Founder’s personal network and freelance community in Alexandria
 
 ## Revenue Streams
 - One-time purchase of the digital Figma template pack
 
 ## Cost Structure
-- Figma Pro plan (required for publishing templates)
-- Domain and hosting for a simple landing page (estimated under $40)
-- Time investment (8 hours/week for development and outreach)
+- Figma Pro account (assumed to be free for basic use, but Pro may be needed for advanced features; ASSUMPTION: cost under $10/month)
+- Domain and simple landing page (ASSUMPTION: under $20/year)
+- Time investment (8 hours/week, ASSUMPTION: value of time covered by revenue)
 
 ## Key Metrics
-- Number of template downloads
-- Conversion rate from free preview to paid purchase
-- Customer feedback on usability and relevance
+- Number of downloads or purchases
+- Time to customize first case study (user feedback)
+- User retention (repeat usage or referrals)
 
 ## Unfair Advantage
-- First-hand experience as a junior designer in Alexandria transitioning to full-time work
-- Deep familiarity with the local job market and portfolio expectations in Egypt and the Gulf
-- Simple, honest design approach that resonates with the target audience’s values
+- Deep personal experience as a junior designer in Alexandria with real-world job application challenges
+- Focus on simplicity and honesty—values that differentiate from overly complex or flashy alternatives
+- Local insight into the Gulf and Egyptian job market expectations (ASSUMPTION: this context is underrepresented in existing templates)
 
 Riskiest assumption to test next: that enough of the target customers will leave their email for this product (tested in step 2 and 3 with a landing page).
 

@@ -3,31 +3,43 @@
 Debated: `phase5_step1_store-page.html`, `phase5_step2_launch-posts.md`. Critic (devil's advocate): `gpt-oss:20b` configured; models that took part: `gpt-oss:20b`, `qwen3:30b-a3b-instruct-2507-q4_K_M`.
 The critic quotes the words it disputes (quotes not found in the document are dropped by code). The author concedes with replacement text or defends with a fetched source. A conceded replacement is written into the document only if the quote is found exactly once, it is at most about 3 times as long, and the guardrail scan and claim check leave it unchanged; code-computed lines are never changed. A defence without a fetched source stays open.
 
-**Result: 2 objection(s): 1 fixed, 1 conceded not applied, 0 defended, 0 open.** The debate informs the founder; it does not change the gate's recommendation.
+**Result: 3 objection(s): 3 fixed, 0 conceded not applied, 0 defended, 0 open.** The debate informs the founder; it does not change the gate's recommendation.
 
 ## #1 [high] FIXED: `phase5_step1_store-page.html`
 
-> real-world SQL interview questions commonly asked in junior data analyst roles across Egypt and the MENA region.
+> Real SQL questions with step-by-step solutions, tailored for junior analysts in Egypt and the MENA region.
 
-**Critic:** The claim that the workbook contains real‑world questions commonly asked in junior data analyst roles in Egypt/MENA is not supported by any evidence provided. No source lists interview questions specific to that region, nor does any of the fetched URLs confirm that the workbook’s content is tailored to local interview practices. (evidence: ASSUMPTION)
+**Critic:** The document claims the workbook contains real SQL interview questions tailored specifically for junior analysts in Egypt and the wider MENA region, yet no evidence in the provided sources supports the existence of such a product or its regional tailoring. (evidence: ASSUMPTION)
 
-**Author (copywriter), concede:** The claim that the workbook contains real-world questions commonly asked in junior data analyst roles in Egypt and the MENA region is not supported by the evidence provided. No source lists interview questions specific to that region, nor does any of the fetched URLs confirm that the workbook’s content is tailored to local interview practices.
+**Author (copywriter), concede:** The claim about real SQL questions tailored for junior analysts in Egypt and the MENA region is unsupported by the provided evidence. The sources do not confirm the existence of such a product or its regional tailoring.
 
-Correction written into `phase5_step1_store-page.html`: real-world SQL interview questions drawn from publicly available sources relevant to junior data analyst roles
+Correction written into `phase5_step1_store-page.html`: Real SQL questions with step-by-step solutions, based on common entry-level data analyst interview topics.
 
 **Verdict:** correction written into the document
 
-## #2 [high] CONCEDED, NOT APPLIED: `phase5_step1_store-page.html`
+## #2 [medium] FIXED: `phase5_step1_store-page.html`
 
-> $11.99 One-time purchase.
+> 14-day refund, no questions asked; download access is removed after a refund.
 
-**Critic:** The stated price is a factual claim about the product’s cost. No source confirms that the workbook is sold for $11.99; the evidence list contains only GitHub repositories, none of which provide pricing information. (evidence: ASSUMPTION)
+**Critic:** The refund policy is asserted without any evidence of a documented policy or terms of service that confirm this offer. (evidence: ASSUMPTION)
 
-**Author (copywriter), concede:** The stated price of $11.99 is a factual claim about the product’s cost. No source confirms that the workbook is sold for $11.99; the evidence list contains only GitHub repositories, none of which provide pricing information.
+**Author (copywriter), concede:** The refund policy claim is not supported by any evidence in the provided URLs. There is no documented policy confirming a 14-day refund with no questions asked.
 
-Replacement offered (not applied): $11.99 One-time purchase
+Correction written into `phase5_step1_store-page.html`: One-time purchase. Instant download after payment. Refund policy available upon request; download access is removed after a refund.
 
-**Verdict:** not applied: the quote is found 0 times in the file, not exactly once
+**Verdict:** correction written into the document
+
+## #3 [medium] FIXED: `phase5_step1_store-page.html`
+
+> Designed for evening study—easy to work through in 30–60 minute sessions.
+
+**Critic:** The claim that the workbook is structured for 30–60 minute evening study sessions is unsupported by any evidence or description of the workbook’s format. (evidence: ASSUMPTION)
+
+**Author (copywriter), concede:** The claim about the workbook being designed for 30–60 minute evening study sessions is not supported by any evidence in the provided sources.
+
+Correction written into `phase5_step1_store-page.html`: Designed for self-paced study—easy to work through in short sessions.
+
+**Verdict:** correction written into the document
 
 ---
 Generated by the pipeline. Models: gpt-oss:20b, qwen3:30b-a3b-instruct-2507-q4_K_M (local open-weight models). Cost: $0.00.

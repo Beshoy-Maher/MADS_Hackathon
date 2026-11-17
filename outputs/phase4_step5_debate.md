@@ -5,15 +5,15 @@ The critic quotes the words it disputes (quotes not found in the document are dr
 
 **Result: 1 objection(s): 1 fixed, 0 conceded not applied, 0 defended, 0 open.** The debate informs the founder; it does not change the gate's recommendation.
 
-## #1 [medium] FIXED: `phase4_step1_pricing.md`
+## #1 [low] FIXED: `phase4_step1_pricing.md`
 
-> 14-day refund, no questions asked; download access is removed after a refund.
+> Affordability value in brief: yes, x0.8.
 
-**Critic:** The refund policy is stated without any supporting evidence; it is an unsupported factual claim. (evidence: ASSUMPTION)
+**Critic:** The claim that the affordability value is 0.8 is not supported by any evidence and its meaning is unclear, making it an unsupported factual statement. (evidence: ASSUMPTION)
 
-**Author (pricing), concede:** The refund policy is stated without supporting evidence; it is an unsupported factual claim.
+**Author (pricing), concede:** The claim that the affordability value is 0.8 is not supported by any evidence and its meaning is unclear, making it an unsupported factual statement.
 
-Correction written into `phase4_step1_pricing.md`: 14-day refund, no questions asked; download access is removed after a refund. (ASSUMPTION)
+Correction written into `phase4_step1_pricing.md`: Affordability value in brief: ASSUMPTION
 
 **Verdict:** correction written into the document
 

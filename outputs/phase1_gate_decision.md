@@ -10,19 +10,18 @@ Reasons:
 | Check | Passed | Value | Threshold |
 |---|---|---|---|
 | relevant_sources | yes | 25 | 5 |
-| independent_voices | yes | 25 | 4 |
+| independent_voices | yes | 11 | 4 |
 | pain_signals | yes | 5 | 2 |
-| demand_score | yes | 95.0 | 40 |
+| demand_score | yes | 89.6 | 40 |
 | founder_fit | yes | 100.0 | 50 |
-| total_score | yes | 75.5 | 50 |
+| total_score | yes | 73.4 | 50 |
 | allowed_product | yes | ok | not excluded |
 
 Gate type: evidence. Allowed outcomes: go, repeat, pivot, stop. Thresholds are fixed in `gates.py` before the data is seen.
 
-Debate before this gate (`phase1_step6_debate.md`): 1 objection(s): 0 fixed, 1 conceded not applied, 0 defended, 0 open (0 open with high severity). Fixed corrections were written into the documents before this gate was shown. It informs this decision; it does not change the recommendation.
-- CONCEDED, NOT APPLIED [medium] This claim about LeetCode-style platforms is not backed by any evidence in the provided list and is an unsupported opinion.
+Debate before this gate (`phase1_step6_debate.md`): 0 objection(s): 0 fixed, 0 conceded not applied, 0 defended, 0 open (0 open with high severity). Fixed corrections were written into the documents before this gate was shown. It informs this decision; it does not change the recommendation.
 
-**Founder decision: GO** at 2026-11-17T19:16:46Z.
+**Founder decision: GO** at 2026-11-17T20:07:05Z.
 
 ---
 Gate logic is deterministic code (no model). Cost: $0.00.

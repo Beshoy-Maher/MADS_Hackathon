@@ -6,7 +6,7 @@ The researcher sharpened the idea, proposed alternatives that fit the founder, a
 
 ## Sharpened founder idea: Figma case study templates for junior designers
 
-- Problem: ASSUMPTION (no fetched post describes this): Junior designers struggle to present their work clearly in portfolios.
+- Problem: ASSUMPTION (no fetched post describes this): Junior designers struggle to present their work clearly in job applications.
 - Format: Figma template pack
 - Search queries: case study template figma, portfolio template struggling, figma junior designers
 - Relevant items found: 14 (of 46 results)
@@ -29,35 +29,41 @@ Existing solutions (7):
 - [Repository paomartinez6111998-gif/Portafolio-Paola: Junior UX/UI Designer Bilingual focused on user-centered d](https://github.com/paomartinez6111998-gif/Portafolio-Paola) (github, 2026-03-09, 0 pts/stars, 0 comments)
 - [Repository Null123-ASD/Personal_Portfolio-UIUX-Graphic-D-: A junior UI/UX & Graphic Designer with a strong int](https://github.com/Null123-ASD/Personal_Portfolio-UIUX-Graphic-D-) (github, 2026-04-28, 0 pts/stars, 0 comments)
 
-## Alternative 1: UX portfolio checklist for first-time job seekers
+## Alternative 1: Simple UX portfolio starter kit
 
-- Problem: ASSUMPTION (no fetched post describes this): Junior designers don’t know what to include in their first UX portfolio.
-- Format: PDF checklist
-- Search queries: portfolio checklist ux, what to include in
-- Relevant items found: 5 (of 12 results)
+- Problem: ASSUMPTION (no fetched post describes this): New designers lack a clean, professional portfolio structure.
+- Format: Figma file
+- Search queries: portfolio starter figma, simple portfolio template
+- Relevant items found: 2 (of 15 results)
 
-People describing the problem (2):
-- [Issue: E3 | Portfolio-bewijs sprint 1 verzamelen](https://github.com/Aceistt/barroc-intens/issues/27) (github, 2026-11-16, 0 pts/stars, 0 comments)
-- [Issue: Portfolio completion checklist](https://github.com/ssd2008/Assi/issues/8) (github, 2026-07-16, 0 pts/stars, 0 comments)
+People describing the problem (0):
+- Nothing of this kind was found.
 
-Existing solutions (3):
-- [Repository YurisCodingClub/pro-check: Checklist for you projects showcased in your portfolio](https://github.com/YurisCodingClub/pro-check) (github, 2022-09-20, 6 pts/stars, 0 comments)
-- [Repository Danishmk1286/Casecraft-UI-UX-Design-Case-Study-Checklist: UI/UX design case study checklist for stu](https://github.com/Danishmk1286/Casecraft-UI-UX-Design-Case-Study-Checklist) (github, 2026-03-17, 1 pts/stars, 0 comments)
-- [Repository abishek456345-sketch/ux-ui-designer-interview-preparation: A practical UX/UI designer interview pre](https://github.com/abishek456345-sketch/ux-ui-designer-interview-preparation) (github, 2026-10-30, 0 pts/stars, 0 comments)
+Existing solutions (2):
+- [Repository TMILLS333/ux-portfolio-starter: Portfolio starter for UX designers. Built for the Claude Code + Fig](https://github.com/TMILLS333/ux-portfolio-starter) (github, 2026-03-14, 0 pts/stars, 0 comments)
+- [Repository thamjidmannarayil/aakriti-architects: A responsive website starter for Aakriti Architects, built wi](https://github.com/thamjidmannarayil/aakriti-architects) (github, 2026-10-10, 0 pts/stars, 0 comments)
 
-## Alternative 2: Simple Figma UI kit for beginner UX projects
+## Alternative 2: UX case study writing guide for beginners
 
-- Problem: ASSUMPTION (no fetched post describes this): New designers waste time building basic UI components from scratch.
-- Format: Figma component library
-- Search queries: figma ui kit beginner, ui components for beginners
-- Relevant items found: 3 (of 9 results)
+- Problem: ASSUMPTION (no fetched post describes this): Junior designers don’t know how to write compelling case study narratives.
+- Format: PDF guide
+- Search queries: case study writing help, how to write case
+- Relevant items found: 11 (of 26 results)
 
-People describing the problem (2):
-- [Issue: Create high quality designs](https://github.com/maharielrosario/feastival/issues/3) (github, 2025-05-18, 0 pts/stars, 0 comments)
-- [Issue: Starter Kit Website](https://github.com/SurPathHub/starter-kit/issues/18) (github, 2021-05-14, 1 pts/stars, 4 comments)
+People describing the problem (7):
+- [Ask HN: What do you wish you knew about UI/UX design?](https://news.ycombinator.com/item?id=4860145) (hackernews, 2012-12-02, 63 pts/stars, 58 comments)
+- [Ask HN: What do you wish you knew about UI/UX design?](https://news.ycombinator.com/item?id=4827387) (hackernews, 2012-11-25, 6 pts/stars, 5 comments)
+- [Writing a case study? This job aid might help...](https://news.ycombinator.com/item?id=7537572) (hackernews, 2014-04-05, 2 pts/stars, 0 comments)
+- [Show HN: Streamlining Resume Building with AI: UX Case Study](https://news.ycombinator.com/item?id=35740042) (hackernews, 2023-04-28, 1 pts/stars, 0 comments)
+- [Issue: PRD: Post-cutover case studies](https://github.com/designbyalex/designbyalex.dev/issues/124) (github, 2026-11-11, 0 pts/stars, 1 comments)
+- [Issue: Questions for the About bio and case studies](https://github.com/alexfinnarn/alexfinnarn.github.io/issues/23) (github, 2026-11-15, 0 pts/stars, 0 comments)
+- [Issue: Write case-study pages for flagship projects](https://github.com/FueRobertHer/astro-portfolio/issues/20) (github, 2026-09-25, 0 pts/stars, 0 comments)
 
-Existing solutions (1):
-- [Repository anjumayoub/UIUX-SWISS-KNIFE: A self-contained HTML course for designers. 121 lessons, 220 quiz ques](https://github.com/anjumayoub/UIUX-SWISS-KNIFE) (github, 2026-07-10, 0 pts/stars, 0 comments)
+Existing solutions (4):
+- [Repository ItsAwSM/Python-for-Data-Analytics: This course will teach you only the relevant topics in Python fo](https://github.com/ItsAwSM/Python-for-Data-Analytics) (github, 2020-08-24, 141 pts/stars, 1 comments)
+- [Repository AnkurNapa/Lead-Score-Case-Study: Problem Statement An education company named X Education sells onl](https://github.com/AnkurNapa/Lead-Score-Case-Study) (github, 2021-07-17, 5 pts/stars, 0 comments)
+- [Repository lcbueno/Heart_failure_scipy_ANOVA_Tukey: Introduction In my case studies I keep writing in English ](https://github.com/lcbueno/Heart_failure_scipy_ANOVA_Tukey) (github, 2021-10-10, 4 pts/stars, 0 comments)
+- [Repository bhardwaj-sunil/Lead_Scoring_Case_Study: Lead Scoring: Lead scoring is a methodology used by sales a](https://github.com/bhardwaj-sunil/Lead_Scoring_Case_Study) (github, 2019-06-16, 2 pts/stars, 0 comments)
 
 ## Source coverage
 
@@ -68,4 +74,4 @@ Existing solutions (1):
 
 ---
 Generated by the pipeline. Model: `qwen3:30b-a3b-instruct-2507-q4_K_M` (local open-weight model). Cost: $0.00.
-Sources cited: 22. Claims without a source are marked ASSUMPTION.
+Sources cited: 27. Claims without a source are marked ASSUMPTION.

@@ -14,7 +14,7 @@ Reasons:
 
 Gate type: evidence. Allowed outcomes: stop. Thresholds are fixed in `gates.py` before the data is seen.
 
-**Founder decision: STOP** at 2026-11-17T19:14:21Z.
+**Founder decision: STOP** at 2026-11-17T20:04:40Z.
 
 ---
 Gate logic is deterministic code (no model). Cost: $0.00.

@@ -10,8 +10,8 @@
 | no_placeholder_text | PASS | 0 | 0 |
 | user_guide_has_usage_and_support | PASS | True | sections present |
 | product_in_allowed_category | PASS | True | True |
-| readable_sentence_length | PASS | 13.0 | <= 28 words |
-| deliverable_package_builds | PASS | sha256:5589a5ad117a2fe4 | non-empty |
+| readable_sentence_length | PASS | 12.6 | <= 28 words |
+| deliverable_package_builds | PASS | sha256:5f89cb40e864cb5a | non-empty |
 | verifier_last_pass_has_no_errors | PASS | open errors: 0 | every module reviewed, 0 open errors |
 | product_is_original | PASS | name clashes: 0, copied passages: 0 | 0 name clashes, 0 runs of 12+ words copied from a source |
 
@@ -24,14 +24,14 @@ Each module is reviewed once; a module with errors is revised once by the builde
 | Module | Errors on first review | Revised | Open errors after last review | SQL statements executed | Reviewed by |
 |---|---|---|---|---|---|
 | 1. Get oriented: what good sql interview prep looks like | 0 | no | 0 | 1 | `qwen3:30b-a3b-instruct-2507-q4_K_M` + SQLite |
-| 2. Step-by-step method for sql interview prep | 0 | no | 0 | 1 | `qwen3:30b-a3b-instruct-2507-q4_K_M` + SQLite |
+| 2. Step-by-step method for sql interview prep | 0 | no | 0 | 2 | `qwen3:30b-a3b-instruct-2507-q4_K_M` + SQLite |
 | 3. Worked example | 0 | no | 0 | 1 | `qwen3:30b-a3b-instruct-2507-q4_K_M` + SQLite |
-| 4. Checklists and worksheet | 0 | no | 0 | 3 | `qwen3:30b-a3b-instruct-2507-q4_K_M` + SQLite |
+| 4. Checklists and worksheet | 0 | no | 0 | 1 | `qwen3:30b-a3b-instruct-2507-q4_K_M` + SQLite |
 
 ## Originality (code check, no model)
 
-- Product name **SQL Interview Prep Workbook for Junior Analysts** compared with 33 existing product name(s) found in the evidence: no clash.
-- Product text compared with 50 fetched source(s) for runs of 12+ identical words: no copied passage.
+- Product name **SQL Interview Prep Workbook for Junior Analysts** compared with 28 existing product name(s) found in the evidence: no clash.
+- Product text compared with 43 fetched source(s) for runs of 12+ identical words: no copied passage.
 - Scope: only the fetched titles and snippets are compared, not the full pages behind the links.
 
 ---

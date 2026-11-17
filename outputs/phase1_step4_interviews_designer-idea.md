@@ -7,17 +7,17 @@
 - Compliments and 'sounds great' are not evidence. Commitments (time, money, intro) are.
 
 ## Interview guide
-1. Tell me about the last time you tried to showcase a design project in your portfolio.
-2. What did you do when you realized your case study wasn’t clearly communicating your process?
-3. How did you decide what to include or leave out when building a case study?
-4. What have you tried to make your case studies stand out to hiring managers?
-5. How much time did you spend on a single case study before submitting it?
-6. How much money, if any, have you spent on tools, templates, or courses to improve your case studies?
+1. Tell me about the last time you applied for a UX design job and had to present your case study.
+2. What did you do when you realized your case study wasn’t clear to recruiters?
+3. How did you try to improve your case study presentation before sending it?
+4. What have you tried to make your portfolio stand out during job applications?
+5. How much time did you spend on your case study before submitting it?
+6. How much money, if any, have you spent to improve how your case study looks?
 
 **What counts as a strong signal:**
-- Spent time editing a case study multiple times
-- Paid for a template, course, or design tool
-- Asked for feedback from peers or mentors on a case study
+- Spent time editing a case study after a rejection
+- Tried free tools or templates to improve layout
+- Asked for feedback from peers or mentors on presentation
 
 ## Who to interview
 - 5 to 8 people from: communities the founder already belongs to.
@@ -25,9 +25,9 @@
 
 ## Outreach draft (written for the founder to send as themselves)
 
-> Hi! I'm Laila. I'm talking to people about one problem I keep hearing about: "Junior designers struggle to present their work clearly in portfolios." If that sounds familiar, could I ask you about your own experience in a 15-minute call? I'm not selling anything. Thank you either way.
+> Hi! I'm Laila. I'm talking to people about one problem I keep hearing about: "Junior designers struggle to present their work clearly in job applications." If that sounds familiar, could I ask you about your own experience in a 15-minute call? I'm not selling anything. Thank you either way.
 
-Status: waiting for founder approval (action `act_73bf46aa`). Sending is STUBBED: after approval the message is saved to the outbox and the founder sends it personally.
+Status: waiting for founder approval (action `act_51960c41`). Sending is STUBBED: after approval the message is saved to the outbox and the founder sends it personally.
 
 ## Interview results
 

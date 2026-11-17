@@ -1,18 +1,18 @@
 # Phase 1, step 3: Market definition for 'SQL Interview Prep Workbook for Junior Analysts'
 
 ## Ideal customer profile
-- ASSUMPTION (no fetched source mentions Egypt): Junior data analysts in Egypt/MENA seeking first jobs, often self-taught or recent bootcamp grads.
-- Facing SQL interviews with limited practice resources tailored to real-world scenarios.
-- Trigger: Receiving a job interview invite or seeing a job post requiring SQL.
-- Tried: Free GitHub repos like [sanketrs/sql-interview-preparation](https://github.com/sanketrs/sql-interview-preparation-questions-with-answers) and [rohanmistry231/SQL-Interview-Preparation](https://github.com/rohanmistry231/SQL-Interview-Preparation), but found them inconsistent or lacking explanations.
+- ASSUMPTION (no fetched source mentions Egypt): Junior data analysts in Egypt/MENA seeking first roles, often self-taught or recent graduates.
+- Facing time pressure: "SQL interview in 2 weeks, how to best prepare?" [Ask HN: SQL interview in 2 weeks, how to best prepare?](https://news.ycombinator.com/item?id=24659490)
+- Tried free online resources like GitHub repos, but struggle with inconsistent quality and lack of worked answers. (ASSUMPTION)
+- Trigger: Receiving a job interview invite with SQL assessment. (ASSUMPTION)
 
 ## What they use today
-- Open-source GitHub repos with SQL questions (e.g., [Aafreen29/SQL-Interview-Prep-Question](https://github.com/Aafreen29/SQL-Interview-Prep-Question)), but often lack worked answers or context.
-- LeetCode-style platforms, but many questions are abstract or not aligned with real analyst roles.
-- Gaps: No curated, beginner-friendly workbook with step-by-step solutions and practical interview framing.
+- Open-source GitHub repos (e.g., [sanketrs/sql-interview-preparation-questions-with-answers](https://github.com/sanketrs/sql-interview-preparation-questions-with-answers), [rohanmistry231/SQL-Interview-Preparation](https://github.com/rohanmistry231/SQL-Interview-Preparation)) offer practice questions but lack detailed, step-by-step solutions.
+- LeetCode and similar platforms focus on algorithmic problems, not real-world data analysis use cases. (ASSUMPTION)
+- No widely recognized, affordable, region-specific workbook with clear, practical SQL answers. (ASSUMPTION)
 
 ## Market size
-ASSUMPTION: Can be measured via job board data (e.g., LinkedIn, Wuzzuf) showing SQL-related entry-level analyst roles in Egypt/MENA, or by tracking GitHub repo stars and forks for SQL prep resources.
+ASSUMPTION: Market size could be measured via job board data (e.g., number of junior data analyst roles posted in Egypt/MENA with SQL requirements).
 
 ## Where these people talk (from the evidence)
 

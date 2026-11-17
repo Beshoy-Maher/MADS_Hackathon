@@ -1,22 +1,21 @@
 # Phase 5, step 4: Promise check (does what we sell match what we built?)
 
-**11 promises checked: 10 kept, 0 broken, 1 unverifiable.**
+**10 promises checked: 6 kept, 0 broken, 4 unverifiable.**
 
 Every promise on the store page and in the launch posts is checked against the product built in Phase 3, the price and refund policy from Phase 4 and the delivery test in step 3. Counts, prices, refund days and delivery are checked by code. For other promises the model may only quote the product; code keeps the quote only if it is in the product word for word. Only code can mark a promise broken, and an item with a broken promise cannot be approved for publishing (`approval.py`). Unverifiable promises are for you to confirm, reword or remove.
 
 | Where | Promise | Verdict | Proof | Checked by |
 |---|---|---|---|---|
-| store page | A practical, affordable SQL interview workbook with real-world questions and fully worked answers, designed specifically for junior analysts in the MENA region. | **KEPT** | product says: &quot;A practical PDF workbook for Junior and aspiring data analysts preparing for SQL interviews, especially in Egypt and the wider MENA region. Made by Mariam.&quot; | model quote, checked by code |
-| store page | Includes real-world SQL interview questions drawn from publicly available sources relevant to junior data analyst roles | **KEPT** | product says: &quot;Use sample data like sales records or user activity logs. Write queries that answer typical questions (e.g., “Find the top 5 customers by order count”).&quot; | model quote, checked by code |
-| store page | Each question comes with a fully worked answer, explaining the logic, syntax, and reasoning — not just the final query. | **KEPT** | product says: &quot;This module walks you through solving a real-world SQL interview question step by step. You’ll practice writing queries using standard SQL that works in SQLite.&quot; | model quote, checked by code |
-| store page | Written in plain, clear language with examples relevant to local datasets and common business contexts in the region. | **KEPT** | product says: &quot;Use sample data like sales records or user activity logs. Write queries that answer typical questions (e.g., “Find the top 5 customers by order count”).&quot; | model quote, checked by code |
-| store page | Designed for evening study — 10–minutes per question, so you can practice without overwhelming your schedule. | **KEPT** | product says: &quot;Time your practice. Simulate interview conditions: 10–15 minutes per question.&quot; | model quote, checked by code |
+| store page | Real SQL questions with step-by-step solutions, based on common entry-level data analyst interview topics. | **KEPT** | product says: &quot;Step-by-step method for sql interview prep&quot; | model quote, checked by code |
+| store page | Includes real-world SQL interview questions commonly asked in entry-level data analyst roles. | **UNVERIFIABLE** | no passage of the product proves it. Confirm, reword or remove it | model found no quote |
+| store page | Each question comes with a fully worked answer, explaining the logic and syntax used. | **UNVERIFIABLE** | no passage of the product proves it. Confirm, reword or remove it | model found no quote |
+| store page | Written in plain language, with examples relevant to local datasets and business contexts in the MENA region. | **UNVERIFIABLE** | no passage of the product proves it. Confirm, reword or remove it | model found no quote |
+| store page | Designed for self-paced study—easy to work through in short sessions. | **KEPT** | product says: &quot;Start with one clear goal: practice SQL queries that match real interview questions&quot; | model quote, checked by code |
 | store page | $11.99 | **KEPT** | price $11.99 matches Phase 4 | code |
 | store page | Instant download after payment. | **KEPT** | delivery after payment passes the MOCKED sale-to-cash test | code |
 | store page | 14-day refund, no questions asked; download access is removed after a refund. | **KEPT** | 14-day refund matches the policy | code |
-| launch post: Hacker News (Show HN) | Show HN: I made a SQL interview prep workbook with step-by-step answers to common questions junior data analysts get asked. | **KEPT** | product says: &quot;A practical PDF workbook for Junior and aspiring data analysts preparing for SQL interviews, especially in Egypt and the wider MENA region. Made by Mariam.&quot; | model quote, checked by code |
-| launch post: Hacker News (Show HN) | It’s for people who want to practice without needing a mentor or expensive course. | **KEPT** | product says: &quot;This module helps you practice SQL interview questions using real-world templates. You’ll apply what you’ve learned in earlier modules to write queries that solve common analyst tasks.&quot; | model quote, checked by code |
-| launch post: Hacker News (Show HN) | What’s one thing I could improve in the structure or examples? | **UNVERIFIABLE** | no passage of the product proves it. Confirm, reword or remove it | model found no quote |
+| launch post: Hacker News (Show HN) | Show HN: I made a SQL interview prep workbook with step-by-step answers to common questions junior data analysts face. | **KEPT** | product says: &quot;Step-by-step method for sql interview prep&quot; | model quote, checked by code |
+| launch post: Hacker News (Show HN) | This workbook walks through each question with reasoning, not just code. | **UNVERIFIABLE** | no passage of the product proves it. Confirm, reword or remove it | model found no quote |
 
 ## What happens next
 - No broken promise: every item can be approved or rejected by you.

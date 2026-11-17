@@ -5,19 +5,19 @@ Product: SQL Interview Prep Workbook for Junior Analysts. Price: $11.99.
 
 ## Event trail
 
-1. checkout created ord_db429759 for $11.99 (MOCKED hosted checkout; no card data touches our system)
-2. checkout created ord_6bfc4196 for $11.99 (MOCKED hosted checkout; no card data touches our system)
-3. delivered ord_db429759: download token issued, delivery email STUBBED
-4. ignored duplicate event evt_7cc6da4457
-5. delivery skipped for ord_db429759: already delivered (idempotent)
+1. checkout created ord_177684d8 for $11.99 (MOCKED hosted checkout; no card data touches our system)
+2. checkout created ord_04073afa for $11.99 (MOCKED hosted checkout; no card data touches our system)
+3. delivered ord_177684d8: download token issued, delivery email STUBBED
+4. ignored duplicate event evt_6b6a44f87a
+5. delivery skipped for ord_177684d8: already delivered (idempotent)
 6. rejected event evt_forged: bad signature
-7. delivered ord_6bfc4196: download token issued, delivery email STUBBED
-8. access revoked for ord_db429759
+7. delivered ord_04073afa: download token issued, delivery email STUBBED
+8. access revoked for ord_177684d8
 
 ## Deliveries (STUBBED emails)
 
-- ord_db429759 -> buyer-A (test): /download/dl_89d0cf824303 (STUBBED: email recorded, not sent)
-- ord_6bfc4196 -> buyer-B (test): /download/dl_32cd8a40857a (STUBBED: email recorded, not sent)
+- ord_177684d8 -> buyer-A (test): /download/dl_cefc95dee0fb (STUBBED: email recorded, not sent)
+- ord_04073afa -> buyer-B (test): /download/dl_6109be6aba39 (STUBBED: email recorded, not sent)
 
 ## Checks
 

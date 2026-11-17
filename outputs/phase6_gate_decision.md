@@ -15,10 +15,10 @@ Reasons:
 
 Gate type: evidence. Allowed outcomes: go, repeat, pivot, stop. Thresholds are fixed in `gates.py` before the data is seen.
 
-Debate before this gate (`phase6_step4_debate.md`): 2 objection(s): 1 fixed, 0 conceded not applied, 0 defended, 1 open (0 open with high severity). Fixed corrections were written into the documents before this gate was shown. It informs this decision; it does not change the recommendation.
-- OPEN [medium] This conclusion is drawn without any supporting data; the memo does not provide evidence that the sale‑to‑cash test was formally applied or that measurable outcomes are required for it to pass.
+Debate before this gate (`phase6_step4_debate.md`): 1 objection(s): 0 fixed, 0 conceded not applied, 0 defended, 1 open (1 open with high severity). Fixed corrections were written into the documents before this gate was shown. It informs this decision; it does not change the recommendation.
+- OPEN [high] The memo asserts a lack of sales and waitlist data, yet none of the provided evidence URLs contain any information about actual purchases, user sign‑ups, or market validation. The claim is therefore unsupported and likely based on an assumption rather than verifiable data.
 
-**Founder decision: REPEAT** at 2026-11-17T19:19:37Z. Note: Keep operating; review after 14 days of real sales data.
+**Founder decision: REPEAT** at 2026-11-17T20:10:15Z. Note: Keep operating; review after 14 days of real sales data.
 
 ---
 Gate logic is deterministic code (no model). Cost: $0.00.

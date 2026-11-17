@@ -1,20 +1,20 @@
 # Phase 1, step 3: Market definition for 'Daily dev motivation via email'
 
 ## Ideal customer profile
-- Software developers interested in daily motivation tools [Ask HN: Daily motivation screen theme for Android](https://news.ycombinator.com/item?id=22865790).
-- Trigger: Feeling stuck, demotivated, or overwhelmed by technical debt or deadlines.
-- Tried: Personalized wallpapers, dev quote apps, or social media for quick morale boosts.
+- ASSUMPTION (no fetched post describes this): Software developers facing burnout during long coding sessions.
+- Trigger: Frustration after debugging or missed deadlines. (ASSUMPTION)
+- Tried: Personal motivation apps, social media, or self-reminders [Ask HN: Daily motivation screen theme for Android](https://news.ycombinator.com/item?id=22865790).
 
 ## What they use today
-- Existing solutions include Android apps like [ruyonga/dev-quotes](https://github.com/ruyonga/dev-quotes) and web apps like [henriquealho/Programming-Quotes](https://github.com/henriquealho/Programming-Quotes).
-- Gaps: Most are static, lack personalization, or require app installation. No widely adopted email-based daily motivation tool exists.
+- Existing tools include email workflows [Yeshwini-J/n8n-motivational-emails](https://github.com/Yeshwini-J/n8n-motivational-emails), Python scripts [hasib-muntasir/Motivational-Quotes-send-to-mail-with-python](https://github.com/hasib-muntasir/Motivational-Quotes-send-to-mail-with-python), and Android apps [ruyonga/dev-quotes](https://github.com/ruyonga/dev-quotes) with curated developer quotes.
+- Gaps: Lack of personalization, inconsistent delivery, or no focus on developer-specific struggles. (ASSUMPTION)
 
 ## Market size
-ASSUMPTION: Market size could be measured by counting active software developers on platforms like GitHub or Stack Overflow, then estimating email engagement rates from similar micro-content services.
+ASSUMPTION – Could be measured via developer survey or email list growth tracking. No sourced market size available.
 
 ## Where these people talk (from the evidence)
 
-- github: 17 relevant item(s)
+- github: 14 relevant item(s)
 - hackernews: 1 relevant item(s)
 
 ---

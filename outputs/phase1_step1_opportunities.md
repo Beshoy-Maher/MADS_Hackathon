@@ -6,7 +6,7 @@ The researcher sharpened the idea, proposed alternatives that fit the founder, a
 
 ## Sharpened founder idea: SQL Interview Prep Workbook for Junior Analysts
 
-- Problem: ASSUMPTION (no fetched source mentions Egypt): Junior data analysts in Egypt and MENA struggle to practice real SQL interview questions with clear explanations.
+- Problem: ASSUMPTION (no fetched source mentions Egypt): Junior data analysts in Egypt and MENA struggle to practice real SQL interview questions with clear solutions.
 - Format: PDF workbook
 - Search queries: sql interview practice, sql questions with answers, sql interview questions
 - Relevant items found: 25 (of 76 results)
@@ -31,38 +31,11 @@ Existing solutions (14):
 - [Repository TeneikaAskew/tech_interview_practice: Explore what a Data Analyst or Data Scientist interview could](https://github.com/TeneikaAskew/tech_interview_practice) (github, 2022-01-07, 31 pts/stars, 0 comments)
 - [Repository ivankupach/fullstack-interview-questions: 800+ fullstack interview questions & answers with code an](https://github.com/ivankupach/fullstack-interview-questions) (github, 2026-10-08, 18 pts/stars, 4 comments)
 
-## Alternative 1: SQL Cheat Sheet for New Data Analysts
+## Alternative 1: Daily SQL Challenges for Aspiring Analysts
 
-- Problem: ASSUMPTION (no fetched post describes this): New data analysts need quick-reference guides for common SQL queries during job prep.
-- Format: PDF cheat sheet
-- Search queries: sql cheat sheet for, sql commands reference
-- Relevant items found: 19 (of 20 results)
-
-People describing the problem (11):
-- [Databases and SQL Cheat Sheet for Interviews](https://news.ycombinator.com/item?id=23758062) (hackernews, 2020-07-07, 2 pts/stars, 0 comments)
-- [Issue: SQL Training Cheat Sheet💾](https://github.com/rehamdata/rehamdata/issues/16) (github, 2026-07-15, 0 pts/stars, 0 comments)
-- [Issue: Add Regex Tester + Cheat Sheet tool](https://github.com/sachininmindfire/sachininmindfire.angular/issues/1) (github, 2026-08-13, 0 pts/stars, 0 comments)
-- [Issue: Create syntax and concurrency cheat sheet for Go and Rust](https://github.com/EmmanuelEkundayo/Learn-Blazingly-Fast/issues/2) (github, 2026-09-09, 0 pts/stars, 0 comments)
-- [OWASP PTK v8.9 with cheat sheets for XSS and SQL just released](https://news.ycombinator.com/item?id=40268757) (hackernews, 2024-05-05, 3 pts/stars, 1 comments)
-- [SQL Cheatsheet for Interviews](https://news.ycombinator.com/item?id=24096384) (hackernews, 2020-08-09, 1 pts/stars, 0 comments)
-- [Cheat Sheet for pesky SQL syntax differences across DBs (Date and Time)](https://news.ycombinator.com/item?id=23797330) (hackernews, 2020-07-10, 1 pts/stars, 0 comments)
-- [Issue: [e2e-202611171519] Proposal <img src=x onerror=alert(document.domain)> for SQLi](https://github.com/mackowski/custodes-sandbox/issues/181) (github, 2026-11-17, 0 pts/stars, 0 comments)
-
-Existing solutions (8):
-- [Repository mergisi/sql-syntax-cheat-sheet: A comprehensive SQL syntax cheat sheet for quick reference, coverin](https://github.com/mergisi/sql-syntax-cheat-sheet) (github, 2024-09-17, 55 pts/stars, 0 comments)
-- [Repository zyxnowell/sql-cheatsheet: Personal cheat sheet for querying relational database in SQL Server](https://github.com/zyxnowell/sql-cheatsheet) (github, 2018-11-06, 39 pts/stars, 0 comments)
-- [Repository sachindc/Data-Science-cheet-sheets: Cheat sheets for Numpy, Pandas, SQL, Scikit Learn](https://github.com/sachindc/Data-Science-cheet-sheets) (github, 2018-02-06, 37 pts/stars, 0 comments)
-- [Repository stribny/python-sqlalchemy: This is a cheat sheet for using SQLAlchemy. It demonstrates the most com](https://github.com/stribny/python-sqlalchemy) (github, 2020-01-30, 15 pts/stars, 0 comments)
-- [Repository kleiton0x00/Advanced-SQL-Injection-Cheatsheet: A cheat sheet that contains advanced queries for SQL](https://github.com/kleiton0x00/Advanced-SQL-Injection-Cheatsheet) (github, 2020-10-23, 3260 pts/stars, 1 comments)
-- [Repository unicornsasfuel/sqlite_sqli_cheat_sheet: A cheat sheet for attacking SQLite via SQLi](https://github.com/unicornsasfuel/sqlite_sqli_cheat_sheet) (github, 2016-04-18, 101 pts/stars, 0 comments)
-- [Repository mrsuman2002/SQL-Injection-Authentication-Bypass-Cheat-Sheet: his list can be used by penetration te](https://github.com/mrsuman2002/SQL-Injection-Authentication-Bypass-Cheat-Sheet) (github, 2018-06-07, 24 pts/stars, 0 comments)
-- [Repository The-Leo/PROGRAMMING-NOTES: This repo contains my study notes and a list of some of the most importa](https://github.com/The-Leo/PROGRAMMING-NOTES) (github, 2022-09-08, 35 pts/stars, 0 comments)
-
-## Alternative 2: Daily SQL Practice Challenges for Job Seekers
-
-- Problem: ASSUMPTION (no fetched post describes this): Aspiring data analysts want bite-sized, daily SQL exercises to build confidence before interviews.
+- Problem: ASSUMPTION (no fetched post describes this): New data analysts need bite-sized, consistent practice to build confidence before job interviews.
 - Format: Email newsletter
-- Search queries: daily sql challenge, sql practice every day
+- Search queries: daily sql challenge, sql practice email
 - Relevant items found: 14 (of 24 results)
 
 People describing the problem (6):
@@ -83,6 +56,26 @@ Existing solutions (8):
 - [Repository helloamanraj/30DaySQLQueryChallengebyTechTFQ: I am participating in a SQL challenge where I will be](https://github.com/helloamanraj/30DaySQLQueryChallengebyTechTFQ) (github, 2024-03-04, 2 pts/stars, 0 comments)
 - [Repository alirezazahiri/leetcode-daily: my code collections for daily leetcode challenges and study plans.](https://github.com/alirezazahiri/leetcode-daily) (github, 2023-02-14, 2 pts/stars, 0 comments)
 
+## Alternative 2: SQL Query Debugging Guide for Beginners
+
+- Problem: ASSUMPTION (no fetched post describes this): Junior analysts get stuck on common SQL errors and don’t know how to fix them independently.
+- Format: Interactive PDF
+- Search queries: sql query not working, common sql errors
+- Relevant items found: 9 (of 26 results)
+
+People describing the problem (8):
+- [Show HN: Beyond "chat with your database" – agentic data exploration](https://news.ycombinator.com/item?id=49910856) (hackernews, 2026-09-30, 2 pts/stars, 0 comments)
+- [Ask HN: SQL Query Generators?](https://news.ycombinator.com/item?id=25324429) (hackernews, 2020-12-06, 2 pts/stars, 0 comments)
+- [Issue: [Enhancement]: aws_cloudwatch_query_definition: support query_language and parameters](https://github.com/hashicorp/terraform-provider-aws/issues/50937) (github, 2026-11-12, 1 pts/stars, 1 comments)
+- [Show HN: Web-based SQL Server Query Plan Viewer](https://news.ycombinator.com/item?id=7382527) (hackernews, 2014-03-11, 1 pts/stars, 0 comments)
+- [Issue: Natural Language to SQL Query Engine](https://github.com/moogwol/htb-mentor/issues/2) (github, 2026-11-14, 0 pts/stars, 0 comments)
+- [Issue: MCP call to run SQL query ends with timeout](https://github.com/Swttch/swttch/issues/681) (github, 2026-11-12, 0 pts/stars, 0 comments)
+- [Issue: SQL queries not working](https://github.com/SIMPLE-AstroDB/SIMPLE-web/issues/217) (github, 2026-05-05, 0 pts/stars, 0 comments)
+- [Issue: 02 Query Data in Google Sheets with SQL](https://github.com/achibanisaid-bot/My-Coursework-Planner/issues/27) (github, 2026-11-06, 0 pts/stars, 0 comments)
+
+Existing solutions (1):
+- [Repository CaptainEFFF/burger: # Node Express Handlebars  ### Overview  In this assignment, you'll create a bu](https://github.com/CaptainEFFF/burger) (github, 2019-06-27, 4 pts/stars, 4 comments)
+
 ## Source coverage
 
 - hackernews: 3 queries ok
@@ -92,4 +85,4 @@ Existing solutions (8):
 
 ---
 Generated by the pipeline. Model: `qwen3:30b-a3b-instruct-2507-q4_K_M` (local open-weight model). Cost: $0.00.
-Sources cited: 58. Claims without a source are marked ASSUMPTION.
+Sources cited: 48. Claims without a source are marked ASSUMPTION.

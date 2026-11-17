@@ -7,17 +7,17 @@
 - Compliments and 'sounds great' are not evidence. Commitments (time, money, intro) are.
 
 ## Interview guide
-1. Tell me about the last time you felt stuck or demotivated during a long coding session.
+1. Tell me about the last time you felt stuck or unmotivated during a coding session.
 2. What did you do when you noticed your energy or focus slipping?
-3. How have you tried to stay positive during tough debugging or tight deadlines?
-4. What tools, habits, or rituals have you used to keep going when coding felt draining?
-5. How much time or money have you spent on things meant to boost your mood or motivation at work?
-6. What’s one thing you’ve kept coming back to when you need a mental reset while coding?
+3. How did you try to get back into a positive mindset while working?
+4. What tools, habits, or reminders have you used to stay motivated over time?
+5. How much time or money have you spent on things meant to help you stay positive at work?
+6. What’s one thing you’ve kept doing, even when it didn’t seem to help?
 
 **What counts as a strong signal:**
-- Mentioned a specific tool, habit, or ritual they use regularly
-- Spent time or money on something to improve mood during work
-- Described a real moment of low motivation and what they did about it
+- They mention a specific past action (e.g., “I set a 5-minute break every hour”).
+- They’ve spent real money or time on a solution (e.g., “I bought a meditation app”).
+- They name a tool or habit they still use regularly despite low results.
 
 ## Who to interview
 - 5 to 8 people from: Hacker News.
@@ -25,9 +25,9 @@
 
 ## Outreach draft (written for the founder to send as themselves)
 
-> Hi! I'm Karim. I'm talking to people about one problem I keep hearing about: "Software developers struggle to stay positive during long coding sessions." If that sounds familiar, could I ask you about your own experience in a 15-minute call? I'm not selling anything. Thank you either way.
+> Hi! I'm Karim. I'm talking to people about one problem I keep hearing about: "Developers struggle to stay positive during long coding sessions." If that sounds familiar, could I ask you about your own experience in a 15-minute call? I'm not selling anything. Thank you either way.
 
-Status: waiting for founder approval (action `act_f828fd06`). Sending is STUBBED: after approval the message is saved to the outbox and the founder sends it personally.
+Status: waiting for founder approval (action `act_caad8637`). Sending is STUBBED: after approval the message is saved to the outbox and the founder sends it personally.
 
 ## Interview results
 

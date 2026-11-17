@@ -2,30 +2,30 @@
 
 | Candidate | Relevant sources | Independent voices | Platforms | Pain posts | Demand | Pay signals | Competition | Founder fit | **Total** |
 |---|---|---|---|---|---|---|---|---|---|
-| Founder idea: Daily dev motivation via email | 18 | 18 | 2 | 1 | 19.0 | 25.0 | 0.0 | 25.5 | **34.0** |
-| Alt 1: Minimalist dev mood board | 5 | 5 | 2 | 1 | 23.3 | 25.0 | 0.0 | 27.8 | **36.4** |
+| Founder idea: Daily dev motivation via email | 15 | 3 | 2 | 1 | 15.4 | 0.0 | 0.0 | 25.5 | **28.8** |
+| Alt 1: Minimalist dev mood board | 5 | 2 | 2 | 1 | 17.6 | 25.0 | 0.0 | 27.8 | **34.1** |
 | Alt 2: Code-positive Instagram feed | 0 | 0 | 0 | 0 | 0.0 | 0.0 | 0.0 | 37.7 | **26.3** |
 
 ## Why
 
-- **Daily dev motivation via email**: Can design emails with existing graphic skills. (skill match 0.4)
-- **Minimalist dev mood board**: Can create minimalist visuals using design skills. (skill match 0.45)
-- **Code-positive Instagram feed**: Can curate and post uplifting content on Instagram. (skill match 0.67)
+- **Daily dev motivation via email**: Can design email visuals with current skills. (skill match 0.4)
+- **Minimalist dev mood board**: Uses graphic design for minimalist mood board. (skill match 0.45)
+- **Code-positive Instagram feed**: Leverages Instagram expertise for feed content. (skill match 0.67)
 
 ## Evidence behind each candidate
 
 ### Founder idea: Daily dev motivation via email
 
 People describing the problem (3):
+- [Issue: Raspberry Pie Zero Bot](https://github.com/cis3296f24/Section3ProjectPresentation/issues/14) (github, 2024-10-10, 4 pts/stars, 2 comments)
 - [Ask HN: Daily motivation screen theme for Android](https://news.ycombinator.com/item?id=22865790) (hackernews, 2020-04-14, 1 pts/stars, 0 comments)
 - [Issue: [Content] Expand the array of Daily Motivational Quotes](https://github.com/devftkrshna/Seiri/issues/5) (github, 2026-04-06, 0 pts/stars, 0 comments)
-- [Issue: Raspberry Pie Zero Bot](https://github.com/cis3296f24/Section3ProjectPresentation/issues/14) (github, 2024-10-10, 4 pts/stars, 2 comments)
 
-Existing solutions (15):
+Existing solutions (12):
 - [Repository hpolatyuruk/daily-developer-tips: A basic python script which periodically tweet developers' mistak](https://github.com/hpolatyuruk/daily-developer-tips) (github, 2019-04-17, 1 pts/stars, 0 comments)
+- [Repository Yeshwini-J/n8n-motivational-emails: A low-code workflow that sends daily motivational quotes via em](https://github.com/Yeshwini-J/n8n-motivational-emails) (github, 2025-06-19, 0 pts/stars, 0 comments)
+- [Repository hasib-muntasir/Motivational-Quotes-send-to-mail-with-python: Send motivational code to Email addres](https://github.com/hasib-muntasir/Motivational-Quotes-send-to-mail-with-python) (github, 2023-11-04, 0 pts/stars, 0 comments)
 - [Repository ruyonga/dev-quotes: Android app to collect amazing and motivational quotes from engineers and softw](https://github.com/ruyonga/dev-quotes) (github, 2020-07-23, 0 pts/stars, 0 comments)
-- [Repository Diego620/Quote-App: This project features a simple layout with my own motivational quotes specifica](https://github.com/Diego620/Quote-App) (github, 2024-06-03, 0 pts/stars, 0 comments)
-- [Repository henriquealho/Programming-Quotes: Web application designed to inspire developers with a curated coll](https://github.com/henriquealho/Programming-Quotes) (github, 2026-03-11, 0 pts/stars, 0 comments)
 
 ### Alt 1: Minimalist dev mood board
 
@@ -48,7 +48,7 @@ Existing solutions (0):
 
 ## How the scores are calculated
 
-demand = 0.5 x engagement(log-scaled points/stars/comments) + 10 x min(pain posts, 5); willingness_to_pay = 25 x posts mentioning paying/price (max 100); competition = 20 x existing solutions with 500+ stars/points (max 100); founder_fit = 45 x skill match + 30 x min(1, hours/8) + 25 x min(1, budget/$50); total = 0.40 demand + 0.15 willingness_to_pay + 0.30 founder_fit + 0.15 x (100 - competition)
+demand = 0.5 x engagement(log-scaled points/stars/comments; posts older than 2 years count half, older than 5 years a quarter) + 10 x min(pain posts, 5); independent voices = distinct authors or communities among discussion posts (repositories excluded); willingness_to_pay = 25 x posts mentioning paying/price (max 100); competition = 20 x existing solutions with 500+ stars/points (max 100); founder_fit = 45 x skill match + 30 x min(1, hours/8) + 25 x min(1, budget/$50); total = 0.40 demand + 0.15 willingness_to_pay + 0.30 founder_fit + 0.15 x (100 - competition)
 
 Founder fit uses the brief: skills, 2 hours/week, $0 budget. Engagement counts are public numbers from the linked sources; they show interest, not guaranteed buyers (ASSUMPTION that interest relates to demand).
 

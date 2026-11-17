@@ -2,15 +2,15 @@
 
 | Candidate | Relevant sources | Independent voices | Platforms | Pain posts | Demand | Pay signals | Competition | Founder fit | **Total** |
 |---|---|---|---|---|---|---|---|---|---|
-| Founder idea: SQL Interview Prep Workbook for Junior Analysts | 25 | 25 | 2 | 5 | 95.0 | 50.0 | 100.0 | 100.0 | **75.5** |
-| Alt 1: SQL Cheat Sheet for New Data Analysts | 19 | 18 | 2 | 3 | 62.0 | 0.0 | 20.0 | 95.5 | **65.4** |
-| Alt 2: Daily SQL Practice Challenges for Job Seekers | 14 | 13 | 2 | 3 | 48.5 | 0.0 | 0.0 | 97.8 | **63.7** |
+| Founder idea: SQL Interview Prep Workbook for Junior Analysts | 25 | 11 | 2 | 5 | 89.6 | 50.0 | 100.0 | 100.0 | **73.4** |
+| Alt 1: Daily SQL Challenges for Aspiring Analysts | 14 | 5 | 2 | 3 | 48.0 | 0.0 | 0.0 | 95.5 | **62.8** |
+| Alt 2: SQL Query Debugging Guide for Beginners | 9 | 8 | 2 | 4 | 47.6 | 0.0 | 0.0 | 97.8 | **63.4** |
 
 ## Why
 
-- **SQL Interview Prep Workbook for Junior Analysts**: Mariam's SQL and mentoring skills directly enable full workbook creation. (skill match 1.0)
-- **SQL Cheat Sheet for New Data Analysts**: Mariam can write cheat sheets but lacks design expertise for optimal layout. (skill match 0.9)
-- **Daily SQL Practice Challenges for Job Seekers**: Mariam's technical writing and mentoring skills support daily challenge development. (skill match 0.95)
+- **SQL Interview Prep Workbook for Junior Analysts**: Mariam’s SQL and mentoring skills directly match the workbook format. (skill match 1.0)
+- **Daily SQL Challenges for Aspiring Analysts**: Daily challenges require content scheduling and engagement—less aligned with her skills. (skill match 0.9)
+- **SQL Query Debugging Guide for Beginners**: Her debugging experience and technical writing cover the guide’s needs well. (skill match 0.95)
 
 ## Evidence behind each candidate
 
@@ -28,21 +28,7 @@ Existing solutions (14):
 - [Repository rohanmistry231/SQL-Interview-Preparation: A comprehensive resource for SQL interview preparation, f](https://github.com/rohanmistry231/SQL-Interview-Preparation) (github, 2025-04-15, 42 pts/stars, 0 comments)
 - [Repository shawlu95/Beyond-LeetCode-SQL: Analysis of SQL Leetcode and classic interview questions, common pitf](https://github.com/shawlu95/Beyond-LeetCode-SQL) (github, 2019-03-02, 1345 pts/stars, 2 comments)
 
-### Alt 1: SQL Cheat Sheet for New Data Analysts
-
-People describing the problem (11):
-- [Databases and SQL Cheat Sheet for Interviews](https://news.ycombinator.com/item?id=23758062) (hackernews, 2020-07-07, 2 pts/stars, 0 comments)
-- [Issue: SQL Training Cheat Sheet💾](https://github.com/rehamdata/rehamdata/issues/16) (github, 2026-07-15, 0 pts/stars, 0 comments)
-- [Issue: Add Regex Tester + Cheat Sheet tool](https://github.com/sachininmindfire/sachininmindfire.angular/issues/1) (github, 2026-08-13, 0 pts/stars, 0 comments)
-- [Issue: Create syntax and concurrency cheat sheet for Go and Rust](https://github.com/EmmanuelEkundayo/Learn-Blazingly-Fast/issues/2) (github, 2026-09-09, 0 pts/stars, 0 comments)
-
-Existing solutions (8):
-- [Repository mergisi/sql-syntax-cheat-sheet: A comprehensive SQL syntax cheat sheet for quick reference, coverin](https://github.com/mergisi/sql-syntax-cheat-sheet) (github, 2024-09-17, 55 pts/stars, 0 comments)
-- [Repository zyxnowell/sql-cheatsheet: Personal cheat sheet for querying relational database in SQL Server](https://github.com/zyxnowell/sql-cheatsheet) (github, 2018-11-06, 39 pts/stars, 0 comments)
-- [Repository sachindc/Data-Science-cheet-sheets: Cheat sheets for Numpy, Pandas, SQL, Scikit Learn](https://github.com/sachindc/Data-Science-cheet-sheets) (github, 2018-02-06, 37 pts/stars, 0 comments)
-- [Repository stribny/python-sqlalchemy: This is a cheat sheet for using SQLAlchemy. It demonstrates the most com](https://github.com/stribny/python-sqlalchemy) (github, 2020-01-30, 15 pts/stars, 0 comments)
-
-### Alt 2: Daily SQL Practice Challenges for Job Seekers
+### Alt 1: Daily SQL Challenges for Aspiring Analysts
 
 People describing the problem (6):
 - [Issue: Security: daily_challenges grants the anon role full write access and has no RLS](https://github.com/AnmolS99/voyage/issues/151) (github, 2026-11-11, 0 pts/stars, 0 comments)
@@ -56,13 +42,24 @@ Existing solutions (8):
 - [Repository Prakhar-002/LEETCODE: 📜 LeetCode Solution Hub 🔥 | Get all solutions 🧩 for daily challenges and spec](https://github.com/Prakhar-002/LEETCODE) (github, 2024-05-24, 5 pts/stars, 0 comments)
 - [Repository pzoladkiewicz/SQL-Prep-Daily-Challenges: ](https://github.com/pzoladkiewicz/SQL-Prep-Daily-Challenges) (github, 2017-04-27, 4 pts/stars, 0 comments)
 
+### Alt 2: SQL Query Debugging Guide for Beginners
+
+People describing the problem (8):
+- [Show HN: Beyond "chat with your database" – agentic data exploration](https://news.ycombinator.com/item?id=49910856) (hackernews, 2026-09-30, 2 pts/stars, 0 comments)
+- [Ask HN: SQL Query Generators?](https://news.ycombinator.com/item?id=25324429) (hackernews, 2020-12-06, 2 pts/stars, 0 comments)
+- [Issue: [Enhancement]: aws_cloudwatch_query_definition: support query_language and parameters](https://github.com/hashicorp/terraform-provider-aws/issues/50937) (github, 2026-11-12, 1 pts/stars, 1 comments)
+- [Show HN: Web-based SQL Server Query Plan Viewer](https://news.ycombinator.com/item?id=7382527) (hackernews, 2014-03-11, 1 pts/stars, 0 comments)
+
+Existing solutions (1):
+- [Repository CaptainEFFF/burger: # Node Express Handlebars  ### Overview  In this assignment, you'll create a bu](https://github.com/CaptainEFFF/burger) (github, 2019-06-27, 4 pts/stars, 4 comments)
+
 ## How the scores are calculated
 
-demand = 0.5 x engagement(log-scaled points/stars/comments) + 10 x min(pain posts, 5); willingness_to_pay = 25 x posts mentioning paying/price (max 100); competition = 20 x existing solutions with 500+ stars/points (max 100); founder_fit = 45 x skill match + 30 x min(1, hours/8) + 25 x min(1, budget/$50); total = 0.40 demand + 0.15 willingness_to_pay + 0.30 founder_fit + 0.15 x (100 - competition)
+demand = 0.5 x engagement(log-scaled points/stars/comments; posts older than 2 years count half, older than 5 years a quarter) + 10 x min(pain posts, 5); independent voices = distinct authors or communities among discussion posts (repositories excluded); willingness_to_pay = 25 x posts mentioning paying/price (max 100); competition = 20 x existing solutions with 500+ stars/points (max 100); founder_fit = 45 x skill match + 30 x min(1, hours/8) + 25 x min(1, budget/$50); total = 0.40 demand + 0.15 willingness_to_pay + 0.30 founder_fit + 0.15 x (100 - competition)
 
 Founder fit uses the brief: skills, 10 hours/week, $50 budget. Engagement counts are public numbers from the linked sources; they show interest, not guaranteed buyers (ASSUMPTION that interest relates to demand).
 
 ---
 Generated by the pipeline. Model: `qwen3:30b-a3b-instruct-2507-q4_K_M` (local open-weight model). Cost: $0.00.
-Sources cited: 24. Claims without a source are marked ASSUMPTION.
+Sources cited: 21. Claims without a source are marked ASSUMPTION.
 Claim check: every statistic or citation above links to fetched evidence.

@@ -1,18 +1,18 @@
 # Phase 1, step 3: Market definition for 'Figma case study templates for junior designers'
 
 ## Ideal customer profile
-- ASSUMPTION (no fetched source mentions Egypt): Junior UX designers in Egypt and the Gulf seeking their first job [Issue: UI/UX designer](https://github.com/Andrei-Skabelin/Mining_shop_org/issues/3)
-- Overwhelmed by structuring case studies despite having design work [Repository jzhupan/eCommerce-case-study](https://github.com/jzhupan/eCommerce-case-study)
-- Trigger: Applying to jobs and realizing their portfolio lacks clear storytelling [Issue: Sección Case Studies](https://github.com/inestncr7-dotcom/portafolio-ejecutivo/issues/3)
-- Tried free Figma templates but found them inconsistent or hard to customize [ASSUMPTION](https://github.com/jzhupan/eCommerce-case-study)
+- ASSUMPTION (no fetched source mentions Egypt): Junior UX designers in Egypt and Gulf applying for first jobs.
+- Struggle to structure case studies clearly despite having design work. (ASSUMPTION)
+- Trigger: Receiving a rejection or feedback like “lack of clarity in process.” (ASSUMPTION)
+- Tried using free Figma templates from GitHub repositories [jzhupan/eCommerce-case-study](https://github.com/jzhupan/eCommerce-case-study) and [ziyingqiao-ship-it/UX-Portfolio-Case-Study-Builder](https://github.com/ziyingqiao-ship-it/UX-Portfolio-Case-Study-Builder), but found them inconsistent or hard to customize.
 
 ## What they use today
-- Free Figma templates from GitHub repos [Repository jzhupan/eCommerce-case-study](https://github.com/jzhupan/eCommerce-case-study)
-- Generic portfolio sites with minimal case study structure [Repository Snowphiya/Current-portfolio](https://github.com/Snowphiya/Current-portfolio)
-- Gaps: Lack of guidance on content flow, evidence-based design reasoning, or visual consistency [Repository ziyingqiao-ship-it/UX-Portfolio-Case-Study-Builder](https://github.com/ziyingqiao-ship-it/UX-Portfolio-Case-Study-Builder)
+- Free Figma templates from public GitHub repos [jzhupan/eCommerce-case-study](https://github.com/jzhupan/eCommerce-case-study), [ziyingqiao-ship-it/UX-Portfolio-Case-Study-Builder](https://github.com/ziyingqiao-ship-it/UX-Portfolio-Case-Study-Builder).
+- Gaps: Lack of guided structure, inconsistent layouts, no emphasis on storytelling or decision-making evidence. (ASSUMPTION)
+- Some use personal portfolios built in Figma [Snowphiya/Current-portfolio](https://github.com/Snowphiya/Current-portfolio), but these are not case-study focused.
 
 ## Market size
-ASSUMPTION – Could be measured via job board searches for “junior UX designer Egypt/Gulf” and estimated via freelance platform activity.
+ASSUMPTION: Can be measured via LinkedIn job posts for “junior UX designer” in Egypt and Gulf, filtered by “portfolio” or “case study” requirements.
 
 ## Where these people talk (from the evidence)
 

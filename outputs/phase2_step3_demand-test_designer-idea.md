@@ -6,9 +6,11 @@
 - Only sign-ups with consent, through the real form, count.
 
 ## How to get real visitors
-- Share your Figma template pack with 5 junior designers in your network who are actively job hunting, asking for honest feedback and a referral to their peers.
-- Collaborate with a junior designer in your network to co-create a quick case study using the template and share it as a real example in a design community.
-- Reach out to 3 local design meetups or online events in Egypt/Gulf and offer to share your template pack as a resource for attendees who are building portfolios.
+- Share 3 detailed, honest Figma case study breakdowns on LinkedIn with a note about the template pack’s role in making such work stand out.
+- Ask 5 junior designers in your network to test the prototype and share their feedback in exchange for a free template.
+- Post a short, real example of a messy case study vs. a clean one in a Figma community group, tagging the template pack as a tool for clarity.
+- Write a 200-word thread on Twitter/X about the hidden struggles of junior designers in the Gulf region when presenting case studies.
+- Offer a free downloadable checklist titled “5 Signs Your Case Study Isn’t Working” in exchange for email signups via a private message to 3 trusted peers.
 
 ## Result so far
 - Real sign-ups recorded: **none yet**. The landing page has not been published, so the test has not started. Waitlist collection is STUBBED in this demo (no public hosting).

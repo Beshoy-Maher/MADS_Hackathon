@@ -52,9 +52,11 @@ Then open **http://localhost:8000**. Pick a sample founder (or paste any brief) 
 | 2 Validate | Publishing the landing page to a public URL | **STUBBED** (approval-gated, saved to outbox) |
 | 2 Gate | Demand gate (pre-registered sign-up target, counts only real sign-ups) | **Working** |
 | 3 Build | MVP spec, product content, user guide; verifier reviews each module (facts, SQL run in SQLite), one revision | **Working** |
-| 3 Gate | Automated MVP tests (11 checks, one of them: the verifier left no error open); gate needs all to pass | **Working** |
+| 3 Build | Originality guard: no passage copied from the sources read, no name taken from an existing product (code, compares fetched snippets) | **Working** |
+| 3 Gate | Automated MVP tests (12 checks, among them: the verifier left no error open, the product is original); gate needs all to pass | **Working** |
 | 4 Commercial | Price from sourced comparables (rule-based), draft terms / privacy / refund policy | **Working** |
 | 5 Launch | Store page and launch posts (drafts in the founder's voice) | **Working** |
+| 5 Launch | Promise checker: every promise on the store page and in the posts matched to the product, price, refund policy and delivery test; a broken promise cannot be approved | **Working** |
 | 5 Launch | Publishing store page and posts | **STUBBED** (approval-gated, saved to outbox) |
 | 5 Launch | Checkout and payment provider | **MOCKED** (no real payments of any kind) |
 | 5 Launch | Automatic delivery, idempotent webhooks, refunds revoke access, reconciliation | **Working** (against the MOCKED provider) |

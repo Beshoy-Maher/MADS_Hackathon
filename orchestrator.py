@@ -31,6 +31,7 @@ from agents.market_analyst import MarketAnalyst
 from agents.notes_analyst import MAX_NOTES_CHARS, NotesAnalyst
 from agents.policy_writer import PolicyWriter
 from agents.pricing import Pricing
+from agents.promise_checker import PromiseChecker
 from agents.qa import QA
 from agents.researcher import Researcher
 from agents.scorer import Scorer
@@ -330,6 +331,13 @@ def _phase5(run: dict) -> gates.GateResult:
     run["ctx"]["mock_sales"] = {"reconciliation": res.data["reconciliation"]}
     _record_step(run, 5, 3, res)
     _write_raw(run, "payment_test_log.md", log_md)
+    _progress(run, "promise checker: matching every promise on the page and in the posts to the product")
+    product_file = run_dir(run["id"]) / "outputs" / "phase3_step2_product.md"
+    product_md = product_file.read_text(encoding="utf-8") if product_file.exists() else ""
+    post_ids = set(posts.data.get("post_actions", []))
+    pc = PromiseChecker(run).run_step(product_md, sp, [a for a in run["pending_actions"] if a["id"] in post_ids],
+                                      pricing, res.data["tests"])
+    _record_step(run, 5, 4, pc)
     return _phase5_gate(run)
 
 
@@ -492,7 +500,10 @@ def run_to_gate_with(run_id: str, decisions: list[dict]) -> dict:
         for a in approval.pending(run):
             choice = d.get("actions", {}).get(a["target"], d.get("default_action"))
             if choice in ("approve", "reject"):
-                run = decide_action(run_id, a["id"], choice == "approve", approval.FOUNDER, d.get("action_note", ""))
+                try:
+                    run = decide_action(run_id, a["id"], choice == "approve", approval.FOUNDER, d.get("action_note", ""))
+                except approval.BrokenPromise:
+                    run = load(run_id)  # stays pending: the launch gate shows it and the founder decides
         if run["status"] != "awaiting_founder":
             break
         g = current_gate(run)

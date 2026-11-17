@@ -168,7 +168,7 @@ def test_every_allowed_brief_reaches_a_gate_with_valid_state():
 
 def test_numbers_a_model_makes_up_are_dropped(monkeypatch):
     """A model that fills the gaps with plausible figures: none of them reaches the brief."""
-    def guessing_model(system, user, fallback, *, max_tokens=1200, **kw):
+    def guessing_model(system, user, fallback, *, max_tokens=1200):
         data = {"founder_name": "Nour", "idea": "Notion templates that help university students plan group projects",
                 "skills": ["Notion", "project management"], "budget_usd": 100, "hours_per_week": 10,
                 "target_market": "undergraduate students in Egypt", "values": [], "constraints": "unknown"}
@@ -182,7 +182,7 @@ def test_numbers_a_model_makes_up_are_dropped(monkeypatch):
 
 def test_numbers_a_model_reads_from_the_text_are_kept(monkeypatch):
     text = "I'm Sara. Selling Anki decks for medical school exams vocabulary. I can do 7h weekly and my budget is 35 dollars."
-    def reading_model(system, user, fallback, *, max_tokens=1200, **kw):
+    def reading_model(system, user, fallback, *, max_tokens=1200):
         data = {"founder_name": "Sara", "idea": "Anki decks for medical school exams vocabulary", "skills": [],
                 "budget_usd": 35, "hours_per_week": 7, "target_market": "", "values": [], "constraints": ""}
         return data, llm.LLMResult(text=json.dumps(data), model="fake-model")

@@ -222,7 +222,7 @@ def ask(payload: dict = Body(...)):
         verdict = guardrails.screen_request_deep(text)
     if not verdict.allowed:
         decision_log.log("guardrails", "refuse_request", run_id=run_id, outcome="refused", detail=f"{verdict.category}: {text[:120]}",
-                         model=(llm.model_status().get("roles") or {}).get("judge") or llm.model_status().get("model") if "model-judge" in verdict.matches else None)
+                         model=llm.model_status().get("model") if "model-judge" in verdict.matches else None)
         return {"allowed": False, "category": verdict.category, "reply": guardrails.refusal_message(verdict), "matches": verdict.matches}
     context = ""
     if run_id:

@@ -6,183 +6,168 @@ A practical PDF for Junior and aspiring data analysts preparing for SQL intervie
 1. Introduction to SQL Interview Questions
 2. Basic SELECT Queries
 3. Filtering with WHERE and ORDER BY
-4. Worked Example: Find Top 5 Sales by Region
+4. Worked Example: Sales Data Analysis
 
 ## Module 1: Introduction to SQL Interview Questions
 
-SQL interview questions test your ability to write clear, correct queries from real-world data. These questions are common in job interviews for junior data analyst roles, especially in Egypt and the wider MENA region where data roles are growing.
+SQL interview questions test your ability to write clear, correct queries. They are common in job interviews for junior data analyst roles, especially in Egypt and the MENA region where data roles are growing.
 
-1. Review a sample SQL interview question from a job board in the MENA region.
-2. Identify the key data elements (e.g., tables, columns) mentioned in the question.
-3. Break the question into simple steps: what data you need, what actions to perform (e.g., filter, join).
-4. Write a standard SQL query using only standard SQL syntax (e.g., SELECT, FROM, WHERE, JOIN).
-5. Test your query in SQLite using a small dataset.
-6. Check if the output matches the expected result in the sample.
+1. Review a sample SQL interview question from a job board in Egypt.
+2. Identify the key task: what data is needed and what output is expected.
+3. Write a standard SQL query using only basic commands (SELECT, FROM, WHERE, ORDER BY).
+4. Test the query in SQLite using a simple database with sample data.
+5. Check if the output matches the expected result.
+6. Refine the query to improve clarity or performance if needed.
 
 **Worked Example**
-*Question:* Find the top 3 customers by total spending in the last month.
-*Tables:* `orders`, `customers`
+*Question:* List all employees with salaries over 5000, ordered by salary descending.
 *Query:*
 ```sql
-SELECT c.customer_id, c.name, SUM(o.amount) AS total_spent
-FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id
-WHERE o.order_date >= '2024-03-01'
-GROUP BY c.customer_id, c.name
-ORDER BY total_spent DESC
-LIMIT 3;
+SELECT name, salary
+FROM employees
+WHERE salary > 5000
+ORDER BY salary DESC;
 ```
+*Output:*
+- name: Ahmed, salary: 7500
+- name: Sara, salary: 6200
 
-✅ Checklist
 - [ ] Reviewed a sample SQL interview question
-- [ ] Identified key tables and columns
-- [ ] Broke the question into steps
-- [ ] Wrote a standard SQL query
-- [ ] Tested in SQLite
-- [ ] Output matches expected result
+- [ ] Identified the key data and output
+- [ ] Wrote a basic SQL query
+- [ ] Tested the query in SQLite
+- [ ] Verified output matches expected result
+- [ ] Improved clarity or performance if needed
 
-❌ Common mistakes
-- Using non-standard SQL syntax (e.g., `ORDER BY` without `DESC`)
-- Missing JOIN or GROUP BY where needed
-- Incorrect date filtering
-- Not limiting results when asked for top N
-- Assuming data structure without checking
+**Common Mistakes**
+- Using unsupported SQL features (e.g., JOINs without data context)
+- Missing ORDER BY or filtering conditions
+- Using incorrect column names or table names
+- Not testing the query in a real environment
+- Assuming the data structure matches the sample
+
 
 ## Module 2: Basic SELECT Queries
 
 **Intro**
-This module teaches you how to use the SELECT statement to pull data from tables. It’s the first step in writing SQL queries for interviews. You’ll learn to pick specific columns and filter results with simple conditions.
+This module teaches how to write basic SELECT queries to pull data from tables. It’s the first step in SQL interviews for junior data analysts. You’ll learn to retrieve specific columns and filter results using simple conditions.
 
 **Steps**
-1. Start with a table name in the SELECT statement. Example: `SELECT name FROM users;`
-2. Add a WHERE clause to filter rows. Use a condition like `WHERE age > 18;`
-3. Use basic operators: =, >, <, >=, <=, !=.
-4. Combine conditions with AND or OR. Example: `WHERE age > 18 AND city = 'Cairo';`
-5. Order results with ORDER BY. Use `ORDER BY age DESC;` to sort by age, highest first.
-6. Limit results with LIMIT. Example: `LIMIT 5;` to show only 5 rows.
+1. Open a SQL editor (like SQLite). Create a table with columns (e.g., name, age, city).
+2. Use SELECT to list one or more columns (e.g., SELECT name FROM users).
+3. Add a WHERE clause to filter rows (e.g., WHERE age > 18).
+4. Use ORDER BY to sort results (e.g., ORDER BY age DESC).
+5. Combine queries with parentheses to group conditions (e.g., WHERE (age > -1 AND city = 'Cairo')).
+6. Test each query with sample data to verify output.
 
 **Worked Example**
-Table: `employees`
-Columns: `name`, `age`, `city`
+Table: employees (name, age, city)
 Query:
 ```sql
 SELECT name, age
 FROM employees
 WHERE city = 'Cairo'
-ORDER BY age DESC
-LIMIT 3;
+ORDER BY age DESC;
 ```
-Result: Shows the 3 oldest employees in Cairo.
+Result:
+- Name: Ahmed, Age: 35
+- Name: Sara, Age: 28
 
 **Checklist**
-- [ ] SELECT specific columns
-- [ ] Use WHERE to filter data
-- [ ] Apply conditions with =, >, <, etc.
-- [ ] Combine conditions with AND or OR
-- [ ] Order results with ORDER BY
-- [ ] Limit output with LIMIT
+- [ ] Created a table with at least 3 columns
+- [ ] Wrote a SELECT query with one column
+- [ ] Added a WHERE clause to filter data
+- [ ] Used ORDER BY to sort results
+- [ ] Tested the query with sample data
 
 **Common Mistakes**
 - Using SELECT * without knowing which columns are needed
 - Forgetting to add a WHERE clause when filtering
-- Misusing AND vs OR in conditions
-- Writing ORDER BY without specifying direction (ASC/DESC)
-- Using LIMIT without a clear purpose or number
+- Typing syntax errors (e.g., missing parentheses or semicolon)
+- Using ORDER BY without specifying direction (ASC/DESC)
+
 
 ## Module 3: Filtering with WHERE and ORDER BY
 
-Filtering and sorting data is key in SQL interviews. You’ll often need to find specific rows and show them in a certain order.
+Filtering and sorting data is key in SQL interviews. You’ll often need to find specific rows or arrange them in a clear order. This module teaches how to use the `WHERE` clause to filter rows and the `ORDER BY` clause to sort them.
 
-1. Use `WHERE` to filter rows. Add a condition after `WHERE` to select only rows that match.
-2. Use `ORDER BY` to sort results. Add `ORDER BY` followed by a column name.
-3. Sort in ascending (default) or descending order with `ASC` or `DESC`.
-4. Combine `WHERE` and `ORDER BY` in one query. Place `WHERE` before `ORDER BY`.
-5. Test your query with sample data. Use a table with known values.
-6. Always check for typos or missing parentheses in your SQL.
+1. Use `WHERE` to select only rows that meet a condition.
+2. Write a condition with a column name and a comparison operator (like `=`, `>`, `<`).
+3. Place the `WHERE` clause after the `SELECT` statement.
+4. Use `ORDER BY` to sort results. Add it after `WHERE` (or after `SELECT`).
+5. Specify a column name and direction: `ASC` (ascending) or `DESC` (descending).
+6. Always use parentheses if combining conditions with `AND` or `OR`.
 
 **Worked Example**
-Table: `orders`
-Columns: `order_id`, `customer_id`, `amount`, `date`
-
-Query:
+Find the top 3 highest-paid employees from a table called `employees`.
 ```sql
-SELECT order_id, customer_id, amount
-FROM orders
-WHERE amount > 500
-ORDER BY amount DESC;
+SELECT name, salary
+FROM employees
+WHERE salary > 5000
+ORDER BY salary DESC
+LIMIT 3;
 ```
-This shows orders over 500, sorted from highest to lowest amount.
 
-**Checklist**
-- [ ] Used `WHERE` to filter rows
-- [ ] Used `ORDER BY` to sort results
-- [ ] Selected correct column for sorting
-- [ ] Used `ASC` or `DESC` for order
-- [ ] Tested query with sample data
-- [ ] Avoided extra conditions or columns
+- [ ] Write a `SELECT` statement to get needed columns
+- [ ] Add a `WHERE` condition to filter rows
+- [ ] Use `ORDER BY` to sort results
+- [ ] Specify the sort column and direction
+- [ ] Test with sample data
 
 **Common Mistakes**
-- Forgetting to close parentheses after `WHERE`
-- Using `ORDER BY` before `WHERE`
-- Sorting by a column not in the SELECT list
-- Using `ASC` or `DESC` without specifying a column
-- Missing a comma after a column name in `SELECT`
+- Forgetting to use `WHERE` when filtering
+- Using `ORDER BY` without a column or direction
+- Writing `ORDER BY` before `WHERE` (it should come after)
+- Using `LIMIT` without a number (e.g., `LIMIT 3` only works if a number is given)
 
 
-## Module 4: Worked Example: Find Top 5 Sales by Region
+## Module 4: Worked Example: Sales Data Analysis
 
-**Intro**
-This module shows how to find the top 5 sales by region using standard SQL. It uses real-world data structure and runs in SQLite, which is common in data analysis tools.
-
-**Steps**
-1. Start with a table named `sales` with columns: `sale_id`, `amount`, `region`.
-2. Use `SELECT` to pick `amount` and `region` from the `sales` table.
-3. Order the results by `amount` in descending order.
-4. Limit the output to 5 rows using `LIMIT 5`.
-5. Ensure all column names match the table structure exactly.
-6. Test the query with sample data to confirm it returns expected results.
+1. Understand the sales data structure: identify tables, columns, and sample data.
+2. Identify the interview question, such as "What are the top 5 products by total sales amount?"
+3. Write a SQL query to select relevant columns from the sales table.
+4. Join the sales table with the products table using product_id to get product names.
+5. Group the results by product name to calculate total sales per product.
+6. Order the grouped results by total sales in descending order.
+7. Limit the output to the top 5 products.
 
 **Worked Example**
-Sample data:
-| sale_id | amount | region     |
-|---------|--------|------------|
-| 101     | 1500   | North      |
-| 102     | 2300   | South      |
-| 103     | 900    | East       |
-| 104     | 3200   | West       |
-| 105     | 1800   | North      |
+Given tables:
+`sales` (sale_id, product_id, quantity, price, date)
+`products` (product_id, product_name)
+
+Question: "What are the top 5 products by total sales amount?"
 
 Query:
 ```sql
-SELECT amount, region
-FROM sales
-ORDER BY amount DESC
+SELECT
+    p.product_name,
+    SUM(s.quantity * s.price) AS total_sales
+FROM sales s
+JOIN products p ON s.product_id = p.product_id
+GROUP BY p.product_name
+ORDER BY total_sales DESC
 LIMIT 5;
 ```
 
-Result:
-| amount | region |
-|--------|--------|
-| 3200   | West   |
-| 2300   | South  |
-| 180.0  | North  |
-| 1500   | North  |
-| 900    | East   |
-
 **Checklist**
-- [ ] Table name is `sales`
-- [ ] Columns are `amount` and `region`
-- [ ] Query uses `ORDER BY amount DESC`
-- [ ] Query uses `LIMIT 5`
-- [ ] Data matches sample structure
+- [ ] Understand the sales data structure
+- [ ] Identify the interview question
+- [ ] Write a query to select relevant columns from the sales table
+- [ ] Join with product table if needed to get product names
+- [ ] Group by product to sum sales per product
+- [ ] Order by total sales in descending order
+- [ ] Limit output to top 5 results
 
-**Common Mistakes**
-- Using `ASC` instead of `DESC` for descending order
-- Missing `LIMIT` when only top 5 are needed
-- Typo in column name (e.g., `amout` instead of `amount`)
-- Assuming region values are unique (they may not be)
+**Common mistakes**
+- Forgetting to join product table to get product names
+- Using `SUM(price)` instead of `SUM(quantity * price)`
+- Not grouping by product name
+- Missing `LIMIT` when only top -5 are needed
+- Using `ORDER BY` without `DESC` for descending order
+
 
 ## A note on results
 
 This product gives you a method and templates. Your results depend on your situation and effort; nothing here is a promise of any outcome.
-Claim check: 0 unsourced claim(s) labelled ASSUMPTION, 1 link(s) not found in the fetched evidence removed.
+Claim check: 0 unsourced claim(s) labelled ASSUMPTION, 4 link(s) not found in the fetched evidence removed.

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Venture Builder is a pipeline of small, role-named agents run by one orchestrator. A founder brief goes in; six phases run one at a time; after each phase a gate measures the results against thresholds fixed in code **before** the data arrives and recommends **go, repeat, pivot or stop**. The run then pauses until the founder decides. Models only write text (ideas, copy, product content). Every decision that matters (scores, gates, tests, prices, payments, approvals) is deterministic code, so it is reproducible and can't be talked into a different answer. Before each gate, a critic agent **debates** the phase's main outputs with the agents that wrote them; the founder sees what was conceded and what is still open, and the recommendation stays with the code. Each kind of work (writer, fast intake, safety judge, critic) has its own model setting. The default is the local Qwen3-4B model for all of them, so it runs on any laptop; `models-large.env` switches the writer to a 30B mixture-of-experts model and the critic to gpt-oss-20b, a different model family. Guardrails screen the brief, every free-text request and every generated text. Every action is appended to the decision log.
+Venture Builder is a pipeline of small, role-named agents run by one orchestrator. A founder brief goes in; six phases run one at a time; after each phase a gate measures the results against thresholds fixed in code **before** the data arrives and recommends **go, repeat, pivot or stop**. The run then pauses until the founder decides. Models only write text (ideas, copy, product content). Every decision that matters (scores, gates, tests, prices, payments, approvals) is deterministic code, so it is reproducible and can't be talked into a different answer. Guardrails screen the brief, every free-text request and every generated text. Every action is appended to the decision log.
 
 ```mermaid
 flowchart LR
@@ -28,7 +28,6 @@ flowchart LR
     G5 -->|go| P6[6 Operate and learn<br/>support, analyst]
     P6 --> G6{Persevere / pivot gate}
     G6 -->|pivot| P1
-    C[[Debate before each gate<br/>critic vs. authors]] -. open objections .-> G1 & G2 & G3 & G4 & G5 & G6
     F((Founder)) -. decides every gate .-> G1 & G2 & G3 & G4 & G5 & G6
     F -. approves every publish / send / refund .-> Q[(Approval queue)]
     P1 & P2 & P5 -->|outbound drafts| Q
@@ -40,10 +39,9 @@ Layers
   app.py                         HTTP API
   orchestrator.py                phase sequencing, run state, outputs, gate pausing
   agents/<role>.py + prompts/    one agent per role
-  agents/critic.py               debate before each gate (devil's advocate vs. the authors)
   gates.py  approval.py  guardrails.py      decisions, founder control, safety (deterministic)
   payments.py webhooks.py delivery.py refunds.py reconcile.py   sale to cash (provider MOCKED)
-  llm.py  tools/sources.py       local models per role (Ollama) and public evidence APIs
+  llm.py  tools/sources.py       local model (Ollama) and public evidence APIs
   decision_log.py                one JSON entry per agent action
 ```
 
@@ -60,14 +58,14 @@ Layers
   4. *Define the market:* ideal customer profile, current solutions and gaps, market size only if sourced, otherwise `ASSUMPTION`. Lists where these people talk, from the evidence.
   5. *Interview customers (The Mom Test):* interview guide about past behaviour (no pitching, no "would you buy"), recruiting plan, and an outreach draft queued for founder approval. The system never simulates interview answers.
   6. *Interview notes (optional, when the founder has talked to people):* the founder pastes notes from real conversations into the dashboard. They are stored in the run folder only (`data/`, not in git). The `notes_analyst` separates commitments (time, money, introductions) from compliments. Every quote is checked against the pasted notes and dropped if it is not there word for word; a hypothetical ("I would buy it") is always a compliment. Without a model, keyword rules do the sorting and the output says so. This step informs the founder's decision and does not change the evidence gate.
-- **Output:** `phase1_step1_opportunities.md`, `phase1_step2_scorecard.md`, `phase1_step3_market.md`, `phase1_step4_interviews.md`, `phase1_step5_interview-notes.md` (only after the founder adds notes), `phase1_step6_debate.md`, `phase1_gate_decision.md`.
+- **Output:** `phase1_step1_opportunities.md`, `phase1_step2_scorecard.md`, `phase1_step3_market.md`, `phase1_step4_interviews.md`, `phase1_step5_interview-notes.md` (only after the founder adds notes), `phase1_gate_decision.md`.
 
 ### Phase 2: Validate (Core step: design the business)
 
 - **Agents:** `strategist`, `copywriter`, `analyst`.
 - **Tools:** local model; waitlist endpoint `POST /api/waitlist/{run}` (consent required; emails stay in local, git-ignored storage).
 - **Method:** *Design the business (Core):* a Lean Canvas (problem, segments, UVP, solution, channels, revenue, costs, key metrics, unfair advantage) built from the evidence, with every guess marked `ASSUMPTION`. The copywriter writes a landing page with a consent-based waitlist form and no testimonials, counters or urgency; publishing it is an approval-gated action. The analyst pre-registers the demand test (default 100 real sign-ups in 14 days) and channels to reach real people without spam or ads.
-- **Output:** `phase2_step1_lean-canvas.md`, `phase2_step2_landing-page.html`, `phase2_step3_demand-test.md`, `phase2_step4_debate.md`, `phase2_gate_decision.md`.
+- **Output:** `phase2_step1_lean-canvas.md`, `phase2_step2_landing-page.html`, `phase2_step3_demand-test.md`, `phase2_gate_decision.md`.
 
 ### Phase 3: Build (Core step: build the product)
 
@@ -76,27 +74,27 @@ Layers
 - **Method:** *Build the product (Core):* the builder writes an MVP spec sized to the founder's hours (3-4 modules, out-of-scope list, acceptance criteria), then the product itself: per module an intro, numbered steps, a worked example, a checklist and common mistakes; then a user guide (how to use, what you need, getting help, refunds). Founder feedback from a "repeat" decision is fed into the rebuild.
 - **Verifier:** after each module is written, the verifier lists its factual errors: wrong statements, code that would not run, invented facts. Every error must quote the wrong words; an error whose quote is not in the module is dropped, so the reviewer cannot invent one. SQL code blocks are also executed in an in-memory SQLite database whose tables and columns are inferred from the example; syntax errors and misused aggregates are reported, and a statement whose schema cannot be inferred is skipped silently. A query written outside a code block is executed too. Code also reports slips a reader would trip over, such as a number split in two in a table, a broken checklist box, or a module with no numbered steps or no checklist. If a module still has no numbered list after its revision, the builder numbers the module's own list items as a last resort: the text is not changed, the checklist stays, and the repair is logged as `builder`, `repair_module_format`. A module with errors is revised by the builder once, with the error list as feedback, and reviewed a second time. There is no second revision. Each review is logged as agent `verifier`, action `review_module`; each revision as `builder`, `revise_module`. Without a model only the SQL check runs, and the report says so.
 - **QA:** 11 deterministic tests: all modules present, >= 120 words each, numbered steps, checklists, no income promises / fake proof / urgency, no placeholder text, user guide sections, allowed category, readable sentence length, package builds (hash), and no errors left open by the verifier's last review of any module.
-- **Output:** `phase3_step1_spec.md`, `phase3_step2_product.md`, `phase3_step3_user-guide.md`, `phase3_step4_qa-report.md`, `phase3_step5_debate.md`, `phase3_gate_decision.md`.
+- **Output:** `phase3_step1_spec.md`, `phase3_step2_product.md`, `phase3_step3_user-guide.md`, `phase3_step4_qa-report.md`, `phase3_gate_decision.md`.
 
 ### Phase 4: Commercial setup (Core step: set the price and policies)
 
 - **Agents:** `pricing`, `policy_writer`.
 - **Tools:** price extraction from cited evidence; templates.
 - **Method:** *Set the price (Core):* anchor = median of prices found in cited sources (else a labelled `ASSUMPTION` by format), x0.8 for a new product, x0.8 again if the founder values affordability, clamped to $5-$49; the model writes the rationale and one price experiment with a pre-set threshold. No fake "was $X" anchors or countdown discounts. *Set the policies (Core):* draft terms of sale, privacy notice and refund policy (14 days, access revoked on refund, refunds approved by the founder), marked DRAFT / not legal advice. No payments of any kind in this phase.
-- **Output:** `phase4_step1_pricing.md`, `phase4_step2_policies.md`, `phase4_step3_debate.md`, `phase4_gate_decision.md`.
+- **Output:** `phase4_step1_pricing.md`, `phase4_step2_policies.md`, `phase4_gate_decision.md`.
 
 ### Phase 5: Launch (Core steps: open the store; deliver automatically)
 
 - **Agents:** `copywriter`, `launcher`.
 - **Tools:** `payments.py` (MOCKED provider), `webhooks.py`, `delivery.py`, `refunds.py`, `reconcile.py`, `approval.py`.
 - **Method:** *Open the store (Core):* store page with price, contents, refund terms and a MOCKED checkout button; launch posts per community, written in the founder's voice for them to post. Each page and post is an approval-gated action; after approval it goes to the outbox (STUBBED), never to the internet. *Deliver automatically (Core):* the launcher runs the full sale-to-cash flow against the MOCKED provider with two test buyers and checks 11 properties (see [Sale to cash](#sale-to-cash)).
-- **Output:** `phase5_step1_store-page.html`, `phase5_step2_launch-posts.md`, `phase5_step3_delivery-test.md`, `payment_test_log.md`, `phase5_step4_debate.md`, `phase5_gate_decision.md`.
+- **Output:** `phase5_step1_store-page.html`, `phase5_step2_launch-posts.md`, `phase5_step3_delivery-test.md`, `payment_test_log.md`, `phase5_gate_decision.md`.
 
 ### Phase 6: Operate and learn
 
 - **Agents:** `support`, `analyst`.
 - **Method:** support kit (FAQ, reply drafts signed by the founder, escalation rules: refunds, payments and legal always go to the founder); metrics that separate real numbers (waitlist, real orders) from MOCKED test numbers, which never count; a persevere-or-pivot memo built from the gate history.
-- **Output:** `phase6_step1_support.md`, `phase6_step2_metrics.md`, `phase6_step3_persevere-or-pivot.md`, `phase6_step4_debate.md`, `phase6_gate_decision.md`.
+- **Output:** `phase6_step1_support.md`, `phase6_step2_metrics.md`, `phase6_step3_persevere-or-pivot.md`, `phase6_gate_decision.md`.
 
 ## Gates
 
@@ -113,36 +111,6 @@ Every phase ends with a gate. Thresholds live in `gates.THRESHOLDS`, are fixed b
 | 6 Operate | evidence | >= 10 real buyers to judge; refund rate < 15% | **go** (persevere) / **repeat** (keep operating, review later) / **pivot** |
 
 **When the system recommends STOP:** the starting idea fails the evidence thresholds and no alternative passes; a second, broader search still finds no public evidence of the problem (absence of evidence first triggers a repeat, not a verdict); the product is in an excluded category (STOP is then the only option); or the waitlist ends below 50% of target on the second attempt. Example from the brief: target 100 sign-ups in 14 days, got 12 → pivot, then stop, never "almost there" (`tests/test_gates.py::test_waitlist_12_of_100_is_not_spun`). The committed demo shows a weak idea (a paid daily quotes email for developers, 2 h/week, $0) stopped at gate 1: `outputs/phase1_gate_decision_weak-idea.md`.
-
-### Debate before each gate
-
-After a phase's steps and before its gate is shown, `orchestrator._debate` hands the phase's main documents to the critic (`agents/critic.py`, `prompts/critic.md`).
-
-| Phase | Debated (author) | Debate output |
-|---|---|---|
-| 1 | opportunities (researcher), market (market_analyst) | `phase1_step6_debate.md` |
-| 2 | Lean Canvas (strategist), demand test (analyst) | `phase2_step4_debate.md` |
-| 3 | MVP spec, product (builder) | `phase3_step5_debate.md` |
-| 4 | pricing (pricing), policies (policy_writer) | `phase4_step3_debate.md` |
-| 5 | store page, launch posts (copywriter) | `phase5_step4_debate.md` |
-| 6 | persevere-or-pivot memo (analyst); the critic argues for the **opposite** decision | `phase6_step4_debate.md` |
-
-```
-Round 1  critic                  up to 4 objections: exact quote, problem, severity, evidence URL or ASSUMPTION
-         code                    drops an objection whose quote is not in the document, one that attacks a line computed
-                                 by code (counts, scores, check tables) or a fetched evidence title, and one that calls
-                                 a fetched link fake; an evidence URL that was never fetched becomes ASSUMPTION
-Round 2  author  (writer model,  CONCEDE with a corrected sentence, or DEFEND with a URL from the fetched evidence
-          in its own role)
-Round 3  critic                  verdict on each defence; code keeps it OPEN if the defence cites no fetched source
-Moderator (code)                 transcript file, one decision-log entry per turn, summary on the gate card
-```
-
-- **It informs, it does not decide.** The gate's recommendation comes from `gates.py` alone; the debate is shown next to it. A test runs the same brief with and without the debate and checks the recommendation is identical.
-- **REPEAT uses it.** A REPEAT with no founder note feeds the corrections and open objections into the next attempt (Phase 3 rebuilds from them).
-- **Critic model.** `LLM_CRITIC_MODEL` defaults to the same 4B model as the writer. With `models-large.env` it is `gpt-oss:20b`, a different model family that does not share the writer's blind spots. If the configured critic is not available, the next model in `LLM_FALLBACK_MODELS` plays the critic and the transcript names it.
-- **Same safety as every other text.** Every turn passes the guardrail output scan; the transcript passes the claim check. Without any model the debate is not run and the gate card says so: objections are never written by templates.
-- Switch off with `DEBATE=false`.
 
 ### Safety layers around every gate
 
@@ -193,9 +161,6 @@ sequenceDiagram
 ```
 brief (JSON/text) -> intake -> run state  data/runs/<id>/state.json   (git-ignored)
   phase steps -> outputs  data/runs/<id>/outputs/phase<N>_step<M>_<name>.<ext>
-  phase outputs -> critic <-> authors -> phase<N>_step<M>_debate.md + gate card (the gate itself is unchanged)
-                   decision log: critic/debate_challenge, <author>/debate_response, critic/debate_verdict
-  each model call -> role (writer / fast / judge / critic) -> its model, or the next one if it cannot load
   every action -> decision log  (timestamp, agent, action, sources[], model, cost, approved_by, + run_id, outcome)
   outbound drafts -> approval queue (run state) -> founder Approve -> outbox.jsonl (STUBBED)
   waitlist form -> data/runs/<id>/waitlist.json (consented emails, local only) -> demand gate
@@ -220,8 +185,6 @@ Personal data: only consented waitlist emails, stored locally and never logged. 
 | Public hosting of the waitlist page | **STUBBED** (form works on the local app) |
 | Customer interviews | **STUBBED** (guide and outreach built; the conversations are the founder's own) |
 | Interview notes: commitments vs. compliments, quotes checked against the founder's pasted notes | Built |
-| Debate before each gate: critic vs. authors, quotes checked in code, open objections on the gate card | Built |
-| One model per role with hand-over to the next model when one cannot load | Built |
 
 ## Roadmap
 

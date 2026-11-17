@@ -7,27 +7,26 @@
 - Compliments and 'sounds great' are not evidence. Commitments (time, money, intro) are.
 
 ## Interview guide
-1. Tell me about the last time you felt unmotivated during a long coding session—what did you actually do?
-2. What did you do when you realized you hadn’t coded for hours straight?
-3. How did you respond when you missed a deadline due to low motivation?
-4. What have you tried to stay motivated during long coding sessions?
-5. How much time did you spend on self-motivation strategies last week?
-6. How much money have you ever spent on tools or products to stay focused?
+1. Tell me about the last time you felt unmotivated during a coding exam week—what did you actually do?
+2. What did you do when you missed a deadline for a project due to low motivation?
+3. How did you spend your time during a week when you had no clear plan for studying or coding?
+4. What have you tried to stay motivated during exam periods—how much time or money did it take?
+5. How much time did you actually spend coding or learning when you felt stuck?
 
 What counts as a strong signal:
-- A specific action taken during a low-motivation session
-- A time commitment spent on self-motivation efforts
-- A financial outlay on a focused-attention product or service
+- Took action without external prompting
+- Spent real time on learning or coding
+- Used a specific habit or tool (e.g., daily checklist, timer)
 
 ## Who to interview
-- 5 to 8 people from: Hacker News (Show HN / Ask HN), GitHub Discussions of related open-source projects.
+- 5 to 8 people from: GitHub Discussions of related open-source projects, Hacker News (Show HN / Ask HN).
 - Recruit only people who opted in. No scraping, no mass messages.
 
 ## Outreach draft (written for the founder to send as themselves)
 
-> Hi! I'm Karim. I'm talking to people about one problem I keep hearing about: "Software devs struggle with daily motivation during long coding sessions." If that sounds familiar, could I ask you about your own experience in a 15-minute call? I'm not selling anything. Thank you either way.
+> Hi! I'm Karim. I'm talking to people about one problem I keep hearing about: "Software devs struggle with daily motivation during exam periods." If that sounds familiar, could I ask you about your own experience in a 15-minute call? I'm not selling anything. Thank you either way.
 
-Status: waiting for founder approval (action `act_c13b1d62`). Sending is STUBBED: after approval the message is saved to the outbox and the founder sends it personally.
+Status: waiting for founder approval (action `act_13201850`). Sending is STUBBED: after approval the message is saved to the outbox and the founder sends it personally.
 
 ## Interview results
 

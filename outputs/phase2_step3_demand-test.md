@@ -6,11 +6,11 @@
 - Only sign-ups with consent, through the real form, count.
 
 ## How to get real visitors
-- Share a concise, solved SQL problem from the workbook in GitHub Discussions with a clear "This is how I’d answer it in an interview" caption, tagging relevant open-source SQL projects.
-- Post a short, practical SQL interview tip to Hacker News (Show HN / Ask HN) with a link to the workbook’s sample page and a comment inviting feedback.
-- Engage in existing threads on GitHub Discussions about SQL for data analysts by offering a clear, accurate answer to a common question with a subtle mention of the workbook.
-- Reply to top comments in relevant SQL or data analysis threads on Hacker News with a helpful SQL snippet and a polite note about the workbook’s practical focus.
-- Use personal LinkedIn or Twitter posts (if public) to share a brief, real-world SQL interview scenario with a clean, actionable solution—no product links, just value.
+- Join 3 active GitHub Discussions related to SQL interview prep and post a concise, honest question about common pitfalls for junior analysts, linking to the workbook in a neutral, value-driven way.
+- Share a short, practical insight on SQL interview patterns in a Hacker News comment thread, subtly mentioning the workbook as a resource for hands-on practice.
+- Engage with a top post in a MENA-focused tech community (e.g., Egyptian or Gulf tech groups) by offering a clear, no-fluff SQL tip and tagging the workbook as a tool for real-world practice.
+- Reply to 2 high-quality comments in SQL-focused threads with specific, actionable advice, embedding a link to the workbook only when it adds direct value.
+- Collaborate with a known junior data analyst on a public thread (e.g., LinkedIn or Reddit) to co-author a short post on SQL fundamentals, crediting the workbook as a supplementary resource.
 
 ## Result so far
 - Real sign-ups recorded: **none yet**. The landing page has not been published, so the test has not started. Waitlist collection is STUBBED in this demo (no public hosting).

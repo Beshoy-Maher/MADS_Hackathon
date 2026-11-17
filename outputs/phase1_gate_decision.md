@@ -9,8 +9,8 @@ Reasons:
 
 | Check | Passed | Value | Threshold |
 |---|---|---|---|
-| relevant_sources | yes | 25 | 5 |
-| independent_voices | yes | 24 | 4 |
+| relevant_sources | yes | 24 | 5 |
+| independent_voices | yes | 23 | 4 |
 | pain_signals | yes | 5 | 2 |
 | demand_score | yes | 94.9 | 40 |
 | founder_fit | yes | 100.0 | 50 |
@@ -19,9 +19,7 @@ Reasons:
 
 Gate type: evidence. Allowed outcomes: go, repeat, pivot, stop. Thresholds are fixed in `gates.py` before the data is seen.
 
-Debate before this gate (`phase1_step6_debate.md`): 1 objection(s), 1 conceded, 0 open (0 high severity). It informs this decision; it does not change the recommendation.
-
-**Founder decision: GO** at 2026-11-17T13:46:37Z.
+**Founder decision: GO** at 2026-11-17T12:30:03Z.
 
 ---
 Gate logic is deterministic code (no model). Cost: $0.00.

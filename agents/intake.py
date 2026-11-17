@@ -186,7 +186,7 @@ def parse(raw: dict | str) -> tuple[dict, str | None]:
                                   ". skills and values are lists of strings; budget_usd and hours_per_week are numbers or null. "
                                   "Use the founder's own words (keep the founder's language). A field the text does not state: "
                                   "empty string, [] or null. Never fill a gap with a typical value.",
-                                  {k: fb.get(k) for k in FIELDS}, max_tokens=500, role="fast")
+                                  {k: fb.get(k) for k in FIELDS}, max_tokens=500)
     if not isinstance(data, dict):
         data = {}
     merged = dict(fb)

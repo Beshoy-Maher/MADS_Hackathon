@@ -65,67 +65,22 @@ def strip_thinking(text: str) -> str:
     return text.strip()
 
 
-ROLES = ("writer", "fast", "judge", "critic")
-_FAILED_FOR_SECONDS = 600
-_failed: dict[str, float] = {}  # model -> time it failed to load; skipped for a while, then tried again
-
-
-def role_model(role: str) -> str:
-    """The model configured for a kind of work (before availability is checked)."""
-    if config.LLM_PROVIDER != "ollama":
-        return config.LLM_MODEL  # a free-tier endpoint serves one model for everything
-    return {"writer": config.LLM_MODEL, "fast": config.LLM_FAST_MODEL, "judge": config.LLM_JUDGE_MODEL,
-            "critic": config.LLM_CRITIC_MODEL}.get(role, config.LLM_MODEL)
-
-
-def _candidates(role: str) -> list[str]:
-    out = []
-    for m in [role_model(role)] + config.LLM_FALLBACK_MODELS:
-        if m and m not in out:
-            out.append(m)
-    return out
-
-
-def _mark_failed(model: str) -> None:
-    _failed[model] = time.time()
-
-
-def _recently_failed(model: str) -> bool:
-    t = _failed.get(model)
-    return t is not None and time.time() - t < _FAILED_FOR_SECONDS
-
-
-def _installed() -> set[str]:
-    r = httpx.get(f"{config.LLM_BASE_URL}/api/tags", timeout=3)
-    return {m.get("name", "") for m in r.json().get("models", [])}
-
-
-def _pick(role: str, names: set[str]) -> str | None:
-    for cand in _candidates(role):
-        if (cand if ":" in cand else cand + ":latest") in names and not _recently_failed(cand):
-            return cand
-    return None
-
-
 def model_status(force: bool = False) -> dict:
-    """Is a model ready? Cached for 10 seconds. `model` is the writer's; `roles` says which model each kind of work uses now."""
+    """Is the configured model ready? Cached for 10 seconds."""
     now = time.time()
     if not force and _status_cache["value"] and now - _status_cache["t"] < 10:
         return _status_cache["value"]
-    status = {"provider": config.LLM_PROVIDER, "model": config.LLM_MODEL, "ready": False, "detail": "",
-              "roles": {r: None for r in ROLES}, "configured": {r: role_model(r) for r in ROLES}}
+    status = {"provider": config.LLM_PROVIDER, "model": config.LLM_MODEL, "ready": False, "detail": ""}
     if config.LLM_PROVIDER == "none":
         status["detail"] = "No model configured: deterministic fallback only."
     elif config.LLM_PROVIDER == "ollama":
         try:
-            names = _installed()
-            status["roles"] = {r: _pick(r, names) for r in ROLES}
-            if status["roles"]["writer"]:
-                status.update(ready=True, model=status["roles"]["writer"], detail="ready")
-                missing = sorted({role_model(r) for r in ROLES if status["roles"][r] != role_model(r)})
-                if missing:
-                    status["detail"] = ("ready; still downloading or not loadable here: " + ", ".join(missing)
-                                        + " (those steps use " + status["roles"]["writer"] + " meanwhile)")
+            r = httpx.get(f"{config.LLM_BASE_URL}/api/tags", timeout=3)
+            names = {m.get("name", "") for m in r.json().get("models", [])}
+            for cand in [config.LLM_MODEL] + config.LLM_FALLBACK_MODELS:
+                if (cand if ":" in cand else cand + ":latest") in names:
+                    status.update(ready=True, model=cand, detail="ready")
+                    break
             else:
                 status["detail"] = (f"Ollama is up; model {config.LLM_MODEL} is not downloaded yet "
                                     "(the first start downloads it; see the model-pull container logs).")
@@ -137,24 +92,16 @@ def model_status(force: bool = False) -> dict:
             r = httpx.get(f"{config.LLM_BASE_URL.rstrip('/')}/models", headers=headers, timeout=5)
             status["ready"] = r.status_code == 200
             status["detail"] = "ready" if status["ready"] else f"HTTP {r.status_code}"
-            if status["ready"]:
-                status["roles"] = {r: config.LLM_MODEL for r in ROLES}
         except Exception as e:  # pragma: no cover - network dependent
             status["detail"] = f"Endpoint not reachable: {type(e).__name__}"
     _status_cache.update(t=now, value=status)
     return status
 
 
-def _think_value(model: str):
-    """gpt-oss always reasons and takes a level, not off; the Qwen3 instruct models take false."""
-    return "low" if model.startswith("gpt-oss") else False
-
-
 def warm_up(wait_seconds: int = 900) -> bool:
-    """Load the local models into memory so the founder's first step does not pay for it.
+    """Load the local model into memory so the founder's first step does not pay for it.
 
-    Waits until the writer model is there, then sends a one-token request to each distinct model in use.
-    Not counted in STATS: no agent did any work.
+    Waits until the model has been downloaded, then sends a one-token request. Not counted in STATS: no agent did any work.
     """
     if config.LLM_PROVIDER != "ollama":
         return False
@@ -162,20 +109,13 @@ def warm_up(wait_seconds: int = 900) -> bool:
     while time.time() < deadline:
         st = model_status(force=True)
         if st["ready"]:
-            ok = False
-            for m in dict.fromkeys(x for x in (st["roles"]["fast"], st["roles"]["judge"], st["roles"]["writer"]) if x):
-                try:
-                    r = httpx.post(f"{config.LLM_BASE_URL}/api/chat", timeout=config.LLM_TIMEOUT_SECONDS, json={
-                        "model": m, "messages": [{"role": "user", "content": "ok"}], "stream": False, "think": _think_value(m),
-                        "keep_alive": "60m", "options": {"num_predict": 1, "num_ctx": 8192}})
-                    if r.status_code >= 400:
-                        _mark_failed(m)
-                        _status_cache["value"] = None
-                    else:
-                        ok = True
-                except Exception:
-                    pass
-            return ok
+            try:
+                httpx.post(f"{config.LLM_BASE_URL}/api/chat", timeout=config.LLM_TIMEOUT_SECONDS, json={
+                    "model": st["model"], "messages": [{"role": "user", "content": "ok"}], "stream": False, "think": False,
+                    "keep_alive": "60m", "options": {"num_predict": 1, "num_ctx": 8192}})
+                return True
+            except Exception:
+                return False
         time.sleep(5)
     return False
 
@@ -184,61 +124,33 @@ def _cost(prompt_tokens: int, completion_tokens: int) -> float:
     return round((prompt_tokens + completion_tokens) / 1_000_000 * config.LLM_COST_PER_MTOK, 6)
 
 
-class _LoadError(Exception):
-    """Ollama could not load or run this model (e.g. not enough memory): try the next one."""
-
-
-def _ollama_chat(model_name: str, system: str, user: str, json_mode: bool, max_tokens: int, temp: float):
-    think = _think_value(model_name)
-    body = {
-        "model": model_name,
-        "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
-        "stream": False,
-        "think": think,
-        "keep_alive": "60m",  # keep the model in memory between steps; reloading it costs many seconds
-        # A reasoning model spends part of the budget on its (hidden) reasoning: give it room for the answer too.
-        "options": {"temperature": temp, "num_predict": max_tokens + (800 if think else 0), "num_ctx": 8192},
-    }
-    if json_mode:
-        body["format"] = "json"
-    r = httpx.post(f"{config.LLM_BASE_URL}/api/chat", json=body, timeout=config.LLM_TIMEOUT_SECONDS)
-    if r.status_code >= 400:
-        raise _LoadError(f"HTTP {r.status_code}: {r.text[:160]}")
-    data = r.json()
-    text = strip_thinking(data.get("message", {}).get("content", ""))
-    return text, int(data.get("prompt_eval_count", 0)), int(data.get("eval_count", 0))
-
-
 def complete(system: str, user: str, fallback: str, *, json_mode: bool = False, max_tokens: int = 1200,
-             temperature: float | None = None, role: str = "writer") -> LLMResult:
-    """Ask the model for this kind of work (`role`: writer, fast, judge, critic).
-
-    If the role's model is missing or cannot be loaded, the next available model is used and the result says which.
-    On any other failure return `fallback` with model=None."""
+             temperature: float | None = None) -> LLMResult:
+    """Ask the model. On any failure return `fallback` with model=None."""
     st = model_status()
     if config.LLM_PROVIDER == "none" or not st["ready"]:
         result = LLMResult(text=fallback, model=None, error="model not ready")
         STATS.add(result)
         return result
-    model_name = (st.get("roles") or {}).get(role) or st["model"]
+    model_name = st["model"]
     temp = config.LLM_TEMPERATURE if temperature is None else temperature
     try:
         if config.LLM_PROVIDER == "ollama":
-            tried: list[str] = []
-            while True:
-                try:
-                    text, pt, ct = _ollama_chat(model_name, system, user, json_mode, max_tokens, temp)
-                    break
-                except _LoadError:
-                    tried.append(model_name)
-                    _mark_failed(model_name)
-                    _status_cache["value"] = None
-                    names = _installed()
-                    nxt = next((c for c in _candidates(role) if c not in tried and not _recently_failed(c)
-                                and (c if ":" in c else c + ":latest") in names), None)
-                    if not nxt:
-                        raise
-                    model_name = nxt
+            body = {
+                "model": model_name,
+                "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
+                "stream": False,
+                "think": False,
+                "keep_alive": "60m",  # keep the model in memory between steps; reloading it costs many seconds
+                "options": {"temperature": temp, "num_predict": max_tokens, "num_ctx": 8192},
+            }
+            if json_mode:
+                body["format"] = "json"
+            r = httpx.post(f"{config.LLM_BASE_URL}/api/chat", json=body, timeout=config.LLM_TIMEOUT_SECONDS)
+            r.raise_for_status()
+            data = r.json()
+            text = strip_thinking(data.get("message", {}).get("content", ""))
+            pt, ct = int(data.get("prompt_eval_count", 0)), int(data.get("eval_count", 0))
         else:
             headers = {"Authorization": f"Bearer {config.LLM_API_KEY}"} if config.LLM_API_KEY else {}
             body = {
@@ -280,10 +192,9 @@ def complete(system: str, user: str, fallback: str, *, json_mode: bool = False, 
 
 
 def complete_json(system: str, user: str, fallback: dict, *, max_tokens: int = 1200,
-                  temperature: float | None = None, role: str = "writer") -> tuple[dict, LLMResult]:
+                  temperature: float | None = None) -> tuple[dict, LLMResult]:
     """Ask for a JSON object. Falls back to `fallback` if the reply does not parse."""
-    res = complete(system, user, json.dumps(fallback), json_mode=True, max_tokens=max_tokens, temperature=temperature,
-                   role=role)
+    res = complete(system, user, json.dumps(fallback), json_mode=True, max_tokens=max_tokens, temperature=temperature)
     if res.used_fallback:
         return fallback, res
     text = res.text.strip()

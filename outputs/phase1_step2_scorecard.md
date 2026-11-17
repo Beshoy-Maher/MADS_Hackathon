@@ -2,15 +2,15 @@
 
 | Candidate | Relevant sources | Independent voices | Platforms | Pain posts | Demand | Pay signals | Competition | Founder fit | **Total** |
 |---|---|---|---|---|---|---|---|---|---|
-| Founder idea: SQL Interview Workbook for Junior Data Analysts | 25 | 24 | 3 | 5 | 94.9 | 0.0 | 80.0 | 100.0 | **71.0** |
-| Alt 1: SQL Practice Sheets for Beginners | 15 | 15 | 3 | 4 | 63.1 | 50.0 | 0.0 | 100.0 | **77.7** |
-| Alt 2: SQL Problem Sets for Junior Analysts | 8 | 8 | 2 | 7 | 60.8 | 0.0 | 0.0 | 100.0 | **69.3** |
+| Founder idea: SQL Interview Workbook for Junior Data Analysts | 24 | 23 | 3 | 5 | 94.9 | 0.0 | 80.0 | 100.0 | **71.0** |
+| Alt 1: SQL Practice Sheets for Beginners | 14 | 14 | 1 | 8 | 64.9 | 0.0 | 0.0 | 100.0 | **71.0** |
+| Alt 2: SQL Problem Sets for Aspiring Analysts | 12 | 11 | 2 | 8 | 66.2 | 0.0 | 0.0 | 92.3 | **69.2** |
 
 ## Why
 
 - **SQL Interview Workbook for Junior Data Analysts**: Has SQL, writing, and mentoring skills. (skill match 1.0)
-- **SQL Practice Sheets for Beginners**: Skills match hands-on practice need. (skill match 1.0)
-- **SQL Problem Sets for Junior Analysts**: Structured problems align with data analysis skills. (skill match 1.0)
+- **SQL Practice Sheets for Beginners**: Skills match hands-on beginner practice. (skill match 1.0)
+- **SQL Problem Sets for Aspiring Analysts**: Can structure overwhelming content into practical sets. (skill match 0.83)
 
 ## How the scores are calculated
 

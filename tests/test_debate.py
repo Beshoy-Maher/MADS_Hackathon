@@ -378,3 +378,18 @@ def test_phase5_corrections_reach_the_approval_queue_and_the_copy():
     assert payload["text"] == "I see some discussion of SQL prep, and many analysts struggle."
     assert critic_mod.mirror_correction(copy, "Tailored to questions asked in Egypt &amp; MENA.", "Practical SQL questions.") == 1
     assert copy["bullets"][0] == "Practical SQL questions." and copy["bullets"][1] == "15 questions"
+
+
+def test_founder_name_policies_and_gate_outcomes_are_not_debated(monkeypatch):
+    assert critic_mod.DEBATED_STEPS[4] == [1]  # policies are commitments, not claims
+    assert critic_mod._COMPUTED_LINE.match("Recommendation: *Repeat*")
+
+    def fake(system, user, fallback, *, max_tokens=1200, temperature=None, role="writer"):
+        res = llm.LLMResult(text="{}", model=role)
+        return {"objections": [{"document": 1, "quote": "Made by Mariam for junior analysts", "problem": "Unsupported author.",
+                                "severity": "medium"}]}, res
+    monkeypatch.setattr(llm, "complete_json", fake)
+    run = _run()
+    run["brief"]["founder_name"] = "Mariam"
+    d = Critic(run).debate(3, [{"file": "p.md", "author": "builder", "text": "Made by Mariam for junior analysts. More text."}]).data
+    assert d["objections"] == 0

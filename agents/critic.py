@@ -32,7 +32,9 @@ MAX_OBJECTIONS = 4
 DOC_CHARS = 3500
 # Which steps of each phase are debated, and the debate's own step number (after the phase's other steps;
 # phase 1 step 5 is kept for the founder's interview notes).
-DEBATED_STEPS = {1: [1, 3], 2: [1, 3], 3: [1, 2], 4: [1, 2], 5: [1, 2], 6: [3]}
+# Phase 4: the pricing rationale only. The policies are commitments the founder makes (drafts marked not legal advice),
+# not market claims, so a critic arguing them into "ASSUMPTION" would make them worse.
+DEBATED_STEPS = {1: [1, 3], 2: [1, 3], 3: [1, 2], 4: [1], 5: [1, 2], 6: [3]}
 DEBATE_STEP = {1: 6, 2: 4, 3: 5, 4: 3, 5: 5, 6: 4}  # phase 5: step 4 is the promise check
 SEVERITIES = ("high", "medium", "low")
 FIXED, NOT_APPLIED, DEFENDED, OPEN = "fixed", "conceded, not applied", "defended", "open"
@@ -55,7 +57,7 @@ def _clean(text) -> str:
 
 # Lines written by code, not by a model: counts from the searches, score tables, check results. Not debated.
 _COMPUTED_LINE = re.compile(r"^\s*(- (Search queries|Relevant items found|Sources cited)\b|\||Sources cited:|Claim check"
-                            r"|[-*]?\s*(\*\*)?(Price|Anchor|Final price)(\*\*)?:)", re.I)  # prices come from the rule in pricing.py
+                            r"|[-*]?\s*(\*\*)?(Price|Anchor|Final price|Recommendation|Gate|Decision)(\*\*)?:)", re.I)  # prices come from the rule in pricing.py
 # A fetched evidence item (title + link) is data from the source, not the author's claim.
 _EVIDENCE_LINE = re.compile(r"^\s*- \[[^\]]*\]\(https?://")
 # Sentences the pipeline writes itself, the same for every run (not the author's claims).
@@ -212,6 +214,10 @@ class Critic(Agent):
             if len(_norm(quote)) < 8 or _norm(quote) not in _norm(d["text"]) or not problem:
                 continue
             line = _quoted_line(quote, d["text"])
+            # The founder's own facts (name, skills, budget, market) come from the brief: they are given, not claims.
+            name = str(self.brief.get("founder_name") or "").strip()
+            if name and len(name) > 1 and name.lower() in quote.lower():
+                continue
             # Code-computed lines and fetched evidence titles are not the author's claims; the critic cannot check
             # whether a fetched link exists, so "this link is fake" about a link the researcher fetched is dropped.
             if _COMPUTED_LINE.match(line) or _EVIDENCE_LINE.match(line):

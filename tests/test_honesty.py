@@ -155,3 +155,11 @@ def test_debate_correction_cannot_break_punctuation_or_add_a_pause(tmp_path):
     assert "punctuation" in _apply_problem("in the provided evidence", "in the provided evidence.", doc, set())
     assert "only the gate" in _apply_problem("meaning there is no signal", "so pause the launch until there is a signal", doc, set())
     assert "experience" in _apply_problem("meaning there is no signal", "which I've encountered before", doc, set())
+
+
+def test_store_copy_fallback_never_cuts_a_sentence():
+    from agents.copywriter import whole_sentences
+    uvp = ("A practical, affordable SQL interview workbook with real-world problem-solving walkthroughs designed "
+           "specifically for junior analysts in Egypt and the MENA region.")
+    assert len(uvp) > 160 and whole_sentences(uvp, 160) == uvp
+    assert whole_sentences("Short one. Second sentence here. Third.", 20) == "Short one."

@@ -24,13 +24,25 @@ def _li(items) -> str:
     return "\n".join(f"<li>{html.escape(str(i))}</li>" for i in items)
 
 
+def whole_sentences(text: str, limit: int) -> str:
+    """As many whole sentences as fit in `limit` characters; never a sentence cut in the middle.
+    If the first sentence alone is longer, it is kept whole."""
+    sents = [x for x in re.split(r"(?<=[.!?])\s+", (text or "").strip()) if x]
+    out = ""
+    for x in sents:
+        if out and len(out) + 1 + len(x) > limit:
+            break
+        out = f"{out} {x}".strip()
+    return out
+
+
 class Copywriter(Agent):
     role = "copywriter"
 
     def _copy(self, candidate: dict, canvas: dict, purpose: str) -> dict:
         fb = {
             "headline": candidate["title"][:90],
-            "subheadline": str(canvas.get("unique_value_proposition") or candidate.get("problem", ""))[:160],
+            "subheadline": whole_sentences(str(canvas.get("unique_value_proposition") or candidate.get("problem", "")), 160),
             "bullets": (canvas.get("solution") or ["Ready-to-use", "Worked examples", "Clear guide"])[:3],
             "who_for": self.brief.get("target_market", ""),
             "cta": "Join the early-access list" if purpose == "landing" else "Get the product",

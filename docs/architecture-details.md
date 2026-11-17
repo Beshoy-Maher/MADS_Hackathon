@@ -11,7 +11,7 @@ After a phase's steps and before its gate is shown, `orchestrator._debate` hands
 | 1 | opportunities (researcher), market (market_analyst) | `phase1_step6_debate.md` |
 | 2 | Lean Canvas (strategist), demand test (analyst) | `phase2_step4_debate.md` |
 | 3 | MVP spec, product (builder) | `phase3_step5_debate.md` |
-| 4 | pricing (pricing); the policies are the founder's commitments and are not debated | `phase4_step3_debate.md` |
+| 4 | pricing (pricing); the policies are the founder's commitments and are not debated | `phase4_step5_debate.md` |
 | 5 | store page, launch posts (copywriter); runs before the promise checker | `phase5_step5_debate.md` |
 | 6 | persevere-or-pivot memo (analyst); the critic argues for the **opposite** decision | `phase6_step4_debate.md` |
 

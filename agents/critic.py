@@ -35,7 +35,7 @@ DOC_CHARS = 3500
 # Phase 4: the pricing rationale only. The policies are commitments the founder makes (drafts marked not legal advice),
 # not market claims, so a critic arguing them into "ASSUMPTION" would make them worse.
 DEBATED_STEPS = {1: [1, 3], 2: [1, 3], 3: [1, 2], 4: [1], 5: [1, 2], 6: [3]}
-DEBATE_STEP = {1: 6, 2: 4, 3: 5, 4: 3, 5: 5, 6: 4}  # phase 5: step 4 is the promise check
+DEBATE_STEP = {1: 6, 2: 4, 3: 5, 4: 5, 5: 5, 6: 4}  # phase 4: step 4 is the unit economics; phase 5: step 4 is the promise check
 SEVERITIES = ("high", "medium", "low")
 FIXED, NOT_APPLIED, DEFENDED, OPEN = "fixed", "conceded, not applied", "defended", "open"
 STATUSES = (FIXED, NOT_APPLIED, DEFENDED, OPEN)

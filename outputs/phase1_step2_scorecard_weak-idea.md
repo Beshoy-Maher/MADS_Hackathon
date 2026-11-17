@@ -2,15 +2,15 @@
 
 | Candidate | Relevant sources | Independent voices | Platforms | Pain posts | Demand | Pay signals | Competition | Founder fit | **Total** |
 |---|---|---|---|---|---|---|---|---|---|
-| Founder idea: Daily dev motivation via email | 8 | 8 | 2 | 1 | 18.6 | 0.0 | 0.0 | 25.5 | **30.1** |
+| Founder idea: Daily dev motivation via email | 11 | 11 | 2 | 1 | 19.0 | 25.0 | 0.0 | 25.5 | **34.0** |
 | Alt 1: Minimalist dev quote Instagram | 1 | 1 | 1 | 0 | 8.6 | 25.0 | 0.0 | 37.7 | **33.5** |
-| Alt 2: Free dev mood boost templates | 4 | 3 | 1 | 0 | 15.2 | 0.0 | 0.0 | 21.0 | **27.4** |
+| Alt 2: Free dev mood boost templates | 3 | 3 | 1 | 0 | 0.0 | 0.0 | 0.0 | 30.9 | **24.3** |
 
 ## Why
 
-- **Daily dev motivation via email**: Can design email visuals and write engaging copy. (skill match 0.4)
-- **Minimalist dev quote Instagram**: Strong Instagram skills match visual content focus. (skill match 0.67)
-- **Free dev mood boost templates**: Limited time and no template design experience. (skill match 0.3)
+- **Daily dev motivation via email**: Can design emails with existing graphic skills. (skill match 0.4)
+- **Minimalist dev quote Instagram**: Strong Instagram skills enable visual content creation. (skill match 0.67)
+- **Free dev mood boost templates**: Can create templates using current design skills. (skill match 0.52)
 
 ## How the scores are calculated
 

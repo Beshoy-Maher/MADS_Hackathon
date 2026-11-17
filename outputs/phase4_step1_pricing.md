@@ -11,7 +11,7 @@
 - Clamp: $5 to $49.
 
 ## Rationale
-This $11.99 price reflects Mariam’s goal of making SQL interview prep accessible to junior analysts in Egypt and the MENA region—especially students with limited budgets. It’s 20% below the assumed market anchor of $15, aligning with her values of affordability and honesty. No fake “was $X” anchors, countdowns, or income promises—just practical, transparent value. This pricing respects both the buyer’s time and the founder’s constraints: working evenings only, with no capacity for discount-driven marketing.
+This $11.99 price reflects affordability for students in Egypt and the MENA region, aligning with Mariam’s values of honesty and accessibility. The anchor of $15 is an ASSUMPTION based on typical small PDF workbook pricing. Applying the 0.8 multiplier accounts for affordability without devaluing the product. No fake deadlines or discounts are used—this price is set to be sustainable, transparent, and respectful of buyers’ time and budget.
 
 ## Next price test (pre-set rule)
 - After the first 100 real store-page visits, compare purchases per 100 visitors. If fewer than 2 in 100 buy, test $9.99 for the next 100 visits and keep whichever price sells more per 100 visitors. The rule is fixed now, before any sales data exists. Visit and purchase counts must be real.

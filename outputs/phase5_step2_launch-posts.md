@@ -4,15 +4,15 @@ Each post is written for the founder to publish under their own name, after read
 
 ## GitHub Discussions of related open-source projects
 
-Hi all, I'm Mariam. I made SQL Interview Prep Workbook for Junior Analysts because junior data analysts struggle to apply sql skills to real interview questions. It's a small digital product. I'd value honest feedback on whether it's useful. Link in comments if the rules allow it.
+Hi all, I'm Mariam. I made SQL Interview Prep Workbook for Junior Analysts because junior data analysts in egypt struggle to find affordable, practical sql interview practice with real answers. It's a small digital product. I'd value honest feedback on whether it's useful. Link in comments if the rules allow it.
 
-Approval: `act_fd788714` (pending)
+Approval: `act_0e0f51cb` (pending)
 
 ## Hacker News (Show HN / Ask HN)
 
-Hi all, I'm Mariam. I made SQL Interview Prep Workbook for Junior Analysts because junior data analysts struggle to apply sql skills to real interview questions. It's a small digital product. I'd value honest feedback on whether it's useful. Link in comments if the rules allow it.
+Hi all, I'm Mariam. I made SQL Interview Prep Workbook for Junior Analysts because junior data analysts in egypt struggle to find affordable, practical sql interview practice with real answers. It's a small digital product. I'd value honest feedback on whether it's useful. Link in comments if the rules allow it.
 
-Approval: `act_9e4e8ba7` (pending)
+Approval: `act_93e06f78` (pending)
 
 
 ---

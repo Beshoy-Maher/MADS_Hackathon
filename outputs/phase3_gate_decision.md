@@ -5,7 +5,7 @@
 **System recommendation: GO**
 
 Reasons:
-- All 11 MVP tests pass.
+- All 12 MVP tests pass.
 
 | Check | Passed | Value | Threshold |
 |---|---|---|---|
@@ -17,15 +17,16 @@ Reasons:
 | no_placeholder_text | yes | 0 | 0 |
 | user_guide_has_usage_and_support | yes | True | sections present |
 | product_in_allowed_category | yes | True | True |
-| readable_sentence_length | yes | 12.5 | <= 28 words |
-| deliverable_package_builds | yes | sha256:33f1aac93e507f40 | non-empty |
+| readable_sentence_length | yes | 13.8 | <= 28 words |
+| deliverable_package_builds | yes | sha256:b13a03aba0be53fa | non-empty |
 | verifier_last_pass_has_no_errors | yes | open errors: 0 | every module reviewed, 0 open errors |
+| product_is_original | yes | name clashes: 0, copied passages: 0 | 0 name clashes, 0 runs of 12+ words copied from a source |
 
 Gate type: tests. Allowed outcomes: go, repeat, pivot, stop. Thresholds are fixed in `gates.py` before the data is seen.
 
-Debate before this gate (`phase3_step5_debate.md`): 1 objection(s): 1 fixed, 0 conceded not applied, 0 defended, 0 open (0 open with high severity). Fixed corrections were written into the documents before this gate was shown. It informs this decision; it does not change the recommendation.
+Debate before this gate (`phase3_step5_debate.md`): 0 objection(s): 0 fixed, 0 conceded not applied, 0 defended, 0 open (0 open with high severity). Fixed corrections were written into the documents before this gate was shown. It informs this decision; it does not change the recommendation.
 
-**Founder decision: GO** at 2026-11-17T15:59:04Z.
+**Founder decision: GO** at 2026-11-17T16:14:24Z.
 
 ---
 Gate logic is deterministic code (no model). Cost: $0.00.

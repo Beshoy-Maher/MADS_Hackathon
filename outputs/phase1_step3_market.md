@@ -1,23 +1,22 @@
 # Phase 1, step 3: Market definition for 'SQL Interview Prep Workbook for Junior Analysts'
 
 ## Ideal customer profile
-- Junior data analysts in Egypt and MENA preparing for first jobs.
-- Facing interview anxiety when applying SQL knowledge to real questions [Ask HN: SQL interview in 2 weeks, how to best prepare?](https://news.ycombinator.com/item?id=24659490).
-- Tried free online resources but found them too abstract or poorly explained.
-- Trigger: Receiving a job interview invite with SQL assessment.
+- Junior data analysts in Egypt/MENA with basic SQL knowledge, seeking first job roles.
+- Trigger: Receiving a SQL interview invite with tight preparation window.
+- Tried: Free online resources like Stack Overflow [SQL interview question](https://stackoverflow.com/questions/3788552/sql-interview-question) and GitHub repos [rohanmistry231/SQL-Interview-Preparation](https://github.com/rohanmistry231/SQL-Interview-Preparation).
 
 ## What they use today
-- LeetCode, HackerRank, and GitHub repos (e.g., [rohanmistry231/SQL-Interview-Preparation](https://github.com/rohanmistry231/SQL-Interview-Preparation)) for practice.
-- Gaps: Solutions lack step-by-step reasoning, context, or beginner-friendly explanations [Issue: SQL interview pipeline](https://github.com/amfooladgar/leetcode-daily-cheatsheet/issues/2).
-- Many resources assume prior experience, leaving beginners stuck [Senior SQL Developer Interview Questions - Too Difficult?](https://stackoverflow.com/questions/6942904/senior-sql-developer-interview-questions-too-difficult).
+- Free GitHub repositories and Stack Overflow posts for practice [rohanmistry231/SQL-Interview-Preparation](https://github.com/rohanmistry231/SQL-Interview-Preparation).
+- Gap: Lack of structured, worked answers with clear explanations; solutions may be incomplete or unverified.
+- Some use AI tutors [Show HN: SQL Expert](https://news.ycombinator.com/item?id=43287523), but these may lack affordability and local context.
 
 ## Market size
-ASSUMPTION: Can be measured via job board data (e.g., LinkedIn, Wuzzuf) showing SQL-related entry-level roles in Egypt and MENA.
+ASSUMPTION. Could be measured via job board data (e.g., LinkedIn, Wuzzuf) showing SQL analyst roles in Egypt/MENA, filtered by “entry-level” or “junior.”
 
 ## Where these people talk (from the evidence)
 
-- github: 15 relevant item(s)
-- hackernews: 7 relevant item(s)
+- github: 11 relevant item(s)
+- hackernews: 11 relevant item(s)
 - stackexchange: 3 relevant item(s)
 
 ---

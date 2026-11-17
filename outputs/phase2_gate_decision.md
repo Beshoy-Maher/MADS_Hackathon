@@ -16,9 +16,9 @@ Reasons:
 
 Gate type: evidence. Allowed outcomes: go, repeat, pivot, stop. Thresholds are fixed in `gates.py` before the data is seen.
 
-Debate before this gate (`phase2_step4_debate.md`): 1 objection(s): 1 fixed, 0 conceded not applied, 0 defended, 0 open (0 open with high severity). Fixed corrections were written into the documents before this gate was shown. It informs this decision; it does not change the recommendation.
+Debate before this gate (`phase2_step4_debate.md`): 3 objection(s): 3 fixed, 0 conceded not applied, 0 defended, 0 open (0 open with high severity). Fixed corrections were written into the documents before this gate was shown. It informs this decision; it does not change the recommendation.
 
-**Founder decision: GO** (founder overrode the recommendation) at 2026-11-17T15:58:09Z. Note: Founder override: build the MVP in parallel with the waitlist test, accepting the risk; re-check demand before launch.
+**Founder decision: GO** (founder overrode the recommendation) at 2026-11-17T16:12:45Z. Note: Founder override: build the MVP in parallel with the waitlist test, accepting the risk; re-check demand before launch.
 
 ---
 Gate logic is deterministic code (no model). Cost: $0.00.

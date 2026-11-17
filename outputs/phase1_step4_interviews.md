@@ -7,17 +7,17 @@
 - Compliments and 'sounds great' are not evidence. Commitments (time, money, intro) are.
 
 ## Interview guide
-1. Tell me about the last time you tried to prepare for a SQL interview.
-2. What did you do when you realized your practice questions didn’t match real interview styles?
-3. How did you find and use sample SQL interview questions before your job hunt?
-4. What have you tried to improve your SQL interview performance that didn’t work?
-5. How much time have you spent on interview prep in the past month?
-6. How much money have you spent on interview prep resources in the last 6 months?
+1. Tell me about the last time you prepared for a SQL interview.
+2. What did you do when you couldn’t figure out how to answer a SQL question during practice?
+3. How did you find practice questions that felt realistic for entry-level roles?
+4. What have you tried to improve your SQL interview performance in the past 3 months?
+5. How much time did you spend each week practicing SQL for interviews?
+6. How much money have you spent on interview prep resources in the last year?
 
 **What counts as a strong signal:**
-- Spent time on real interview questions (not just tutorials)
-- Paid for or actively sought out practice materials
-- Tried solving questions under time pressure or mock conditions
+- Spent time or money on interview prep
+- Tried multiple sources (free or paid)
+- Shared or discussed practice questions with peers
 
 ## Who to interview
 - 5 to 8 people from: GitHub Discussions of related open-source projects, Hacker News (Show HN / Ask HN).
@@ -25,9 +25,9 @@
 
 ## Outreach draft (written for the founder to send as themselves)
 
-> Hi! I'm Mariam. I'm talking to people about one problem I keep hearing about: "Junior data analysts struggle to apply SQL skills to real interview questions." If that sounds familiar, could I ask you about your own experience in a 15-minute call? I'm not selling anything. Thank you either way.
+> Hi! I'm Mariam. I'm talking to people about one problem I keep hearing about: "Junior data analysts in Egypt struggle to find affordable, practical SQL interview practice with real answers." If that sounds familiar, could I ask you about your own experience in a 15-minute call? I'm not selling anything. Thank you either way.
 
-Status: waiting for founder approval (action `act_5a487a3b`). Sending is STUBBED: after approval the message is saved to the outbox and the founder sends it personally.
+Status: waiting for founder approval (action `act_a3ded451`). Sending is STUBBED: after approval the message is saved to the outbox and the founder sends it personally.
 
 ## Interview results
 

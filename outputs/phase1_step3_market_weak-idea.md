@@ -1,21 +1,20 @@
 # Phase 1, step 3: Market definition for 'Daily dev motivation via email'
 
 ## Ideal customer profile
-- Software developers seeking quick positivity breaks during work.
-- Triggered by burnout or repetitive coding tasks.
-- Tried random quotes on social media or personal note-taking apps.
-- Found in communities like Hacker News, GitHub, or developer forums.
+- Software developers facing burnout during long coding sessions.
+- Trigger: feeling stuck, overwhelmed, or demotivated mid-task.
+- Tried: public GitHub repos with developer quotes [ruyonga/dev-quotes](https://github.com/ruyonga/dev-quotes), [henriquealho/Programming-Quotes](https://github.com/henriquealho/Programming-Quotes), or tweet-based tips [hpolatyuruk/daily-developer-tips](https://github.com/hpolatyuruk/daily-developer-tips).
 
 ## What they use today
-- Existing solutions include GitHub repos with curated developer quotes [henriquealho/Programming-Quotes](https://github.com/henriquealho/Programming-Quotes), quote apps [ruyonga/dev-quotes](https://github.com/ruyonga/dev-quotes), and tweet-based tips [hpolatyuruk/daily-developer-tips](https://github.com/hpolatyuruk/daily-developer-tips).
-- Gaps: no consistent daily email delivery, limited personalization, and reliance on public platforms.
+- Existing solutions include public GitHub repos with curated quotes or automated tweet scripts.
+- Gaps: not delivered daily via email, lack personalization, no consistent UX or design quality.
 
 ## Market size
-ASSUMPTION: Could be measured via GitHub stars on developer quote repos or engagement on HN threads about dev motivation. No sourced market size available.
+ASSUMPTION: Market size could be measured by counting active software developers on platforms like GitHub or Stack Overflow, then estimating interest in daily motivational content through engagement with related repositories.
 
 ## Where these people talk (from the evidence)
 
-- github: 7 relevant item(s)
+- github: 10 relevant item(s)
 - hackernews: 1 relevant item(s)
 
 ---

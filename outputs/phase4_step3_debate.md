@@ -1,6 +1,6 @@
 # Phase 4 debate before the gate
 
-Debated: `phase4_step1_pricing.md`, `phase4_step2_policies.md`. Critic (devil's advocate): `gpt-oss:20b` configured; models that took part: `gpt-oss:20b`.
+Debated: `phase4_step1_pricing.md`. Critic (devil's advocate): `gpt-oss:20b` configured; models that took part: `gpt-oss:20b`.
 The critic quotes the words it disputes (quotes not found in the document are dropped by code). The author concedes with replacement text or defends with a fetched source. A conceded replacement is written into the document only if the quote is found exactly once, it is at most about 3 times as long, and the guardrail scan and claim check leave it unchanged; code-computed lines are never changed. A defence without a fetched source stays open.
 
 **Result: 0 objection(s): 0 fixed, 0 conceded not applied, 0 defended, 0 open.** The debate informs the founder; it does not change the gate's recommendation.

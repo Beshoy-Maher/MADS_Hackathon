@@ -3,17 +3,41 @@
 Debated: `phase2_step1_lean-canvas.md`, `phase2_step3_demand-test.md`. Critic (devil's advocate): `gpt-oss:20b` configured; models that took part: `gpt-oss:20b`, `qwen3:30b-a3b-instruct-2507-q4_K_M`.
 The critic quotes the words it disputes (quotes not found in the document are dropped by code). The author concedes with replacement text or defends with a fetched source. A conceded replacement is written into the document only if the quote is found exactly once, it is at most about 3 times as long, and the guardrail scan and claim check leave it unchanged; code-computed lines are never changed. A defence without a fetched source stays open.
 
-**Result: 1 objection(s): 1 fixed, 0 conceded not applied, 0 defended, 0 open.** The debate informs the founder; it does not change the gate's recommendation.
+**Result: 3 objection(s): 3 fixed, 0 conceded not applied, 0 defended, 0 open.** The debate informs the founder; it does not change the gate's recommendation.
 
 ## #1 [medium] FIXED: `phase2_step1_lean-canvas.md`
 
-> Junior data analysts lack practical experience applying SQL to real interview scenarios.
+> Junior data analysts in Egypt and the MENA region lack affordable, practical SQL interview prep with real, worked answers.
 
-**Critic:** The statement is an unsubstantiated claim about the target market’s skill level; no evidence from the provided URLs supports it. (evidence: ASSUMPTION)
+**Critic:** The statement claims a lack of affordable, practical SQL interview prep resources in the target market, but no evidence from the fetched URLs supports this assertion. (evidence: ASSUMPTION)
 
-**Author (strategist), concede:** The statement is an unsubstantiated claim about the target market’s skill level without direct evidence from the provided URLs.
+**Author (strategist), concede:** The claim about a lack of affordable, practical SQL interview prep resources in the target market is not supported by the evidence. The available resources include multiple GitHub repositories with SQL interview practice, some with worked solutions and explanations.
 
-Correction written into `phase2_step1_lean-canvas.md`: ASSUMPTION: Junior data analysts may lack practical experience applying SQL to real interview scenarios.
+Correction written into `phase2_step1_lean-canvas.md`: ASSUMPTION: Junior data analysts in Egypt and the MENA region may face challenges finding affordable, practical SQL interview prep with real, worked answers.
+
+**Verdict:** correction written into the document
+
+## #2 [medium] FIXED: `phase2_step1_lean-canvas.md`
+
+> Existing resources are often incomplete, lack explanations, or are not tailored to entry-level candidates.
+
+**Critic:** This claim about the shortcomings of current resources is unsupported by any of the provided evidence. (evidence: ASSUMPTION)
+
+**Author (strategist), concede:** The claim that existing resources are often incomplete, lack explanations, or are not tailored to entry-level candidates is not directly supported by the evidence. While some repositories contain solutions, the quality and completeness vary, and no data confirms widespread shortcomings.
+
+Correction written into `phase2_step1_lean-canvas.md`: ASSUMPTION: Existing SQL interview resources may not consistently provide complete explanations or be tailored to entry-level candidates.
+
+**Verdict:** correction written into the document
+
+## #3 [medium] FIXED: `phase2_step1_lean-canvas.md`
+
+> Focus on real-world scenarios relevant to entry-level roles in Egypt and the wider MENA region.
+
+**Critic:** The assertion that the workbook will focus on real-world scenarios specific to the region is not backed by any evidence. (evidence: ASSUMPTION)
+
+**Author (strategist), concede:** The assertion that the workbook will focus on real-world scenarios specific to the region is not supported by any of the provided evidence, which includes generic SQL practice repositories without regional context.
+
+Correction written into `phase2_step1_lean-canvas.md`: ASSUMPTION: The workbook may include real-world scenarios relevant to entry-level roles in the MENA region.
 
 **Verdict:** correction written into the document
 

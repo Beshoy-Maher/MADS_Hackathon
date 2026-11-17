@@ -2,15 +2,15 @@
 
 | Candidate | Relevant sources | Independent voices | Platforms | Pain posts | Demand | Pay signals | Competition | Founder fit | **Total** |
 |---|---|---|---|---|---|---|---|---|---|
-| Founder idea: SQL Interview Prep Workbook for Junior Analysts | 25 | 25 | 3 | 6 | 95.0 | 25.0 | 100.0 | 100.0 | **71.7** |
-| Alt 1: SQL Practice with Real-World Data Sets | 15 | 15 | 2 | 7 | 73.9 | 0.0 | 0.0 | 95.5 | **73.2** |
-| Alt 2: Daily SQL Challenges for Job Seekers | 11 | 10 | 1 | 2 | 38.2 | 0.0 | 0.0 | 93.2 | **58.3** |
+| Founder idea: SQL Interview Prep Workbook for Junior Analysts | 25 | 25 | 3 | 7 | 81.9 | 50.0 | 20.0 | 100.0 | **82.3** |
+| Alt 1: SQL Practice with Real-World Data Sets | 9 | 9 | 2 | 4 | 63.9 | 0.0 | 0.0 | 95.5 | **69.2** |
+| Alt 2: Data Analyst Resume & Portfolio Guide | 6 | 6 | 1 | 0 | 9.4 | 0.0 | 0.0 | 93.2 | **46.7** |
 
 ## Why
 
-- **SQL Interview Prep Workbook for Junior Analysts**: Mariam's SQL and mentoring skills directly enable this workbook. (skill match 1.0)
-- **SQL Practice with Real-World Data Sets**: She can create real-world data scenarios using her data analysis experience. (skill match 0.9)
-- **Daily SQL Challenges for Job Seekers**: Her technical writing and mentoring skills support daily challenge design. (skill match 0.85)
+- **SQL Interview Prep Workbook for Junior Analysts**: Mariam’s SQL and mentoring skills directly match the workbook’s needs. (skill match 1.0)
+- **SQL Practice with Real-World Data Sets**: She can create real-world datasets using her data analysis experience. (skill match 0.9)
+- **Data Analyst Resume & Portfolio Guide**: Her technical writing and mentoring skills support resume/portfolio guidance. (skill match 0.85)
 
 ## How the scores are calculated
 

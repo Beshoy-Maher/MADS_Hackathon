@@ -1,14 +1,28 @@
 # Venture Builder by The Overfitters
 
-An open-source team of AI agents that takes a founder's brief toward a validated, sellable **digital** product, through six gated phases: Discover, Validate, Build, Commercial setup, Launch, Operate and learn. It runs on a free local open-weight model, cites a public source for every market claim (or labels it `ASSUMPTION`), and says **"don't launch this"** when the evidence is weak. The founder approves every gate, and nothing is published, sent, spent or refunded without a click. That rule is enforced in code. Before every gate a **critic agent debates the phase's outputs with the agents that wrote them**, and the founder sees what was conceded and what is still open.
+An open-source team of AI agents that takes a founder's brief toward a validated, sellable **digital** product, through six gated phases: Discover, Validate, Build, Commercial setup, Launch, Operate and learn. It runs on a free local open-weight model, cites a public source for every market claim (or labels it `ASSUMPTION`), and says **"don't launch this"** when the evidence is weak. The founder approves every gate, and nothing is published, sent, spent or refunded without a click. That rule is enforced in code. Before every gate a **critic agent debates the phase's outputs with the agents that wrote them**, and the founder sees what was corrected, what was defended and what is still open.
 
-Measured, not claimed: more than 380 tests that run with no model or network; guardrails refuse 37 of 40 trick prompts they were never tuned on (rules alone: 2 of 40) and wrongly refuse 0 of 62 normal requests ([`evals/results.md`](evals/results.md)); Phase 1, including the debate before its gate, took about 30 seconds on an NVIDIA RTX 4080 in the committed demo run (the whole strong-founder run, six phases, about 3 minutes); $0.00 per run.
+Measured, not claimed: more than 440 tests that run with no model or network; guardrails refuse 37 of 40 trick prompts they were never tuned on (rules alone: 2 of 40) and wrongly refuse 0 of 62 normal requests ([`evals/results.md`](evals/results.md)); Phase 1, including the debate before its gate, took 33 seconds on an NVIDIA GPU (RTX 4080) with the 30B writer in the committed demo run; $0.00 per run.
 
-The committed demo run, produced by `scripts/run_demo.py` with the local model, shows the three outcomes that matter:
+The committed demo run, produced by `scripts/run_demo.py` with local open-weight models, shows the three outcomes that matter:
 
-- **Promising idea, GO:** an SQL interview workbook passes the evidence gate on 25 relevant sources, 25 independent voices and 6 pain posts ([gate](outputs/phase1_gate_decision.md)), a critic agent (gpt-oss-20b) debates the phase's documents before every gate (in this run: 4 objections, 3 fixed in the documents, 1 conceded but not applied because the quote appears twice, 0 defended, 0 open; see [the Phase 5 debate](outputs/phase5_step4_debate.md)), then it runs through all six phases to a [MOCKED sale-to-cash test](outputs/payment_test_log.md). The demand gate recommended repeat because no real visitor has seen the page; the demo founder overrode it to show the later phases, and the override is recorded ([gate](outputs/phase2_gate_decision.md)).
+- **Promising idea, GO:** an SQL interview workbook passes the evidence gate on 25 relevant sources, 25 independent voices and 7 pain posts ([gate](outputs/phase1_gate_decision.md)), passes all 12 build tests ([report](outputs/phase3_step4_qa-report.md)), and runs through all six phases to a [MOCKED sale-to-cash test](outputs/payment_test_log.md). The demand gate recommended repeat because no real visitor has seen the page; the demo founder overrode it to show the later phases, and the override is recorded ([gate](outputs/phase2_gate_decision.md)). Before its six gates the critic raised 9 objections: 7 fixed in the documents, 1 conceded but not applied (its quote appears twice), 0 defended, 1 open. In the [Phase 6 debate](outputs/phase6_step4_debate.md) it caught the memo claiming sign-ups and clicks showed interest when there were none, and the memo was corrected.
 - **Weak idea, STOP:** a paid daily-quotes email for developers fails on founder fit and total score, and no alternative passes, so the system says "do not launch this" ([gate](outputs/phase1_gate_decision_weak-idea.md)).
 - **Excluded idea, refused:** a crypto-signals channel is refused before any agent runs ([gate](outputs/phase1_gate_decision_excluded-idea.md)).
+
+Where each claim can be checked:
+
+| Claim | Evidence |
+|---|---|
+| The system recommends STOP on weak evidence | [`outputs/phase1_gate_decision_weak-idea.md`](outputs/phase1_gate_decision_weak-idea.md), thresholds in [`gates.py`](gates.py) (`THRESHOLDS`) |
+| Nothing is published, sent, spent or refunded without the founder | [`approval.py`](approval.py) (`request_action`, `execute_action`), [`tests/test_approval.py`](tests/test_approval.py) |
+| Guardrail results, including the prompts that get through | [`evals/results.md`](evals/results.md), cases in [`evals/`](evals/) |
+| Every market claim has a source or the label `ASSUMPTION` | [`outputs/phase1_step1_opportunities.md`](outputs/phase1_step1_opportunities.md), [`outputs/phase1_step3_market.md`](outputs/phase1_step3_market.md), checker in [`tools/claims.py`](tools/claims.py) |
+| Payment triggers delivery, refunds revoke access, books reconcile (MOCKED provider) | [`outputs/payment_test_log.md`](outputs/payment_test_log.md), [`tests/test_payments.py`](tests/test_payments.py) |
+| Every agent action is logged with sources, model, cost and approver | [`decision_log.json`](decision_log.json) |
+| The product passes the 12 deterministic build tests, originality included (12/12 in the committed demo run) | [`outputs/phase3_step4_qa-report.md`](outputs/phase3_step4_qa-report.md), tests in [`agents/qa.py`](agents/qa.py) |
+| Every promise on the store page and in the posts is matched to the product (10 checked: 8 kept, 0 broken, 2 for the founder to confirm) | [`outputs/phase5_step4_promise-check.md`](outputs/phase5_step4_promise-check.md), checker in [`agents/promise_checker.py`](agents/promise_checker.py) |
+| A critic debates each phase before its gate; a conceded correction is written into the document only when every safety check passes | [`outputs/phase6_step4_debate.md`](outputs/phase6_step4_debate.md), debate in [`agents/critic.py`](agents/critic.py), tests in [`tests/test_debate.py`](tests/test_debate.py) |
 
 ## Quickstart
 
@@ -73,7 +87,7 @@ An **orchestrator** (`orchestrator.py`) runs the six phases in order. Each phase
   | Judge | `qwen3:4b-instruct-2507-q4_K_M` | same | the two safety judges, temperature 0 |
   | Critic | `qwen3:4b-instruct-2507-q4_K_M` | `gpt-oss:20b` (OpenAI gpt-oss-20b, 14 GB) | devil's advocate in the debate before each gate |
 
-  All are Apache-2.0. With `models-large.env` the critic is a different model family from the writer, so it does not share the writer's blind spots. A model that is missing or cannot be loaded (for example, not enough memory) hands over to the next one in `LLM_FALLBACK_MODELS`, and the decision log records the model that really answered. Each role's model can also be set on its own in `.env` (`LLM_MODEL`, `LLM_FAST_MODEL`, `LLM_JUDGE_MODEL`, `LLM_CRITIC_MODEL`). The committed demo run in `outputs/` and `decision_log.json` used `models-large.env` on an NVIDIA RTX 4080: the 30B writer, the `gpt-oss:20b` critic, and the 4B model for intake and the safety judges. The default for `docker compose up` is the 4B model for every role.
+  All are Apache-2.0. With `models-large.env` the critic is a different model family from the writer, so it does not share the writer's blind spots. A model that is missing or cannot be loaded (for example, not enough memory) hands over to the next one in `LLM_FALLBACK_MODELS`, and the decision log records the model that really answered. Each role's model can also be set on its own in `.env` (`LLM_MODEL`, `LLM_FAST_MODEL`, `LLM_JUDGE_MODEL`, `LLM_CRITIC_MODEL`). The committed demo run in `outputs/` and `decision_log.json` used `qwen3:30b-a3b-instruct-2507-q4_K_M` for writing, `gpt-oss:20b` as the critic and `qwen3:4b-instruct-2507-q4_K_M` for intake and the safety judges, on an NVIDIA GPU (RTX 4080); plain `docker compose up` uses the 4B model for every role.
 - **Hardware:** everything runs on a CPU. With an NVIDIA GPU, add `docker-compose.gpu.yml`; the models use GPU memory first, then system RAM.
 - **No paid service is required.** Optionally, point `LLM_PROVIDER=openai_compatible` and `LLM_BASE_URL` at any free-tier OpenAI-compatible endpoint serving an open-weight model.
 - **Without any model** (`LLM_PROVIDER=none`), every agent falls back to deterministic templates; such steps are logged with `"model": null` and labelled in the outputs.
@@ -82,11 +96,11 @@ An **orchestrator** (`orchestrator.py`) runs the six phases in order. Each phase
 
 ## Cost per run
 
-**About $0.00 per run** (local models, ~52k tokens for all three demo founders in our demo run: 37 model calls, including the verifier's reviews and the debate before each gate; research APIs are free). The dashboard header shows the running cost, and every decision-log entry records `"cost": 0`.
+**About $0.00 per run** (local models, ~59k tokens for all three demo founders in our demo run: 40 model calls, including the verifier's reviews, the debate before each gate and the promise check; research APIs are free). `decision_log.json` has 51 entries with a model because one entry is one agent action, not one call: some actions make several calls (the builder writes the product's modules in one call each and logs one `build_product` action), and some entries name the model that wrote text without a new call (the 8 `apply_debate_correction` entries, and each debate's summary entry, which names the models that took part). The dashboard header shows the running cost, and every decision-log entry records `"cost": 0`.
 
 ## Demo video
 
-Demo video (3 minutes): https://drive.google.com/file/d/1_flIP4f2UaXU5lvi1eR81f5lqV7ubHwC/view?usp=sharing
+Demo video: https://drive.google.com/file/d/1_flIP4f2UaXU5lvi1eR81f5lqV7ubHwC/view?usp=sharing
 
 ## What our system will NOT do
 

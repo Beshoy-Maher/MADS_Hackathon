@@ -111,7 +111,7 @@ Every phase ends with a gate. Thresholds live in `gates.THRESHOLDS`, are fixed b
 | Scope check (before 1) | founder | only for an idea close to an excluded category (money, health, legal): nothing is researched or written until the founder confirms it gives no advice | **go** (confirmed, logged) / **pivot** (reword; the new idea is screened again) / **stop** |
 | 1 Evidence | evidence | >= 5 relevant sources, >= 4 independent voices, >= 2 pain posts, demand >= 40, founder fit >= 50, total >= 50, allowed category | **go** if all pass; **pivot** to an alternative that passes; **repeat** with broader queries if no candidate has enough evidence either way (or sources were unreachable); otherwise **stop** |
 | 2 Demand | evidence | Lean Canvas complete; real waitlist sign-ups vs. pre-registered target (default 100 in 14 days) | **go** at target; **repeat** while the window is open or the test hasn't run; **pivot/stop** below 50% at the end |
-| 3 Build | tests | all 11 MVP tests pass, including no errors left open by the verifier | **go** / **repeat** (rebuild with feedback) |
+| 3 Build | tests | all 12 MVP tests pass, including no errors left open by the verifier and the originality check | **go** / **repeat** (rebuild with feedback) |
 | 4 Commercial | founder | price with rationale, three policies drafted, no guardrail violations left | **go** / **repeat** |
 | 5 Launch | founder | sale-to-cash tests pass; every page/post approved or rejected | **go** / **repeat** |
 | 6 Operate | evidence | >= 10 real buyers to judge; refund rate < 15% | **go** (persevere) / **repeat** (keep operating, review later) / **pivot** |

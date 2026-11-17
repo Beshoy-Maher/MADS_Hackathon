@@ -58,7 +58,7 @@ def main() -> int:
         print(f"{name}: status={run['status']} gates={gates}")
     if status["ready"] and llm.STATS.fallbacks and "--allow-fallback" not in sys.argv:
         print(f"ABORT: the model was ready but {llm.STATS.fallbacks} call(s) fell back (model crashed or timed out). "
-              "outputs/ left unchanged.")
+              "outputs/ left unchanged. " + " | ".join(llm.STATS.errors[:5]))
         return 2
     if final_dir.exists():
         for f in final_dir.iterdir():

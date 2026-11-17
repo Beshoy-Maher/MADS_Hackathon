@@ -1,188 +1,196 @@
-# SQL Interview Workbook for Junior Data Analysts
+# SQL Interview Prep Workbook for Junior Analysts
 
-A practical PDF for Junior and aspiring data analysts preparing for SQL interviews, especially in Egypt and the wider MENA region. Made by Mariam.
+A practical PDF workbook for Junior and aspiring data analysts preparing for SQL interviews, especially in Egypt and the wider MENA region. Made by Mariam.
 
 ## Contents
-1. Introduction to SQL Interview Questions
-2. Basic SELECT Queries
-3. Filtering with WHERE and ORDER BY
-4. Worked Example: Find Top 5 Sales by Region
+1. Get oriented: what good sql interview prep looks like
+2. Step-by-step method for sql interview prep
+3. Worked example
+4. Checklists and worksheet
 
-## Module 1: Introduction to SQL Interview Questions
+## Module 1: Get oriented: what good sql interview prep looks like
 
-SQL interview questions test your ability to write clear, correct queries from real-world data. These questions are common in job interviews for junior data analyst roles, especially in Egypt and the wider MENA region where data roles are growing.
+Preparing for a SQL interview means showing you can write correct, readable queries that solve real problems. This module helps you understand what interviewers look for and how to avoid common errors.
 
-1. Review a sample SQL interview question from a job board in the MENA region.
-2. Identify the key data elements (e.g., tables, columns) mentioned in the question.
-3. Break the question into simple steps: what data you need, what actions to perform (e.g., filter, join).
-4. Write a standard SQL query using only standard SQL syntax (e.g., SELECT, FROM, WHERE, JOIN).
-5. Test your query in SQLite using a small dataset.
-6. Check if the output matches the expected result in the sample.
+1. Know the typical interview format: Most junior analyst interviews include 1–2 coding questions on a shared screen or whiteboard. ASSUMPTION You’ll be asked to write SQL to answer a business question using sample data.
 
-**Worked Example**
-*Question:* Find the top 3 customers by total spending in the last month.
-*Tables:* `orders`, `customers`
+2. Use standard SQL: Stick to basic syntax that works in SQLite (e.g., `SELECT`, `FROM`, `WHERE`, `GROUP BY`, `ORDER BY`). Avoid database-specific features like `LIMIT` with offset or window functions unless asked.
+
+3. Read the question carefully: Identify the table(s), columns, and what you’re being asked to calculate (e.g., count, average, filter). Highlight key terms like “active users” or “last 30 days.”
+
+4. Write step-by-step: Break the query into parts. First, select the data. Then filter. Then group or aggregate. Test each step as you go.
+
+5. Check for correctness: Run your query in a tool like DB Fiddle or SQLite online. Ensure it returns expected results and handles edge cases (e.g., NULL values).
+
+6. Explain your logic: Even if the query is correct, interviewers want to hear your thinking. Say why you chose a `JOIN`, or how you handled duplicates.
+
+**Worked example**:
+*Question:* Find the number of unique users who made a purchase in January 2024.
+*Table:* `sales` (columns: `user_id`, `purchase_date`)
 *Query:*
 ```sql
-SELECT c.customer_id, c.name, SUM(o.amount) AS total_spent
-FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id
-WHERE o.order_date >= '2024-03-01'
-GROUP BY c.customer_id, c.name
-ORDER BY total_spent DESC
-LIMIT 3;
-```
-
-✅ Checklist
-- [ ] Reviewed a sample SQL interview question
-- [ ] Identified key tables and columns
-- [ ] Broke the question into steps
-- [ ] Wrote a standard SQL query
-- [ ] Tested in SQLite
-- [ ] Output matches expected result
-
-❌ Common mistakes
-- Using non-standard SQL syntax (e.g., `ORDER BY` without `DESC`)
-- Missing JOIN or GROUP BY where needed
-- Incorrect date filtering
-- Not limiting results when asked for top N
-- Assuming data structure without checking
-
-## Module 2: Basic SELECT Queries
-
-**Intro**
-This module teaches you how to use the SELECT statement to pull data from tables. It’s the first step in writing SQL queries for interviews. You’ll learn to pick specific columns and filter results with simple conditions.
-
-**Steps**
-1. Start with a table name in the SELECT statement. Example: `SELECT name FROM users;`
-2. Add a WHERE clause to filter rows. Use a condition like `WHERE age > 18;`
-3. Use basic operators: =, >, <, >=, <=, !=.
-4. Combine conditions with AND or OR. Example: `WHERE age > 18 AND city = 'Cairo';`
-5. Order results with ORDER BY. Use `ORDER BY age DESC;` to sort by age, highest first.
-6. Limit results with LIMIT. Example: `LIMIT 5;` to show only 5 rows.
-
-**Worked Example**
-Table: `employees`
-Columns: `name`, `age`, `city`
-Query:
-```sql
-SELECT name, age
-FROM employees
-WHERE city = 'Cairo'
-ORDER BY age DESC
-LIMIT 3;
-```
-Result: Shows the 3 oldest employees in Cairo.
-
-**Checklist**
-- [ ] SELECT specific columns
-- [ ] Use WHERE to filter data
-- [ ] Apply conditions with =, >, <, etc.
-- [ ] Combine conditions with AND or OR
-- [ ] Order results with ORDER BY
-- [ ] Limit output with LIMIT
-
-**Common Mistakes**
-- Using SELECT * without knowing which columns are needed
-- Forgetting to add a WHERE clause when filtering
-- Misusing AND vs OR in conditions
-- Writing ORDER BY without specifying direction (ASC/DESC)
-- Using LIMIT without a clear purpose or number
-
-## Module 3: Filtering with WHERE and ORDER BY
-
-Filtering and sorting data is key in SQL interviews. You’ll often need to find specific rows and show them in a certain order.
-
-1. Use `WHERE` to filter rows. Add a condition after `WHERE` to select only rows that match.
-2. Use `ORDER BY` to sort results. Add `ORDER BY` followed by a column name.
-3. Sort in ascending (default) or descending order with `ASC` or `DESC`.
-4. Combine `WHERE` and `ORDER BY` in one query. Place `WHERE` before `ORDER BY`.
-5. Test your query with sample data. Use a table with known values.
-6. Always check for typos or missing parentheses in your SQL.
-
-**Worked Example**
-Table: `orders`
-Columns: `order_id`, `customer_id`, `amount`, `date`
-
-Query:
-```sql
-SELECT order_id, customer_id, amount
-FROM orders
-WHERE amount > 500
-ORDER BY amount DESC;
-```
-This shows orders over 500, sorted from highest to lowest amount.
-
-**Checklist**
-- [ ] Used `WHERE` to filter rows
-- [ ] Used `ORDER BY` to sort results
-- [ ] Selected correct column for sorting
-- [ ] Used `ASC` or `DESC` for order
-- [ ] Tested query with sample data
-- [ ] Avoided extra conditions or columns
-
-**Common Mistakes**
-- Forgetting to close parentheses after `WHERE`
-- Using `ORDER BY` before `WHERE`
-- Sorting by a column not in the SELECT list
-- Using `ASC` or `DESC` without specifying a column
-- Missing a comma after a column name in `SELECT`
-
-
-## Module 4: Worked Example: Find Top 5 Sales by Region
-
-**Intro**
-This module shows how to find the top 5 sales by region using standard SQL. It uses real-world data structure and runs in SQLite, which is common in data analysis tools.
-
-**Steps**
-1. Start with a table named `sales` with columns: `sale_id`, `amount`, `region`.
-2. Use `SELECT` to pick `amount` and `region` from the `sales` table.
-3. Order the results by `amount` in descending order.
-4. Limit the output to 5 rows using `LIMIT 5`.
-5. Ensure all column names match the table structure exactly.
-6. Test the query with sample data to confirm it returns expected results.
-
-**Worked Example**
-Sample data:
-| sale_id | amount | region     |
-|---------|--------|------------|
-| 101     | 1500   | North      |
-| 102     | 2300   | South      |
-| 103     | 900    | East       |
-| 104     | 3200   | West       |
-| 105     | 1800   | North      |
-
-Query:
-```sql
-SELECT amount, region
+SELECT COUNT(DISTINCT user_id)
 FROM sales
-ORDER BY amount DESC
-LIMIT 5;
+WHERE purchase_date >= '2024-01-01'
+  AND purchase_date < '2024-02-01';
 ```
 
-Result:
-| amount | region |
-|--------|--------|
-| 3200   | West   |
-| 2300   | South  |
-| 180.0  | North  |
-| 1500   | North  |
-| 900    | East   |
+- [ ] Read the question fully
+- [ ] Use only standard SQL
+- [ ] Test with sample data
+- [ ] Handle NULLs and edge cases
+- [ ] Explain your approach
+
+**Common mistakes**:
+- Using `LIKE` when `=` is enough
+- Forgetting `DISTINCT` when counting unique values
+- Assuming data is clean (e.g., no NULLs)
+- Writing complex queries without testing step-by-step
+
+## Module 2: Step-by-step method for sql interview prep
+
+Start with a clear plan. Break SQL interview prep into repeatable steps. This method works for standard SQL in SQLite, which is widely supported.
+
+1. **List common SQL interview topics**
+   Focus on: `SELECT`, `WHERE`, `GROUP BY`, `HAVING`, `JOIN`, `UNION`, `ORDER BY`, and basic window functions. Use free resources like SQLZoo (unverified link removed) or Mode Analytics SQL Tutorial (unverified link removed) for practice.
+
+2. **Pick one topic per day**
+   Choose one topic. Write 3–5 practice queries using real data. Use sample datasets like `sales`, `employees`, or `orders` from SQLite.
+
+3. **Write queries by hand first**
+   Type each query without copying. This builds memory and logic. Test it in a SQLite environment (e.g., DB Fiddle or SQLite Online).
+
+4. **Review and refactor**
+   After running, check for errors. Simplify complex `JOIN`s. Use aliases for clarity. Avoid `SELECT *`.
+
+5. **Time yourself**
+   Set a 10-minute limit per query. Simulate interview pressure. Track speed and accuracy.
+
+6. **Document your progress**
+   Keep a log: date, topic, query, errors, fixes. Review weekly.
+
+**Worked Example**
+Topic: `JOIN`
+Dataset: `employees` (id, name, dept_id), `departments` (id, name)
+Goal: List all employees with their department names.
+Query:
+```sql
+SELECT e.name, d.name AS dept_name
+FROM employees e
+JOIN departments d ON e.dept_id = d.id;
+```
 
 **Checklist**
-- [ ] Table name is `sales`
-- [ ] Columns are `amount` and `region`
-- [ ] Query uses `ORDER BY amount DESC`
-- [ ] Query uses `LIMIT 5`
-- [ ] Data matches sample structure
+- [ ] Used standard SQL (no vendor-specific syntax)
+- [ ] Tested in SQLite
+- [ ] Wrote queries by hand
+- [ ] Used aliases for tables
+- [ ] Avoided `SELECT *`
+- [ ] Timed each query
 
-**Common Mistakes**
-- Using `ASC` instead of `DESC` for descending order
-- Missing `LIMIT` when only top 5 are needed
-- Typo in column name (e.g., `amout` instead of `amount`)
-- Assuming region values are unique (they may not be)
+**Common mistakes**
+- Forgetting `ON` in `JOIN`
+- Using `WHERE` instead of `ON` for join conditions
+- Mixing up `HAVING` and `WHERE`
+- Not aliasing tables in complex queries
+- Copying code instead of typing it
+
+## Module 3: Worked example
+
+This module shows how to solve a real SQL interview question step by step. You’ll learn how to break down a problem, write clean queries, and think through edge cases—just like in a real interview.
+
+1. **Read the question carefully**
+   Identify the goal: what data are you retrieving? What conditions apply?
+   Example: “Find the top 3 customers by total order value in 2023.”
+
+2. **List the required columns and filters**
+   Decide what to select: customer name, total order value, etc.
+   Note: Only include what the question asks for.
+
+3. **Use `GROUP BY` for aggregation**
+   Group by customer to sum their order values.
+   Use `SUM()` with `WHERE` to filter by year.
+
+4. **Sort and limit results**
+   Use `ORDER BY SUM(value) DESC` to rank by highest total.
+   Add `LIMIT 3` to return only the top 3.
+
+5. **Test your query**
+   Run it in SQLite. Check for syntax errors.
+   Verify output matches expected logic.
+
+6. **Review for edge cases**
+   Consider: Are there null values? What if two customers tie for 3rd place?
+   Adjust if needed—e.g., use `LIMIT 3` only if ties are acceptable.
+
+**Worked Example**
+Given a table `orders` with columns `customer_id`, `order_date`, and `amount`:
+```sql
+SELECT customer_id, SUM(amount) AS total_value
+FROM orders
+WHERE order_date LIKE '2023%'
+GROUP BY customer_id
+ORDER BY total_value DESC
+LIMIT 3;
+```
+
+**Checklist**
+- [ ] Query uses `SUM()` for total value
+- [ ] `GROUP BY` matches the selected non-aggregated column
+- [ ] `WHERE` filters by year 2023
+- [ ] Results sorted descending
+- [ ] `LIMIT 3` applied
+- [ ] No unnecessary columns selected
+
+**Common mistakes**
+- Forgetting `GROUP BY` when using `SUM()`
+- Using `ORDER BY` without `GROUP BY`
+- Applying `LIMIT` before `ORDER BY`
+- Including extra columns not in the question
+- Not filtering by year before aggregation
+
+## Module 4: Checklists and worksheet
+
+This module helps you practice SQL interview questions using real-world templates. Use these checklists and worksheets to test your skills before interviews. All examples use standard SQL that works in SQLite.
+
+1. Open a SQLite database or use an online tool like DB Fiddle.
+2. Copy the sample dataset provided (e.g., `sales`, `employees`, `orders`) into your environment.
+3. Read the question carefully. Identify the required output (e.g., “list all employees in Cairo”).
+4. Write your query step by step:
+   - Start with `SELECT`
+   - Add `FROM` with the correct table
+   - Use `WHERE` to filter data
+   - Use `ORDER BY` if needed
+   - Test each part before finalizing
+5. Run your query and check results against expected output.
+6. Save your query in a text file with a `.sql` extension.
+
+**Worked Example:**
+*Question:* Find all employees in the "Sales" department, sorted by hire date (newest first).
+*Query:*
+```sql
+SELECT name, hire_date
+FROM employees
+WHERE department = 'Sales'
+ORDER BY hire_date DESC;
+```
+
+**Checklist:**
+- [ ] Dataset loaded correctly
+- [ ] Query uses standard SQL
+- [ ] `SELECT` lists only needed columns
+- [ ] `WHERE` filters match the question
+- [ ] `ORDER BY` is used if sorting is required
+- [ ] Query runs without errors in SQLite
+
+**Common mistakes:**
+- Using `=` instead of `LIKE` for partial matches
+- Forgetting to escape quotes in strings
+- Missing `FROM` clause
+- Using `ORDER BY` without `SELECT`
+- Not testing small parts of the query step by step
 
 ## A note on results
 
 This product gives you a method and templates. Your results depend on your situation and effort; nothing here is a promise of any outcome.
-Claim check: 0 unsourced claim(s) labelled ASSUMPTION, 1 link(s) not found in the fetched evidence removed.
+Claim check: 0 unsourced claim(s) labelled ASSUMPTION, 2 link(s) not found in the fetched evidence removed.

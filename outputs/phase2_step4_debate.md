@@ -1,45 +1,21 @@
 # Phase 2 debate before the gate
 
-Debated: `phase2_step1_lean-canvas.md`, `phase2_step3_demand-test.md`. Critic (devil's advocate): `qwen3:4b-instruct-2507-q4_K_M` configured; models that took part: `qwen3:4b-instruct-2507-q4_K_M`.
-The critic quotes the words it disputes (quotes not found in the document are dropped by code). The author concedes with a correction or defends with a fetched source. A defence without a source stays open.
+Debated: `phase2_step1_lean-canvas.md`, `phase2_step3_demand-test.md`. Critic (devil's advocate): `gpt-oss:20b` configured; models that took part: `gpt-oss:20b`, `qwen3:30b-a3b-instruct-2507-q4_K_M`.
+The critic quotes the words it disputes (quotes not found in the document are dropped by code). The author concedes with replacement text or defends with a fetched source. A conceded replacement is written into the document only if the quote is found exactly once, it is at most about 3 times as long, and the guardrail scan and claim check leave it unchanged; code-computed lines are never changed. A defence without a fetched source stays open.
 
-**Result: 3 objection(s), 3 conceded, 0 still open (0 high severity).** The debate informs the founder; it does not change the gate's recommendation.
+**Result: 1 objection(s): 1 fixed, 0 conceded not applied, 0 defended, 0 open.** The debate informs the founder; it does not change the gate's recommendation.
 
-## #1 [high] RESOLVED: `phase2_step1_lean-canvas.md`
+## #1 [medium] FIXED: `phase2_step1_lean-canvas.md`
 
-> ASSUMPTION: Localized content that reflects regional interview patterns in Egypt and MENA
+> Junior data analysts lack practical experience applying SQL to real interview scenarios.
 
-**Critic:** The claim that localized content reflects regional interview patterns in Egypt and MENA is unsupported and lacks evidence. No data or sources are provided to validate that such patterns exist or are distinct enough to warrant tailored content. This assumption introduces a significant risk if the product fails to meet local needs or if regional interview practices are not actually different from global ones. (evidence: ASSUMPTION)
+**Critic:** The statement is an unsubstantiated claim about the target market’s skill level; no evidence from the provided URLs supports it. (evidence: ASSUMPTION)
 
-**Author (strategist), concede:** The claim that localized content reflects regional interview patterns in Egypt and MENA is not supported by evidence from the provided sources. There is no data or source indicating that interview patterns differ significantly between global and regional markets in these areas.
+**Author (strategist), concede:** The statement is an unsubstantiated claim about the target market’s skill level without direct evidence from the provided URLs.
 
-Proposed correction: Remove the claim about localized content reflecting regional interview patterns in Egypt and MENA. Replace with a general value proposition focused on practical, beginner-friendly SQL practice without regional tailoring.
+Correction written into `phase2_step1_lean-canvas.md`: ASSUMPTION: Junior data analysts may lack practical experience applying SQL to real interview scenarios.
 
-**Verdict:** conceded by the author; correction proposed
-
-## #2 [medium] RESOLVED: `phase2_step3_demand-test.md`
-
-> Use personal LinkedIn or Twitter posts (if public) to share a brief, real-world SQL interview scenario with a clean, actionable solution—no product links, just value.
-
-**Critic:** The strategy includes sharing value without product links, yet the demand test is designed to collect sign-ups via a form. This creates a disconnect: the value-sharing activities do not lead to sign-ups, and the method for collecting real data is not aligned with the actual outreach. There is no evidence that such posts will generate interest or conversions, making the demand test design flawed. (evidence: ASSUMPTION)
-
-**Author (analyst), concede:** The critic is correct: sharing value on personal social media without product links does not create a direct path to waitlist sign-ups. The outreach activities are designed to build visibility and trust, but they do not result in real sign-ups because the waitlist form is not publicly accessible or linked in any of these posts. Without a published landing page or a clear, visible pathway from the content to the form, there is no mechanism for visitors to convert. This disconnect undermines the d
-
-Proposed correction: Revise the outreach strategy to include a publicly hosted, non-promotional landing page (e.g., via GitHub Pages or Vercel) that appears after a value-sharing post. The landing page should offer a brief, standalone SQL problem-solving example and a clear, non-salesy call to action: 'If you're interested in practicing real SQL interview problems, check out the workbook sample.' This allows value sharing to naturally lead to sign-up conversion without product promotion.
-
-**Verdict:** conceded by the author; correction proposed
-
-## #3 [medium] RESOLVED: `phase2_step1_lean-canvas.md`
-
-> Limited access to culturally relevant or region-specific interview content
-
-**Critic:** This claim is presented as a problem without evidence. There is no data or source indicating that junior data analysts in Egypt or the MENA region lack access to culturally relevant content. The claim is vague and could be a generalization without support, and it is not backed by any of the provided evidence URLs or regional data. (evidence: ASSUMPTION)
-
-**Author (strategist), concede:** The claim that junior data analysts in Egypt or the MENA region lack access to culturally relevant or region-specific interview content is not backed by any of the provided evidence. No source indicates a gap in access to such content.
-
-Proposed correction: Replace the problem statement with a more general one: 'Junior data analysts lack practical, step-by-step guidance for SQL interview preparation, regardless of region.'
-
-**Verdict:** conceded by the author; correction proposed
+**Verdict:** correction written into the document
 
 ---
-Generated by the pipeline. Models: qwen3:4b-instruct-2507-q4_K_M (local open-weight models). Cost: $0.00.
+Generated by the pipeline. Models: gpt-oss:20b, qwen3:30b-a3b-instruct-2507-q4_K_M (local open-weight models). Cost: $0.00.

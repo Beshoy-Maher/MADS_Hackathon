@@ -1,33 +1,33 @@
 # Phase 5 debate before the gate
 
-Debated: `phase5_step1_store-page.html`, `phase5_step2_launch-posts.md`. Critic (devil's advocate): `qwen3:4b-instruct-2507-q4_K_M` configured; models that took part: `qwen3:4b-instruct-2507-q4_K_M`.
-The critic quotes the words it disputes (quotes not found in the document are dropped by code). The author concedes with a correction or defends with a fetched source. A defence without a source stays open.
+Debated: `phase5_step1_store-page.html`, `phase5_step2_launch-posts.md`. Critic (devil's advocate): `gpt-oss:20b` configured; models that took part: `gpt-oss:20b`, `qwen3:30b-a3b-instruct-2507-q4_K_M`.
+The critic quotes the words it disputes (quotes not found in the document are dropped by code). The author concedes with replacement text or defends with a fetched source. A conceded replacement is written into the document only if the quote is found exactly once, it is at most about 3 times as long, and the guardrail scan and claim check leave it unchanged; code-computed lines are never changed. A defence without a fetched source stays open.
 
-**Result: 2 objection(s), 2 conceded, 0 still open (0 high severity).** The debate informs the founder; it does not change the gate's recommendation.
+**Result: 2 objection(s): 1 fixed, 1 conceded not applied, 0 defended, 0 open.** The debate informs the founder; it does not change the gate's recommendation.
 
-## #1 [medium] RESOLVED: `phase5_step2_launch-posts.md`
+## #1 [medium] FIXED: `phase5_step1_store-page.html`
 
-> I'm sharing it here because I see a lot of discussion around SQL interview prep, especially in the MENA region
+> Tailored to the types of data and scenarios junior analysts typically work with in local companies.
 
-**Critic:** The statement implies there is significant discussion about SQL interview prep in the MENA region, but no evidence is provided to support this claim. This is an unsupported observation that could mislead the founder into thinking there is a proven demand or community engagement in the region, when no data exists to confirm it. (evidence: ASSUMPTION)
+**Critic:** The statement claims specific tailoring to local company scenarios, yet no evidence or data is provided to substantiate this claim. (evidence: ASSUMPTION)
 
-**Author (copywriter), concede:** I acknowledge that the statement about significant discussion around SQL interview prep in the MENA region is not supported by evidence. There is no data or source in the provided evidence URLs that confirms community-level discussion or demand in the MENA region specifically.
+**Author (copywriter), concede:** The claim about tailoring to local company scenarios lacks supporting evidence from the provided sources and cannot be verified. It should be revised to reflect the absence of such specific data.
 
-Proposed correction: The workbook is designed for junior data analysts in Egypt and the wider MENA region who are preparing for their first job interview. While there is no direct evidence of community discussion on SQL interview prep in the region, the focus is on practical, real-world data tasks commonly encountered in early data analyst roles.
+Correction written into `phase5_step1_store-page.html`: Tailored to common data and scenarios junior analysts typically work with in local companies (based on general patterns observed in public resources).
 
-**Verdict:** conceded by the author; correction proposed
+**Verdict:** correction written into the document
 
-## #2 [medium] RESOLVED: `phase5_step2_launch-posts.md`
+## #2 [medium] CONCEDED, NOT APPLIED: `phase5_step2_launch-posts.md`
 
-> It’s a digital download at $11.99 as a practical tool to help learners practice real interview questions
+> I made SQL Interview Prep Workbook for Junior Analysts because junior data analysts struggle to apply sql skills to real interview questions.
 
-**Critic:** The claim that the workbook is a 'practical tool to help learners practice real interview questions' is vague and lacks specificity. It does not define what 'real interview questions' means, nor does it provide examples or sources to back up the authenticity or relevance of the questions. This oversells the value without grounding it in evidence. (evidence: ASSUMPTION)
+**Critic:** This asserts a specific problem faced by junior analysts without any supporting evidence or source. It is an unsupported claim. (evidence: ASSUMPTION)
 
-**Author (copywriter), concede:** The claim that the workbook helps learners practice 'real interview questions' is vague and lacks specificity. Without defining what 'real' means or providing examples, it risks being perceived as an overselling of value. The evidence does not include examples of actual interview questions or their sources from real interviews.
+**Author (copywriter), concede:** The assertion about junior analysts struggling to apply SQL skills to real interview questions is not supported by any of the provided evidence URLs. It is an unsupported generalization.
 
-Proposed correction: Each question is based on real-world data tasks commonly seen in junior data analyst interviews, such as filtering, joining, aggregating, and writing queries to answer business questions. These are drawn from publicly available SQL practice repositories, including those from DataCamp-Palestine and SQL-CS50, which include interview-style problems relevant to practical data work.
+Replacement offered (not applied): I made SQL Interview Prep Workbook for Junior Analysts because I noticed a gap in resources that help junior analysts apply SQL skills to real interview questions.
 
-**Verdict:** conceded by the author; correction proposed
+**Verdict:** not applied: the quote is found 2 times in the file, not exactly once
 
 ---
-Generated by the pipeline. Models: qwen3:4b-instruct-2507-q4_K_M (local open-weight models). Cost: $0.00.
+Generated by the pipeline. Models: gpt-oss:20b, qwen3:30b-a3b-instruct-2507-q4_K_M (local open-weight models). Cost: $0.00.

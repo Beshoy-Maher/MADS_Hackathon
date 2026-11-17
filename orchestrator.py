@@ -25,7 +25,7 @@ from agents.analyst import Analyst
 from agents.base import StepResult
 from agents.builder import Builder
 from agents.copywriter import Copywriter
-from agents.critic import DEBATE_STEP, DEBATED_STEPS, OPEN, NOT_APPLIED, Critic, doc_text, summary_line
+from agents.critic import DOC_CHARS, DEBATE_STEP, DEBATED_STEPS, OPEN, NOT_APPLIED, Critic, doc_text, summary_line
 from agents.interviewer import Interviewer
 from agents.launcher import Launcher
 from agents.market_analyst import MarketAnalyst
@@ -360,7 +360,8 @@ def _debate(run: dict, phase: int) -> None:
             path = run_dir(run["id"]) / "outputs" / st["file"]
             if path.exists():
                 limit = 5000 if st["agent"] == "builder" and st["step"] == 2 else None
-                text = doc_text(path.read_text(encoding="utf-8"), limit) if limit else doc_text(path.read_text(encoding="utf-8"))
+                html = st["file"].endswith(".html")
+                text = doc_text(path.read_text(encoding="utf-8"), limit or DOC_CHARS, html=html)
                 docs.append({"file": st["file"], "author": st["agent"], "text": text, "path": str(path)})
     if not docs:
         return

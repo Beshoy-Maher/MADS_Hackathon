@@ -44,6 +44,7 @@ class _Stats:
         self.completion_tokens = 0
         self.calls = 0
         self.fallbacks = 0
+        self.errors: list[str] = []  # why calls fell back (model, error), for the demo script's report
 
     def add(self, r: LLMResult) -> None:
         with self.lock:
@@ -52,6 +53,7 @@ class _Stats:
             self.completion_tokens += r.completion_tokens
             if r.used_fallback:
                 self.fallbacks += 1
+                self.errors.append(r.error or "unknown")
 
 
 STATS = _Stats()
@@ -146,8 +148,10 @@ def model_status(force: bool = False) -> dict:
 
 
 def _think_value(model: str):
-    """gpt-oss always reasons and takes a level, not off; the Qwen3 instruct models take false."""
-    return "low" if model.startswith("gpt-oss") else False
+    """gpt-oss always reasons and takes a level, not off; the Qwen3 instruct models take false.
+    Medium, not low: at low effort gpt-oss skims and, as the critic, returned no objections to documents with clear
+    unsupported claims; at medium it finds them in a few seconds on a GPU."""
+    return "medium" if model.startswith("gpt-oss") else False
 
 
 def warm_up(wait_seconds: int = 900) -> bool:
@@ -188,7 +192,7 @@ class _LoadError(Exception):
     """Ollama could not load or run this model (e.g. not enough memory): try the next one."""
 
 
-def _ollama_chat(model_name: str, system: str, user: str, json_mode: bool, max_tokens: int, temp: float):
+def _ollama_chat(model_name: str, system: str, user: str, json_mode: bool, max_tokens: int, temp: float, _retry: bool = True):
     think = _think_value(model_name)
     body = {
         "model": model_name,
@@ -197,7 +201,7 @@ def _ollama_chat(model_name: str, system: str, user: str, json_mode: bool, max_t
         "think": think,
         "keep_alive": "60m",  # keep the model in memory between steps; reloading it costs many seconds
         # A reasoning model spends part of the budget on its (hidden) reasoning: give it room for the answer too.
-        "options": {"temperature": temp, "num_predict": max_tokens + (800 if think else 0), "num_ctx": 8192},
+        "options": {"temperature": temp, "num_predict": max_tokens + (4000 if think else 0), "num_ctx": 8192},
     }
     if json_mode:
         body["format"] = "json"
@@ -206,6 +210,9 @@ def _ollama_chat(model_name: str, system: str, user: str, json_mode: bool, max_t
         raise _LoadError(f"HTTP {r.status_code}: {r.text[:160]}")
     data = r.json()
     text = strip_thinking(data.get("message", {}).get("content", ""))
+    if not text and think and _retry:
+        # A reasoning model can spend the whole budget thinking and leave no answer: try once more with twice the room.
+        return _ollama_chat(model_name, system, user, json_mode, max_tokens * 2 + 4000, temp, _retry=False)
     return text, int(data.get("prompt_eval_count", 0)), int(data.get("eval_count", 0))
 
 
@@ -274,7 +281,7 @@ def complete(system: str, user: str, fallback: str, *, json_mode: bool = False, 
             raise ValueError("empty completion")
         result = LLMResult(text=text, model=model_name, prompt_tokens=pt, completion_tokens=ct, cost=_cost(pt, ct))
     except Exception as e:
-        result = LLMResult(text=fallback, model=None, error=f"{type(e).__name__}: {e}"[:200])
+        result = LLMResult(text=fallback, model=None, error=f"{role} {model_name}: {type(e).__name__}: {e}"[:300])
     STATS.add(result)
     return result
 

@@ -87,6 +87,7 @@ function debateHtml(d) {
       <td class="${o.status === "open" ? "bad" : (o.status === "conceded, not applied" ? "warn" : "ok")}">${esc(o.status.toUpperCase())}${o.stance ? ` <span class="small muted">(${esc(o.stance)})</span>` : ""}</td></tr>`).join("")}</table>
       ${d.open ? `<p class="small muted">Click REPEAT with no note and the next attempt works from these points.</p>` : ""}` : ""}`;
 }
+let decidedOpen = false;
 let current = null, timer = null, viewerRun = null, modelReady = true, statusTimer = null;
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -175,12 +176,24 @@ async function render() {
   }
   const acts = v.actions;
   if (acts.length) {
-    html += `<div class="card"><h2>Approval queue <span class="small muted">(nothing is published, sent or refunded without you)</span></h2>${actError ? `<p class="bad small">${esc(actError)}</p>` : ""}<table>
-      ${acts.map(a => `<tr><td><span class="badge ${a.kind === "refund" ? "bad" : "warn"}">${esc(a.kind)}</span></td><td><b>${esc(a.target)}</b><br><span class="muted small">${esc(a.description)}</span>
+    // A repeated phase writes a new draft and asks again: number the drafts per phase and target, mark older ones replaced.
+    const seen = {}, total = {};
+    acts.forEach(a => { const k = `${a.phase}|${a.kind}|${a.target}`; total[k] = (total[k] || 0) + 1; });
+    const info = a => { const k = `${a.phase}|${a.kind}|${a.target}`; seen[k] = (seen[k] || 0) + 1;
+      return {n: seen[k], many: total[k] > 1, replaced: seen[k] < total[k]}; };
+    const rows = acts.map(a => ({a, i: info(a)}));
+    const row = ({a, i}) => `<tr><td><span class="badge ${a.kind === "refund" ? "bad" : "warn"}">${esc(a.kind)}</span></td><td><b>${esc(a.target)}</b>
+      <span class="small muted">${a.phase ? `phase ${a.phase}` : ""}${i.many ? `, attempt ${i.n}` : ""}</span>${i.replaced ? ` <span class="badge muted">replaced by a later attempt</span>` : ""}
+      <br><span class="muted small">${esc(a.description)}</span>
       ${a.payload && (a.payload.message || a.payload.text) ? `<pre>${esc(a.payload.message || a.payload.text)}</pre>` : ""}
       ${a.payload && a.payload.promise_check ? promiseLine(a.payload.promise_check) : ""}</td>
       <td>${a.status === "pending" ? `<button class="go" onclick="act('${a.id}',true)">Approve</button> <button class="stop" onclick="act('${a.id}',false)">Reject</button>` :
-        `<span class="badge ${a.status === "approved" ? "ok" : "bad"}">${esc(a.status)}</span>${a.executed ? `<div class="small mock">sent to outbox (STUBBED)</div>` : ""}`}</td></tr>`).join("")}</table></div>`;
+        `<span class="badge ${a.status === "approved" ? "ok" : "bad"}">${esc(a.status)}</span>${a.executed ? `<div class="small mock">sent to outbox (STUBBED)</div>` : ""}`}</td></tr>`;
+    const waiting = rows.filter(x => x.a.status === "pending"), done = rows.filter(x => x.a.status !== "pending");
+    html += `<div class="card"><h2>Approval queue <span class="small muted">(nothing is published, sent or refunded without you)</span></h2>${actError ? `<p class="bad small">${esc(actError)}</p>` : ""}
+      <h3>Waiting for your decision (${waiting.length})</h3>
+      ${waiting.length ? `<table>${waiting.map(row).join("")}</table>` : `<p class="small muted">Nothing is waiting for you.</p>`}
+      ${done.length ? `<details ${decidedOpen ? "open" : ""} ontoggle="decidedOpen = this.open"><summary class="small">Already decided (${done.length}): approved items went to the outbox once, rejected ones were not sent</summary><table>${done.map(row).join("")}</table></details>` : ""}</div>`;
   }
   if (r.researched) {
     const n = r.interview_notes;

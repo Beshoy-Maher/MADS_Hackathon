@@ -7,17 +7,16 @@
 - Compliments and 'sounds great' are not evidence. Commitments (time, money, intro) are.
 
 ## Interview guide
-1. Tell me about the last time you felt unmotivated during exam week and what you did to get through it.
-2. What did you do when you realized you weren’t making progress on your coding assignments?
-3. How did you spend your time during the week before your final exams?
-4. What have you tried to stay motivated during long study sessions?
-5. How much time did you spend each day reviewing material before exams?
-6. What have you done when you felt like quitting during a tough week?
+1. Tell me about the last time you felt unmotivated during a coding exam week—what did you actually do?
+2. What did you do when you missed a deadline for a project due to low motivation?
+3. How did you spend your time during a week when you had no clear plan for studying or coding?
+4. What have you tried to stay motivated during exam periods—how much time or money did it take?
+5. How much time did you actually spend coding or learning when you felt stuck?
 
 What counts as a strong signal:
-- Spent over 3 hours daily on study sessions.
-- Used a daily routine to stay consistent.
-- Tried at least two different motivation methods.
+- Took action without external prompting
+- Spent real time on learning or coding
+- Used a specific habit or tool (e.g., daily checklist, timer)
 
 ## Who to interview
 - 5 to 8 people from: GitHub Discussions of related open-source projects, Hacker News (Show HN / Ask HN).
@@ -25,9 +24,9 @@ What counts as a strong signal:
 
 ## Outreach draft (written for the founder to send as themselves)
 
-> Hi! I'm Karim. I'm talking to people about one problem I keep hearing about: "Software devs struggle with daily motivation during exam weeks." If that sounds familiar, could I ask you about your own experience in a 15-minute call? I'm not selling anything. Thank you either way.
+> Hi! I'm Karim. I'm talking to people about one problem I keep hearing about: "Software devs struggle with daily motivation during exam periods." If that sounds familiar, could I ask you about your own experience in a 15-minute call? I'm not selling anything. Thank you either way.
 
-Status: waiting for founder approval (action `act_979e55ce`). Sending is STUBBED: after approval the message is saved to the outbox and the founder sends it personally.
+Status: waiting for founder approval (action `act_13201850`). Sending is STUBBED: after approval the message is saved to the outbox and the founder sends it personally.
 
 ## Interview results
 

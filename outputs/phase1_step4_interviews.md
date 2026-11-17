@@ -8,16 +8,16 @@
 
 ## Interview guide
 1. Tell me about the last time you failed to pass a SQL interview because of a specific question.
-2. What did you do when you realized you didn’t understand a SQL query during a job interview?
+2. What did you do when you realized you didn’t understand a SQL concept during a job interview?
 3. How much time did you spend practicing SQL questions before your first job interview?
 4. What have you tried to prepare for SQL interviews that didn’t work?
-5. How much money have you spent on SQL learning resources to get ready for interviews?
-6. What did you do after being rejected from a data analyst role due to SQL performance?
+5. How much money did you spend on SQL learning resources before landing a job?
+6. How did you handle a situation where you didn’t get a job offer after a SQL interview?
 
 What counts as a strong signal:
-- Tried a specific resource and failed to improve.
-- Spent over 10 hours practicing without results.
-- Failed a job interview due to a SQL question.
+- Spent over 10 hours practicing SQL questions.
+- Tried at least three different learning resources without success.
+- Failed a SQL interview due to a specific, identifiable gap in knowledge.
 
 
 ## Who to interview
@@ -28,7 +28,7 @@ What counts as a strong signal:
 
 > Hi! I'm Mariam. I'm talking to people about one problem I keep hearing about: "Junior data analysts struggle with SQL interview questions." If that sounds familiar, could I ask you about your own experience in a 15-minute call? I'm not selling anything. Thank you either way.
 
-Status: waiting for founder approval (action `act_adf728be`). Sending is STUBBED: after approval the message is saved to the outbox and the founder sends it personally.
+Status: waiting for founder approval (action `act_1e242bed`). Sending is STUBBED: after approval the message is saved to the outbox and the founder sends it personally.
 
 ## Interview results
 

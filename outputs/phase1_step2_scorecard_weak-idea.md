@@ -2,15 +2,15 @@
 
 | Candidate | Relevant sources | Independent voices | Platforms | Pain posts | Demand | Pay signals | Competition | Founder fit | **Total** |
 |---|---|---|---|---|---|---|---|---|---|
-| Founder idea: Daily Motivational Email for Devs | 24 | 24 | 2 | 4 | 60.7 | 25.0 | 0.0 | 18.8 | **48.7** |
-| Alt 1: Dev Daily Design Kit | 11 | 11 | 2 | 8 | 73.4 | 50.0 | 0.0 | 15.2 | **56.4** |
-| Alt 2: Dev Community Instagram Feed | 0 | 0 | 0 | 0 | 0.0 | 0.0 | 0.0 | 21.9 | **21.6** |
+| Founder idea: Daily Motivational Email for Devs | 24 | 24 | 2 | 4 | 60.7 | 25.0 | 0.0 | 30.0 | **52.0** |
+| Alt 1: Dev Inspiration Instagram Feed | 4 | 3 | 2 | 1 | 17.0 | 0.0 | 0.0 | 15.2 | **26.3** |
+| Alt 2: Dev Productivity Template Pack | 11 | 11 | 2 | 2 | 37.8 | 25.0 | 0.0 | 7.5 | **36.1** |
 
 ## Why
 
-- **Daily Motivational Email for Devs**: Can draft content but needs email delivery skill. (skill match 0.25)
-- **Dev Daily Design Kit**: Lacks design templates and no design skill. (skill match 0.17)
-- **Dev Community Instagram Feed**: No Instagram content strategy or community building skill. (skill match 0.32)
+- **Daily Motivational Email for Devs**: Skills align with daily Instagram content. (skill match 0.5)
+- **Dev Inspiration Instagram Feed**: No email or productivity skills. (skill match 0.17)
+- **Dev Productivity Template Pack**: No email or productivity skills. (skill match 0.0)
 
 ## How the scores are calculated
 

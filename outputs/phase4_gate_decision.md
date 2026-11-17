@@ -15,7 +15,7 @@ Reasons:
 
 Gate type: founder. Allowed outcomes: go, repeat, pivot, stop. Thresholds are fixed in `gates.py` before the data is seen.
 
-**Founder decision: GO** at 2026-11-17T07:56:19Z.
+**Founder decision: GO** at 2026-11-17T12:40:05Z.
 
 ---
 Gate logic is deterministic code (no model). Cost: $0.00.

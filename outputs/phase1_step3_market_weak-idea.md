@@ -1,13 +1,13 @@
 # Phase 1, step 3: Market definition for 'Daily Motivational Email for Devs'
 
 ## Ideal customer profile
-Software developers during exam weeks, feeling unmotivated. Trigger moment: early morning before studying. They try quick motivation tools like apps or social media [Ask HN: Daily motivation screen theme for Android](https://news.ycombinator.com/item?id=22865790).
+Software developers during exam periods, facing motivation gaps. Trigger moment: early morning before studying. They try quick motivational tools like apps or social media posts [Ask HN: Daily motivation screen theme for Android](https://news.ycombinator.com/item?id=22865790).
 
 ## What they use today
-Existing tools include automated motivational email scripts (e.g., Python-based senders) [Repository alonsocontr/daily-emailer](https://github.com/alonsocontr/daily-emailer) and AI-powered email bots [Repository Akhilesh-yadav680/InspireMailer](https://github.com/Akhilesh-yadav680/InspireMailer). These offer automation but lack personalization and developer-specific content.
+Existing solutions include automated motivational email scripts (e.g., Python-based senders) and apps like MorningFuel [Repository Cyber-Ella/MorningFuel](https://github.com/Cyber-Ella/MorningFuel). Gaps: lack of personalization, consistency, or developer-specific content.
 
 ## Market size
-ASSUMPTION. Can be measured by estimating active software developer communities (e.g., via Stack Overflow, GitHub) and their engagement with motivation tools.
+ASSUMPTION. Can be measured by counting active software developer communities on platforms like GitHub or Stack Overflow during exam seasons, using search queries for "study motivation" or "coding exam" with filters for active users.
 
 ## Where these people talk (from the evidence)
 

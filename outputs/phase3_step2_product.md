@@ -4,184 +4,170 @@ A practical PDF for Junior and aspiring data analysts preparing for SQL intervie
 
 ## Contents
 1. Introduction to SQL Interview Questions
-2. Basic SQL Queries: SELECT, WHERE, GROUP BY
-3. Real-World Example: Sales Data Analysis
-4. How to Prepare for Your Interview
+2. Basic SELECT Queries
+3. Filtering with WHERE and ORDER BY
+4. Worked Example: Sales Data Analysis
 
 ## Module 1: Introduction to SQL Interview Questions
 
-SQL interviews test your ability to write clear, correct queries. This module helps junior data analysts understand what to expect in SQL interviews—especially in Egypt and the wider MENA region.
+SQL interview questions test your ability to write clear, correct queries. They are common in job interviews for junior data analyst roles, especially in Egypt and the MENA region where data roles are growing.
 
-1. Review basic SQL concepts: tables, columns, SELECT, FROM, WHERE.
-2. Practice writing queries to filter, sort, and retrieve data.
-3. Study common interview questions like "Find all employees with salary over 5000" or "List customers from a specific city."
-4. Use SQLite to test queries. Download SQLite Browser or use online tools.
-5. Review sample answers and explain your logic step-by-step.
-6. Time yourself: aim for 5 minutes per question.
-
-Worked example:
-Find all customers from Cairo.
-```sql
-SELECT name, email
-FROM customers
-WHERE city = 'Cairo';
-```
-This query retrieves customer names and emails where city is Cairo.
-
-Checklist
-- [ ] Know what tables and columns hold
-- [ ] Can write a SELECT query with WHERE
-- [ ] Can filter data using a condition
-- [ ] Can sort results with ORDER BY
-- [ ] Can explain what a query does
-- [ ] Practiced 3 sample queries
-
-Common mistakes
-- Using incorrect table or column names
-- Forgetting to use quotes around text values
-- Writing queries that don’t match the sample data
-- Not explaining the logic behind the query
-- Assuming data is always in a standard format
-
-
-## Module 2: Basic SQL Queries: SELECT, WHERE, GROUP BY
-
-**Intro**
-This module builds confidence with basic SQL commands used in interviews. You’ll practice SELECT, WHERE, and GROUP BY — the foundation of any SQL query.
-
-**Steps**
-1. Open SQLite. Use the command `sqlite3` in your terminal or any SQL environment that supports standard SQL.
-2. Create a table named `employees` with columns: `id`, `name`, `department`, `salary`, and `hire_date`.
-3. Insert sample data: 5 employees with different departments and salaries.
-4. Write a SELECT query to list all employee names and departments.
-5. Add a WHERE clause to show only employees in the "Marketing" department.
-6. Use GROUP BY to show the average salary for each department.
+1. Review a sample SQL interview question from a job board in Egypt.
+2. Identify the key task: what data is needed and what output is expected.
+3. Write a standard SQL query using only basic commands (SELECT, FROM, WHERE, ORDER BY).
+4. Test the query in SQLite using a simple database with sample data.
+5. Check if the output matches the expected result.
+6. Refine the query to improve clarity or performance if needed.
 
 **Worked Example**
+*Question:* List all employees with salaries over 5000, ordered by salary descending.
+*Query:*
 ```sql
-SELECT department, AVG(salary) AS avg_salary
+SELECT name, salary
 FROM employees
-WHERE department = 'Marketing'
-GROUP BY department;
+WHERE salary > 5000
+ORDER BY salary DESC;
 ```
-Result:
-- department: Marketing
-- avg_salary: 5000
+*Output:*
+- name: Ahmed, salary: 7500
+- name: Sara, salary: 6200
 
-*Note: This example shows only one department because the sample data includes only Marketing employees. If multiple departments exist, the query would return one row per department.*
-
-**Checklist**
-- [ ] Created the employees table
-- [ ] Inserted 5 sample records
-- [ ] Ran a SELECT query for names and departments
-- [ ] Used WHERE to filter Marketing employees
-- [ ] Used GROUP BY to group by department
-- [ ] Verified output matches expected results
+- [ ] Reviewed a sample SQL interview question
+- [ ] Identified the key data and output
+- [ ] Wrote a basic SQL query
+- [ ] Tested the query in SQLite
+- [ ] Verified output matches expected result
+- [ ] Improved clarity or performance if needed
 
 **Common Mistakes**
-- Using GROUP BY without an aggregate function (e.g., AVG, COUNT)
-- Forgetting to quote string values (e.g., 'Marketing')
-- Missing parentheses in WHERE clauses
-- Using GROUP BY on non-aggregated columns
-- Not testing queries with sample data before running
+- Using unsupported SQL features (e.g., JOINs without data context)
+- Missing ORDER BY or filtering conditions
+- Using incorrect column names or table names
+- Not testing the query in a real environment
+- Assuming the data structure matches the sample
 
 
-## Module 3: Real-World Example: Sales Data Analysis
+## Module 2: Basic SELECT Queries
 
 **Intro**
-Sales data is common in data jobs. SQL helps you answer real questions about sales, like "Which product sold most last month?" This module shows how SQL skills apply to real sales data.
+This module teaches how to write basic SELECT queries to pull data from tables. It’s the first step in SQL interviews for junior data analysts. You’ll learn to retrieve specific columns and filter results using simple conditions.
 
 **Steps**
-1. Load a sample sales table with columns: `product_id`, `product_name`, `sale_date`, `quantity`, `price`.
-2. Filter data to show only sales from last month using `WHERE sale_date >= '2024-03-01'`.
-3. Calculate total revenue per product using `SUM(quantity * price)`.
-4. Group results by `product_name` to see revenue per product.
-5. Order the results by total revenue, descending.
-6. Limit output to top 5 products using `LIMIT 5`.
+1. Open a SQL editor (like SQLite). Create a table with columns (e.g., name, age, city).
+2. Use SELECT to list one or more columns (e.g., SELECT name FROM users).
+3. Add a WHERE clause to filter rows (e.g., WHERE age > 18).
+4. Use ORDER BY to sort results (e.g., ORDER BY age DESC).
+5. Combine queries with parentheses to group conditions (e.g., WHERE (age > -1 AND city = 'Cairo')).
+6. Test each query with sample data to verify output.
 
 **Worked Example**
-Sample data:
-| product_id | product_name | sale_date | quantity | price |
-|-----------|--------------|-----------|----------|-------|
-| 101       | Laptop       | 2024-03-05 | 3        | 5000  |
-| 102       | Mouse        | 2024-03-04 | 10       | 100   |
+Table: employees (name, age, city)
+Query:
+```sql
+SELECT name, age
+FROM employees
+WHERE city = 'Cairo'
+ORDER BY age DESC;
+```
+Result:
+- Name: Ahmed, Age: 35
+- Name: Sara, Age: 28
+
+**Checklist**
+- [ ] Created a table with at least 3 columns
+- [ ] Wrote a SELECT query with one column
+- [ ] Added a WHERE clause to filter data
+- [ ] Used ORDER BY to sort results
+- [ ] Tested the query with sample data
+
+**Common Mistakes**
+- Using SELECT * without knowing which columns are needed
+- Forgetting to add a WHERE clause when filtering
+- Typing syntax errors (e.g., missing parentheses or semicolon)
+- Using ORDER BY without specifying direction (ASC/DESC)
+
+
+## Module 3: Filtering with WHERE and ORDER BY
+
+Filtering and sorting data is key in SQL interviews. You’ll often need to find specific rows or arrange them in a clear order. This module teaches how to use the `WHERE` clause to filter rows and the `ORDER BY` clause to sort them.
+
+1. Use `WHERE` to select only rows that meet a condition.
+2. Write a condition with a column name and a comparison operator (like `=`, `>`, `<`).
+3. Place the `WHERE` clause after the `SELECT` statement.
+4. Use `ORDER BY` to sort results. Add it after `WHERE` (or after `SELECT`).
+5. Specify a column name and direction: `ASC` (ascending) or `DESC` (descending).
+6. Always use parentheses if combining conditions with `AND` or `OR`.
+
+**Worked Example**
+Find the top 3 highest-paid employees from a table called `employees`.
+```sql
+SELECT name, salary
+FROM employees
+WHERE salary > 5000
+ORDER BY salary DESC
+LIMIT 3;
+```
+
+- [ ] Write a `SELECT` statement to get needed columns
+- [ ] Add a `WHERE` condition to filter rows
+- [ ] Use `ORDER BY` to sort results
+- [ ] Specify the sort column and direction
+- [ ] Test with sample data
+
+**Common Mistakes**
+- Forgetting to use `WHERE` when filtering
+- Using `ORDER BY` without a column or direction
+- Writing `ORDER BY` before `WHERE` (it should come after)
+- Using `LIMIT` without a number (e.g., `LIMIT 3` only works if a number is given)
+
+
+## Module 4: Worked Example: Sales Data Analysis
+
+1. Understand the sales data structure: identify tables, columns, and sample data.
+2. Identify the interview question, such as "What are the top 5 products by total sales amount?"
+3. Write a SQL query to select relevant columns from the sales table.
+4. Join the sales table with the products table using product_id to get product names.
+5. Group the results by product name to calculate total sales per product.
+6. Order the grouped results by total sales in descending order.
+7. Limit the output to the top 5 products.
+
+**Worked Example**
+Given tables:
+`sales` (sale_id, product_id, quantity, price, date)
+`products` (product_id, product_name)
+
+Question: "What are the top 5 products by total sales amount?"
 
 Query:
 ```sql
 SELECT
-  product_name,
-  SUM(quantity * price) AS total_revenue
-FROM sales
-WHERE sale_date >= '2024-03-01'
-GROUP BY product_name
-ORDER BY total_revenue DESC
+    p.product_name,
+    SUM(s.quantity * s.price) AS total_sales
+FROM sales s
+JOIN products p ON s.product_id = p.product_id
+GROUP BY p.product_name
+ORDER BY total_sales DESC
 LIMIT 5;
 ```
 
-Result:
-| product_name | total_revenue |
-|-------------|---------------|
-| Laptop      | 15000         |
-| Mouse       | 1000          |
-
 **Checklist**
-- [ ] Data has `sale_date`, `product_name`, `quantity`, `price`
-- [ ] Filtered by date range
-- [ ] Used `SUM(quantity * price)`
-- [ ] Grouped by `product_name`
-- [ ] Ordered by revenue descending
-- [ ] Limited to top 5
+- [ ] Understand the sales data structure
+- [ ] Identify the interview question
+- [ ] Write a query to select relevant columns from the sales table
+- [ ] Join with product table if needed to get product names
+- [ ] Group by product to sum sales per product
+- [ ] Order by total sales in descending order
+- [ ] Limit output to top 5 results
 
-**Common Mistakes**
-- Forgetting to multiply `quantity` and `price`
-- Using `GROUP BY` without `SELECT` of grouped column
-- Not filtering by date range
-- Using `ORDER BY` without `DESC` for highest first
+**Common mistakes**
+- Forgetting to join product table to get product names
+- Using `SUM(price)` instead of `SUM(quantity * price)`
+- Not grouping by product name
+- Missing `LIMIT` when only top -5 are needed
+- Using `ORDER BY` without `DESC` for descending order
 
-## Module 4: How to Prepare for Your Interview
-
-Preparing for a SQL interview takes focused practice. This module gives you clear, step-by-step actions to build confidence and readiness.
-
-1. Review common SQL interview questions from trusted sources. Use open-access databases like DataCamp's SQL interview questions (unverified link removed) or Kaggle's SQL challenges (unverified link removed).
-
-2. Pick 5–10 questions that match your experience level. Focus on filtering, joins, aggregations, and basic queries.
-
-3. Practice each question with a real dataset. Use SQLite, which is standard and widely supported. Download sample data from public sources like Kaggle datasets (unverified link removed) or Google Dataset Search (unverified link removed).
-
-4. Write out your solution in standard SQL. Test it in SQLite using a local tool or online editor like SQLite Online (unverified link removed).
-
-5. Record a short explanation of your solution. Speak aloud or write a brief note. This helps you explain your logic clearly.
-
-6. Review your work after 24 hours. Identify gaps and revise.
-
-**Worked Example**
-*Question: Find the top 3 customers by total spending.*
-*Data: A table named "orders" with columns "customer_id", "amount".*
-*Query:*
-```sql
-SELECT customer_id, SUM(amount) AS total_spent
-FROM orders
-GROUP BY customer_id
-ORDER BY total_spent DESC
-LIMIT 3;
-```
-
-**Checklist**
-- [ ] Reviewed 5–10 interview questions
-- [ ] Selected questions from reliable sources
-- [ ] Practiced with a real dataset
-- [ ] Wrote and tested SQL in SQLite
-- [ ] Recorded a short explanation
-- [ ] Reviewed and revised after 24 hours
-
-**Common Mistakes**
-- Using complex joins without a clear need
-- Skipping data validation before writing queries
-- Not practicing explaining solutions aloud
-- Relying on memory instead of writing code
-- Using non-standard SQL syntax
 
 ## A note on results
 
 This product gives you a method and templates. Your results depend on your situation and effort; nothing here is a promise of any outcome.
-Claim check: 0 unsourced claim(s) labelled ASSUMPTION, 7 link(s) not found in the fetched evidence removed.
+Claim check: 0 unsourced claim(s) labelled ASSUMPTION, 4 link(s) not found in the fetched evidence removed.

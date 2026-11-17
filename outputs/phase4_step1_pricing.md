@@ -12,7 +12,7 @@
 
 ## Rationale
 Pricing rationale:
-Anchor: ASSUMPTION: typical small PDF price assumed at $15. $11.99 balances affordability for students in Egypt and MENA, where data tools are often costly. No discounts: no fake scarcity or deadlines. Price reflects founder’s skills and target market’s needs. No income promises or fake urgency. Price is fixed, transparent, and grounded in practicality.
+Anchor: ASSUMPTION (typical small PDF price). Applied affordability rule (x0.8) to ensure accessibility for students in Egypt and MENA. No discounts—this price reflects honesty, practicality, and affordability without fake scarcity. The price aligns with founder’s values and target market’s budget. No income projections or countdowns. Price is fixed, no variants.
 
 ## Next price test (pre-set rule)
 - After the first 100 real store-page visits, compare purchases per 100 visitors. If fewer than 2 in 100 buy, test $9.99 for the next 100 visits and keep whichever price sells more per 100 visitors. The rule is fixed now, before any sales data exists. Visit and purchase counts must be real.

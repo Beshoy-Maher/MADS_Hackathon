@@ -16,7 +16,7 @@ Reasons:
 
 Gate type: evidence. Allowed outcomes: go, repeat, pivot, stop. Thresholds are fixed in `gates.py` before the data is seen.
 
-**Founder decision: GO** (founder overrode the recommendation) at 2026-11-17T07:48:36Z. Note: Founder override: build the MVP in parallel with the waitlist test, accepting the risk; re-check demand before launch.
+**Founder decision: GO** (founder overrode the recommendation) at 2026-11-17T12:31:23Z. Note: Founder override: build the MVP in parallel with the waitlist test, accepting the risk; re-check demand before launch.
 
 ---
 Gate logic is deterministic code (no model). Cost: $0.00.

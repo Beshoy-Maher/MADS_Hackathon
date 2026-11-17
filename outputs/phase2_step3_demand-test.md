@@ -6,11 +6,11 @@
 - Only sign-ups with consent, through the real form, count.
 
 ## How to get real visitors
-- Join 3 active GitHub Discussions related to SQL interview prep and post a concise, honest reply with a link to the workbook, emphasizing practicality for junior analysts.
-- Share a short, no-fluff post on Hacker News under a relevant thread (e.g., "How I prepared for SQL interviews as a junior data analyst") with a subtle mention of the workbook as a resource.
-- Engage in weekly threads on Reddit communities like r/dataisbeautiful or r/learnsql by offering a brief, helpful comment and linking to the workbook when appropriate.
-- Collaborate with a small, trusted data analysis group on LinkedIn or Discord to share a real, student-friendly SQL practice tip and include a link to the workbook as a follow-up.
-- Reply to 5 genuine comments in SQL-focused forums (e.g., Stack Overflow, Data Science Stack Exchange) with value, then offer the workbook as a practical next step.
+- Join 3 active GitHub Discussions related to SQL interview prep and post a concise, honest question about common pitfalls for junior analysts, linking to the workbook in a neutral, value-driven way.
+- Share a short, practical insight on SQL interview patterns in a Hacker News comment thread, subtly mentioning the workbook as a resource for hands-on practice.
+- Engage with a top post in a MENA-focused tech community (e.g., Egyptian or Gulf tech groups) by offering a clear, no-fluff SQL tip and tagging the workbook as a tool for real-world practice.
+- Reply to 2 high-quality comments in SQL-focused threads with specific, actionable advice, embedding a link to the workbook only when it adds direct value.
+- Collaborate with a known junior data analyst on a public thread (e.g., LinkedIn or Reddit) to co-author a short post on SQL fundamentals, crediting the workbook as a supplementary resource.
 
 ## Result so far
 - Real sign-ups recorded: **none yet**. The landing page has not been published, so the test has not started. Waitlist collection is STUBBED in this demo (no public hosting).

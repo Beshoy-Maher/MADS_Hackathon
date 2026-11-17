@@ -188,3 +188,14 @@ def test_lines_computed_by_code_and_fetched_evidence_are_not_debated(monkeypatch
     monkeypatch.setattr(llm, "complete_json", fake)
     d = Critic(_run()).debate(1, [{"file": "a.md", "author": "researcher", "text": doc}]).data
     assert d["objections"] == 0  # an evidence title and a doubt about a fetched link are both dropped
+
+
+def test_evidence_lists_and_pipeline_sentences_are_left_out_of_the_debate():
+    raw = ("## Idea\nThe researcher searched public discussions. Every item below links to its source.\n\nEvidence:\n"
+           + "".join(f"- [Repository user{i}/sql-practice: SQL problems](https://github.com/user{i}/sql-practice) (github, 2 pts)\n"
+                     for i in range(60))
+           + "- No sources found. Every market statement below is an ASSUMPTION.\n## Source coverage\n- reddit: 0 queries ok\n"
+           + "Junior analysts say they freeze on window functions.")
+    t = critic_mod.doc_text(raw)
+    assert "github.com" not in t and "Every item below" not in t and "No sources found" not in t and "reddit: 0" not in t
+    assert "freeze on window functions" in t  # the author's own claim is still debated

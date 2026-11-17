@@ -72,11 +72,15 @@ class Researcher(Agent):
                 queries.append(extra)
         evidence, report = src.search(queries[:3] if main else queries[:1])
         kw = keywords(cand["title"] + " " + cand.get("problem", "") + " " + " ".join(queries), 8)
+        # The subject itself must be in the item ("sql"), not only words every nearby topic shares ("interview questions").
+        core = topic_keywords(self.brief.get("idea", "") if main else cand["title"], 2) or topic_keywords(cand["title"], 2)
         scored = []
         for ev in evidence:
             r = src.relevance(ev, kw)
-            matched = sum(1 for k in kw if k in f"{ev.title} {ev.snippet}".lower())
-            if r >= MIN_RELEVANCE or matched >= 2:
+            text = f"{ev.title} {ev.snippet}".lower()
+            matched = sum(1 for k in kw if k in text)
+            on_topic = not core or any(k in text for k in core)
+            if on_topic and (r >= MIN_RELEVANCE or matched >= 2):
                 d = ev.as_dict()
                 d["relevance"] = round(r, 2)
                 scored.append(d)

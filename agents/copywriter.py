@@ -9,7 +9,7 @@ from __future__ import annotations
 import html
 
 import approval
-from agents.base import Agent, StepResult, brief_summary, footer
+from agents.base import Agent, StepResult, brief_summary, community_places, footer
 
 PAGE_CSS = """body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:720px;margin:40px auto;padding:0 16px;color:#1d2433;line-height:1.55}
 h1{font-size:2rem;line-height:1.2}.sub{font-size:1.15rem;color:#4a5568}.card{border:1px solid #e2e8f0;border-radius:12px;padding:16px 20px;margin:18px 0}
@@ -106,7 +106,7 @@ class Copywriter(Agent):
         return self.result("store-page", "open_store_page", page, ext="html", data={"copy": c, "publish_action": act["id"]})
 
     def launch_posts(self, candidate: dict, communities: dict, price: float | None = None) -> StepResult:
-        places = list(communities)[:3] or ["the founder's own network"]
+        places = community_places(communities, 3) or ["the founder's own network"]
         name = self.brief.get("founder_name", "the founder")
         fb_posts = {p: (f"Hi all, I'm {name}. I made {candidate['title']} because {candidate.get('problem', 'I kept seeing this problem').rstrip('.').lower()}. "
                         "It's a small digital product. I'd value honest feedback on whether it's useful. Link in comments if the rules allow it.")

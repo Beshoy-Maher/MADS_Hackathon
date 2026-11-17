@@ -116,8 +116,11 @@ def evidence_gate(candidates: list[dict], attempt: int = 1, sources_ok: bool = T
     if main.get("excluded"):
         return GateResult(1, "evidence_gate", "evidence", STOP, ["The product is in an excluded category."], main_checks, allowed=(STOP,))
     if not failed:
-        return GateResult(1, "evidence_gate", "evidence", GO,
-                          [f"'{main['title']}' meets every pre-set evidence threshold."], main_checks, allowed=allowed)
+        reasons = [f"'{main['title']}' meets every pre-set evidence threshold."]
+        if main.get("platforms", 2) < 2:
+            reasons.append("All of this evidence comes from one platform. It passes the thresholds, but treat it as weaker than it "
+                           "looks: confirm it in the customer interviews (step 4) before spending money.")
+        return GateResult(1, "evidence_gate", "evidence", GO, reasons, main_checks, allowed=allowed)
     passing_alts = [c for c in candidates[1:] if not c.get("excluded") and all(ch.passed for ch in checks_for(c))]
     if passing_alts:
         best = max(passing_alts, key=lambda c: c["total"])

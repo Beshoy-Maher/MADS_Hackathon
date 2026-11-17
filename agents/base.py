@@ -89,10 +89,14 @@ class Agent:
 
     def result(self, name: str, action: str, content: str, *, ext: str = "md", data: dict | None = None,
                sources: list[str] | None = None) -> StepResult:
-        if self.check_claims and ext == "md":
+        if ext == "md":
+            # Every agent's text is checked: links that were never fetched are removed, unsourced claims are labelled.
+            # Research agents get the full check (any statistic); the others the light one (citations, market trends).
             from tools import claims
-            content, report = claims.check(content, self.evidence_urls())
-            content = content.rstrip() + "\n" + claims.footer_note(report) + "\n"
+            allowed = self.evidence_urls() | set(sources or [])
+            content, report = claims.check(content, allowed, mode="full" if self.check_claims else "light")
+            if self.check_claims or report["relabelled"] or report["removed_links"]:
+                content = content.rstrip() + "\n" + claims.footer_note(report) + "\n"
             data = dict(data or {}, claim_check=report)
         if ext in ("md", "html", "txt"):
             scan = guardrails.scan_output(content)
@@ -104,6 +108,20 @@ class Agent:
 
 
 # -- formatting helpers shared by agents -----------------------------------
+PLACE_NAMES = {"hackernews": "Hacker News (Show HN / Ask HN)", "github": "GitHub Discussions of related open-source projects"}
+
+
+def community_places(communities: dict, limit: int = 4) -> list[str]:
+    """Where the founder can talk to these people. Evidence sources are not all places to post:
+    Stack Exchange does not allow promotion, so it is left out; subreddits keep their names."""
+    out = []
+    for name in communities:
+        if name == "stackexchange":
+            continue
+        out.append(PLACE_NAMES.get(name, name))
+    return out[:limit]
+
+
 def brief_summary(brief: dict) -> str:
     return json.dumps({k: brief.get(k) for k in ("founder_name", "idea", "skills", "budget_usd", "hours_per_week",
                                                  "target_market", "values", "constraints")}, ensure_ascii=False, indent=1)

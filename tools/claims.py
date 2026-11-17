@@ -18,12 +18,28 @@ URL_RX = re.compile(r"https?://[^\s)\]]+")
 CLAIM_RX = re.compile(
     r"(\d+(\.\d+)?\s?%|\b\d{1,3}(,\d{3})+\b|\b\d+(\.\d+)?\s?(million|billion|thousand|k|m|bn)\b|\b(over|more than|nearly|about|around|approximately)\s+\d{3,}"
     r"|\(source[:s]?|\bsource:|\baccording to\b|\bstudies (show|suggest)|\bresearch (shows|suggests)|\bsurveys? (show|found)|\breports? (show|that)"
-    r"|\b\d{1,2}\s?[–-]\s?\d{1,2}\s+years?\b|\bstatistics\b|\bon average\b|\b(market|industry) (is worth|size of|is growing|grew)\b|\bCAGR\b)",
+    r"|\b\d{1,2}\s?[–-]\s?\d{1,2}\s+years?\b|\bstatistics\b|\bon average\b|\b(market|industry) (is worth|size of|is growing|grew)\b|\bCAGR\b"
+    r"|\b(growing|rising|increasing|expanding|booming)\s+(fast|rapidly|quickly|steadily)\b|\b(high|huge|strong|growing|rising|massive)\s+demand\b"
+    r"|\bin[- ]demand\b|\bmost (employers|companies|recruiters|people|students|analysts)\b)",
     re.IGNORECASE,
 )
+# Light mode, for product, pricing, launch and support texts: these may hold ordinary numbers (a price, a day count),
+# so only citation phrases and market-trend statements are treated as claims.
+LIGHT_RX = re.compile(
+    r"(\(source[:s]?|\bsource:|\baccording to\b|\bstudies (show|suggest)|\bresearch (shows|suggests)|\bsurveys? (show|found)|\breports? (show|that)"
+    r"|\bstatistics\b|\b(market|industry) (is worth|size of|is growing|grew)\b|\bCAGR\b|\b\d+(\.\d+)?\s?(million|billion)\b"
+    r"|\b\d+(\.\d+)?\s?%\s+of\s+(people|companies|employers|recruiters|students|users|analysts|customers|developers|founders)\b"
+    r"|\b(growing|rising|increasing|expanding|booming)\s+(fast|rapidly|quickly|steadily)\b|\b(is|are|has|have|shows?|sees?|with|there'?s)\s+(a\s+)?(high|huge|strong|growing|rising|massive)\s+demand\b"
+    r"|\bin[- ]demand\b|\bmost (employers|companies|recruiters)\b)",
+    re.IGNORECASE,
+)
+_BARE_URL = re.compile(r"(?<![(\[<\"'=])\bhttps?://[^\s)\]>\"']+")
+_ORPHAN_SOURCE = re.compile(r"^\s*[*_>-]*\s*\**(source|sources|reference|references|further reading|see also)\**\s*:.*\(unverified link removed\).*$", re.IGNORECASE)
 
 
-def check(text: str, allowed_urls: set[str]) -> tuple[str, dict]:
+def check(text: str, allowed_urls: set[str], mode: str = "full") -> tuple[str, dict]:
+    """mode="full" for research outputs; mode="light" for everything else (see LIGHT_RX)."""
+    claim_rx = CLAIM_RX if mode == "full" else LIGHT_RX
     removed_links = 0
     relabelled = 0
 
@@ -34,7 +50,18 @@ def check(text: str, allowed_urls: set[str]) -> tuple[str, dict]:
         removed_links += 1
         return f"{m.group(1)} (unverified link removed)"
 
+    def fix_bare(m: re.Match) -> str:
+        nonlocal removed_links
+        url = m.group(0).rstrip(".,;:")
+        if url in allowed_urls or "localhost" in url:
+            return m.group(0)
+        removed_links += 1
+        return "(unverified link removed)"
+
     text = LINK_RX.sub(fix_link, text or "")
+    text = _BARE_URL.sub(fix_bare, text)
+    # A "Source: ..." line whose only link was invented is itself an invented citation: drop the whole line.
+    text = "\n".join(l for l in text.splitlines() if not _ORPHAN_SOURCE.match(l))
     out_lines = []
     for line in text.splitlines():
         stripped = line.strip()
@@ -46,7 +73,7 @@ def check(text: str, allowed_urls: set[str]) -> tuple[str, dict]:
         for p in parts:
             urls = {u.rstrip(".,") for u in URL_RX.findall(p)}
             sourced = bool(urls & allowed_urls)
-            if CLAIM_RX.search(p) and not sourced and "ASSUMPTION" not in p:
+            if claim_rx.search(p) and not sourced and "ASSUMPTION" not in p:
                 # Drop invented citations such as "(source: LinkedIn Job Trends, 2023)".
                 p = re.sub(r"\s*\((source|sources)[^)]*\)", "", p, flags=re.IGNORECASE)
                 lead = re.match(r"^(\s*(?:[-*]|\d+\.)\s+)?", p).group(0)

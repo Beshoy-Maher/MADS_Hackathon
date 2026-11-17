@@ -51,17 +51,22 @@ class Pricing(Agent):
                     "If fewer than 2% of landing-page visitors buy after 100+ visits, test a lower price or a smaller first product. "
                     "If almost everyone who visits buys, the price is probably too low. Offer a fair refund so buyers carry no risk.")
         task = (f"Founder brief:\n{brief_summary(self.brief)}\nProduct: {spec.get('product_name')} ({spec.get('format')})\n"
-                f"Price anchor: {anchor_note}. Steps applied: {'x0.8 new-product discount, ' if comps else ''}{'x0.8 affordability, ' if affordable else ''}clamp $5-$49. Rule-based price: ${price}.\nWrite a short pricing rationale (max 150 words): why this price, "
-                "what to test next (one price experiment with a pre-set threshold), and why there are no discounts with fake deadlines. "
-                "Do not change the price. No income projections.")
-        rationale = self.write(task, fallback, max_tokens=400)
+                f"Price anchor: {anchor_note}. Steps applied: {'x0.8 new-product discount, ' if comps else ''}{'x0.8 affordability, ' if affordable else ''}clamp $5-$49. Rule-based price: ${price}.\nWrite a short pricing rationale (max 90 words): why this price fits this founder "
+                "and these buyers, and why there are no discounts with fake deadlines. "
+                "Do not change the price. Do not state any number other than the price and the anchor. No income projections.")
+        rationale = self.write(task, fallback, max_tokens=300)
+        # The next price test is a rule too, fixed before any sales data exists (a small model invents thresholds otherwise).
+        lower = max(5, round(price * 0.8)) - (0.01 if price > 6 else 0)
+        experiment = (f"After the first 100 real store-page visits, compare purchases per 100 visitors. If fewer than 2 in 100 buy, "
+                      f"test ${lower:.2f} for the next 100 visits and keep whichever price sells more per 100 visitors. "
+                      "The rule is fixed now, before any sales data exists. Visit and purchase counts must be real.")
         refund_text = f"{REFUND_DAYS}-day refund, no questions asked; download access is removed after a refund."
         md = [f"# Phase 4, step 1: Pricing for '{spec.get('product_name')}'", "",
               f"**Price: ${price} (USD), one-time.**", "", "## Anchor", f"- {anchor_note}"]
         md += [f"- [{c['title']}]({c['url']}): ${c['price']}" for c in comps[:6]]
         md += ["", "## Rule", f"- New product discount: {'x0.8 on the sourced anchor' if comps else 'not applied (anchor is an ASSUMPTION, not a sourced price)'}.",
                f"- Affordability value in brief: {'yes, x0.8' if affordable else 'no'}.", "- Clamp: $5 to $49.", "",
-               "## Rationale", rationale, "", "## Refunds", f"- {refund_text}", "",
+               "## Rationale", rationale, "", "## Next price test (pre-set rule)", f"- {experiment}", "", "## Refunds", f"- {refund_text}", "",
                "## What the system will not do", "- No fake 'was $99' anchors, no countdown discounts, no income estimates.",
                footer(self.model, [c["url"] for c in comps])]
         return self.result("pricing", "set_price", "\n".join(md),

@@ -100,3 +100,36 @@ def test_secrets_in_a_brief_are_not_stored():
     run = orchestrator.create_run({"idea": "A Notion template for tutors", "founder_name": "S",
                                    "constraints": "my gumroad password is hunter2"})
     assert "hunter2" not in json.dumps(run)
+
+
+def test_invented_links_and_citations_are_removed_from_any_agent_output():
+    from tools import claims
+    text = ("Use GROUP BY to count rows.\n*Source: [SQLZoo - Basic SELECT](https://sqlzoo.net/made-up)*\n"
+            "See https://example.com/invented for more. Data roles are growing fast in the region.\n"
+            "The price is $11.99 and the refund window is 14 days.")
+    out, report = claims.check(text, {"https://example.org/real"}, mode="light")
+    assert "sqlzoo" not in out and "example.com/invented" not in out and report["removed_links"] == 2
+    assert "ASSUMPTION (unverified): Data roles are growing fast" in out
+    assert "The price is $11.99 and the refund window is 14 days." in out  # ordinary numbers are left alone
+
+
+def test_fetched_links_survive_the_claim_check():
+    from tools import claims
+    out, report = claims.check("- [A real post](https://example.org/real)", {"https://example.org/real"}, mode="light")
+    assert "https://example.org/real" in out and report["removed_links"] == 0
+
+
+def test_a_repository_pitch_is_not_a_pain_post(monkeypatch):
+    from tools import sources as s
+    monkeypatch.setattr(s, "_get_json", lambda url, headers=None: {"items": [{"full_name": "a/b", "html_url": "https://github.com/a/b",
+                        "description": "Struggling with SQL interviews? Frustrated? This repo helps.", "stargazers_count": 3,
+                        "owner": {"login": "a"}}]} if "repositories" in url else {"items": []})
+    ev = s.github("sql interview")
+    assert ev and "pain" not in ev[0].signals and "existing_solution" in ev[0].signals
+
+
+def test_single_platform_evidence_is_flagged_at_the_gate():
+    import gates
+    c = {"title": "X", "relevant_sources": 9, "voices": 9, "pain": 4, "demand_score": 80, "founder_fit": 90, "total": 70, "platforms": 1}
+    g = gates.evidence_gate([c])
+    assert g.recommendation == "go" and any("one platform" in r for r in g.reasons)

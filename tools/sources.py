@@ -133,7 +133,9 @@ def github(query: str, limit: int = 8) -> list[Evidence]:
         out.append(Evidence("github", r.get("html_url", ""), f"Repository {r.get('full_name')}: {(r.get('description') or '')[:120]}",
                             int(r.get("stargazers_count") or 0), int(r.get("open_issues_count") or 0), (r.get("created_at") or "")[:10],
                             (r.get("description") or "")[:240], query, "github:" + str((r.get("owner") or {}).get("login", "")),
-                            ["existing_solution"] + _signals(text)))
+                            # A repository is something that already exists. Its description is the author's pitch
+                            # ("struggling with X?"), not a person describing a problem, so it never counts as a pain post.
+                            ["existing_solution"] + [s for s in _signals(text) if s != "pain"]))
     try:
         issues = _get_json(f"https://api.github.com/search/issues?q={quote_plus(query)}+is:issue&per_page={limit}", headers)
     except httpx.HTTPError:

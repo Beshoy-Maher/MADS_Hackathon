@@ -7,7 +7,7 @@ never counted as real.
 from __future__ import annotations
 
 import gates
-from agents.base import Agent, StepResult, brief_summary, footer
+from agents.base import Agent, StepResult, brief_summary, community_places, footer
 
 
 class Analyst(Agent):
@@ -17,7 +17,7 @@ class Analyst(Agent):
         t = gates.THRESHOLDS["demand"]
         target = int(self.brief.get("waitlist_target") or t["default_waitlist_target"])
         window = int(self.brief.get("waitlist_window_days") or t["default_window_days"])
-        channels = list(communities)[:4] or ["founder's own network (ASSUMPTION)"]
+        channels = community_places(communities) or ["founder's own network (ASSUMPTION)"]
         fallback = "\n".join([f"- Share the landing page personally in: {', '.join(channels)} (following each community's rules).",
                               "- Ask the people interviewed in phase 1 whether they want to be notified.",
                               "- One honest post per channel; no paid ads (budget is kept for the product)."])

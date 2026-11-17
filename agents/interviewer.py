@@ -8,7 +8,7 @@ send personally).
 from __future__ import annotations
 
 import approval
-from agents.base import Agent, StepResult, brief_summary, footer
+from agents.base import Agent, StepResult, brief_summary, community_places, footer
 
 MOM_TEST_RULES = [
     "Talk about their life and past behaviour, not about our idea.",
@@ -40,7 +40,7 @@ class Interviewer(Agent):
         outreach = (f"Hi! I'm {name}. I'm researching how {self.brief.get('target_market', 'people')} deal with "
                     f"{candidate.get('problem', 'this problem').rstrip('.').lower()}. I'm not selling anything. "
                     "Could I ask you about your experience in a 15-minute call? Thank you either way.")
-        places = ", ".join(list(communities)[:4]) or "communities the founder already belongs to"
+        places = ", ".join(community_places(communities)) or "communities the founder already belongs to"
         action = approval.request_action(self.run, "send", "customer interview outreach (5 people)",
                                          f"Personal message from {name} to 5 people found in {places}.",
                                          {"message": outreach}, agent=self.role)

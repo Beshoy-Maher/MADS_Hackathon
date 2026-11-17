@@ -18,14 +18,28 @@ def _env(name: str, default: str) -> str:
 # Local open-weight model served by Ollama (started by docker compose).
 LLM_PROVIDER = _env("LLM_PROVIDER", "ollama")  # "ollama" | "openai_compatible" | "none"
 LLM_BASE_URL = _env("LLM_BASE_URL", "http://localhost:11434")
-LLM_MODEL = _env("LLM_MODEL", "qwen3:4b-instruct-2507-q4_K_M")
-# Tried in order if LLM_MODEL is not available in Ollama (first one present wins).
-LLM_FALLBACK_MODELS = [m.strip() for m in _env("LLM_FALLBACK_MODELS", "qwen3:4b-instruct,qwen3:4b,qwen3:1.7b").split(",") if m.strip()]
+# One model per kind of work. All are open-weight (Apache-2.0) and run locally through Ollama.
+# Writer: research, analysis and every text the founder reads (Qwen3-30B-A3B-Instruct-2507, MoE, 3.3B active).
+LLM_MODEL = _env("LLM_MODEL", "qwen3:30b-a3b-instruct-2507-q4_K_M")
+# Fast: intake (brief to fields) and short structured tasks (Qwen3-4B-Instruct-2507).
+LLM_FAST_MODEL = _env("LLM_FAST_MODEL", "qwen3:4b-instruct-2507-q4_K_M")
+# Judge: the two safety judges (yes/no, temperature 0).
+LLM_JUDGE_MODEL = _env("LLM_JUDGE_MODEL", "qwen3:4b-instruct-2507-q4_K_M")
+# Critic: the devil's advocate in the debate before each gate. A different model family from the writer
+# (OpenAI gpt-oss-20b), so it does not share the writer's blind spots.
+LLM_CRITIC_MODEL = _env("LLM_CRITIC_MODEL", "gpt-oss:20b")
+# Tried in order when a role's model is not downloaded or cannot be loaded (for example not enough memory).
+LLM_FALLBACK_MODELS = [m.strip() for m in _env("LLM_FALLBACK_MODELS",
+                       "qwen3:4b-instruct-2507-q4_K_M,qwen3:4b-instruct,qwen3:4b,qwen3:1.7b").split(",") if m.strip()]
 LLM_API_KEY = _env("LLM_API_KEY", "")  # only for a free-tier OpenAI-compatible endpoint
-LLM_TIMEOUT_SECONDS = float(_env("LLM_TIMEOUT_SECONDS", "180"))
+LLM_TIMEOUT_SECONDS = float(_env("LLM_TIMEOUT_SECONDS", "300"))
 LLM_TEMPERATURE = float(_env("LLM_TEMPERATURE", "0.3"))
 # Price per 1M tokens of the model in USD. 0 for a local model.
 LLM_COST_PER_MTOK = float(_env("LLM_COST_PER_MTOK", "0"))
+
+# Debate before each gate: a critic challenges the phase's outputs, the authors answer, the critic gives a verdict.
+# It informs the founder; it never changes a gate's recommendation.
+DEBATE = _env("DEBATE", "true").lower() == "true"
 
 # Public evidence sources used by the researcher.
 RESEARCH_ONLINE = _env("RESEARCH_ONLINE", "true").lower() == "true"

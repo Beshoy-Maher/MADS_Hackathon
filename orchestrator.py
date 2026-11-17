@@ -25,6 +25,7 @@ from agents.analyst import Analyst
 from agents.base import StepResult
 from agents.builder import Builder
 from agents.copywriter import Copywriter
+from agents.critic import DEBATE_STEP, DEBATED_STEPS, Critic, doc_text
 from agents.interviewer import Interviewer
 from agents.launcher import Launcher
 from agents.market_analyst import MarketAnalyst
@@ -347,6 +348,37 @@ def _phase6(run: dict) -> gates.GateResult:
     return g
 
 
+def _debate(run: dict, phase: int) -> None:
+    """The critic challenges this phase's main outputs and their authors answer, before the gate is shown.
+    It informs the founder and never changes the gate. A failure here never stops the phase."""
+    run["ctx"].get("debates", {}).pop(str(phase), None)
+    if not config.DEBATE:
+        return
+    docs = []
+    for st in run["steps"]:
+        if st["phase"] == phase and st["step"] in DEBATED_STEPS.get(phase, []):
+            path = run_dir(run["id"]) / "outputs" / st["file"]
+            if path.exists():
+                limit = 5000 if st["agent"] == "builder" and st["step"] == 2 else None
+                text = doc_text(path.read_text(encoding="utf-8"), limit) if limit else doc_text(path.read_text(encoding="utf-8"))
+                docs.append({"file": st["file"], "author": st["agent"], "text": text})
+    if not docs:
+        return
+    _progress(run, "critic: debating this phase's outputs with their authors (devil's advocate)")
+    try:
+        res = Critic(run).debate(phase, docs, opposite=(phase == 6))
+    except Exception as e:  # the debate is advice; a crash must not cost the founder the phase
+        decision_log.log("critic", "debate_error", run_id=run["id"], outcome="error", phase=phase, detail=f"{type(e).__name__}: {e}"[:300])
+        return
+    summary = dict(res.data)
+    summary.pop("claim_check", None)
+    if summary.get("ran"):
+        _record_step(run, phase, DEBATE_STEP[phase], res)
+        summary["file"] = run["steps"][-1]["file"]
+    run["ctx"].setdefault("debates", {})[str(phase)] = summary
+    save(run)
+
+
 PHASE_FUNCS = {1: _phase1, 2: _phase2, 3: _phase3, 4: _phase4, 5: _phase5, 6: _phase6}
 
 
@@ -362,6 +394,11 @@ def _gate_markdown(run: dict, phase: int) -> str:
                "", "Reasons:"] + [f"- {r}" for r in g["reasons"]] + ["", "| Check | Passed | Value | Threshold |", "|---|---|---|---|"]
         md += [f"| {c['name']} | {'yes' if c['passed'] else 'NO'} | {c['value']} | {c['threshold']} |" for c in g["checks"]]
         md += ["", f"Gate type: {g['kind']}. Allowed outcomes: {', '.join(g['allowed'])}. Thresholds are fixed in `gates.py` before the data is seen.", ""]
+        deb = g.get("debate")
+        if deb and deb.get("ran"):
+            md += [f"Debate before this gate (`{deb.get('file')}`): {deb['objections']} objection(s), {deb['conceded']} conceded, "
+                   f"{deb['open']} open ({deb['high_open']} high severity). It informs this decision; it does not change the recommendation."]
+            md += [f"- OPEN [{o['severity']}] {o['problem']}" for o in deb["items"] if o["status"] == "open"] + [""]
         if fd:
             override = " (founder overrode the recommendation)" if fd != g["recommendation"] else ""
             md += [f"**Founder decision: {fd.upper()}**{override} at {g.get('decided_at')}." + (f" Note: {g['note']}" if g.get("note") else ""), ""]
@@ -380,6 +417,9 @@ def _store_gate(run: dict, g: gates.GateResult) -> None:
     d["attempt"] = run["attempts"].get(str(g.phase), 1)
     d["at"] = _now()
     d["founder_decision"] = None
+    deb = run["ctx"].get("debates", {}).get(str(g.phase))
+    if deb and g.gate != "scope_gate":
+        d["debate"] = deb
     run["gates"].append(d)
     decision_log.log("gate", g.gate, run_id=run["id"], outcome=g.recommendation, phase=g.phase,
                      detail=" ".join(g.reasons)[:300])
@@ -400,6 +440,8 @@ def advance(run_id: str) -> dict:
         save(run)
         try:
             g = PHASE_FUNCS[phase](run)
+            if g.gate != "scope_gate" and run["screening"]["allowed"]:
+                _debate(run, phase)
             _store_gate(run, g)
             run["status"] = "awaiting_founder"
         except Exception as e:  # keep the run inspectable instead of losing it
@@ -444,8 +486,11 @@ def decide(run_id: str, decision: str, actor: str, note: str = "") -> dict:
             run["status"] = "ready"
     elif decision == gates.REPEAT:
         run["attempts"][str(phase)] = run["attempts"].get(str(phase), 1) + 1
-        if note:
-            run["ctx"].setdefault("feedback", {})[str(phase)] = note
+        deb = g.get("debate") or {}
+        from_debate = "; ".join((o["fix"] or o["problem"]) for o in deb.get("items", []) if o["status"] == "open" or o["fix"])
+        if note or from_debate:
+            # No note: the next attempt works from the debate's corrections and open objections.
+            run["ctx"].setdefault("feedback", {})[str(phase)] = note or ("Points from the debate: " + from_debate)[:1500]
         # Phase 6 "repeat" means: keep operating and re-run the review when real data arrives.
         run["status"] = "monitoring" if phase == 6 else "ready"
     elif decision == gates.PIVOT:

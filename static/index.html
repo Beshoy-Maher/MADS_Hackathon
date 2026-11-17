@@ -75,6 +75,18 @@ iframe{width:100%;height:520px;border:1px solid var(--line);border-radius:8px;ba
   </main>
 </div>
 <script>
+function debateHtml(d) {
+  if (!d.ran) return `<p class="small muted">Debate not run: no model was available for the critic.</p>`;
+  const sev = {high: "bad", medium: "warn", low: "muted"};
+  return `<h3>Debate before this gate <span class="small muted">(critic vs. authors; informs you, does not change the recommendation)</span></h3>
+    <p><b>${d.objections}</b> objection(s): <b>${d.conceded}</b> conceded, <b>${d.open}</b> still open${d.high_open ? ` (<span class="bad">${d.high_open} high severity</span>)` : ""}.
+    <span class="small muted">Models: ${esc((d.models || []).join(", "))}. Full transcript: ${esc(d.file || "")}</span></p>
+    ${d.items.length ? `<table><tr><th>#</th><th>Severity</th><th>Objection</th><th>Outcome</th></tr>${d.items.map(o => `<tr><td>${o.id}</td>
+      <td><span class="badge ${sev[o.severity] || "muted"}">${esc(o.severity)}</span></td>
+      <td><span class="muted small">"${esc(o.quote)}"</span><br>${esc(o.problem)}${o.fix ? `<br><span class="small">Correction: ${esc(o.fix)}</span>` : ""}</td>
+      <td class="${o.status === "open" ? "bad" : "ok"}">${esc(o.status.toUpperCase())}${o.stance ? ` <span class="small muted">(${esc(o.stance)})</span>` : ""}</td></tr>`).join("")}</table>
+      ${d.open ? `<p class="small muted">Click REPEAT with no note and the next attempt works from these points.</p>` : ""}` : ""}`;
+}
 let current = null, timer = null, viewerRun = null, modelReady = true, statusTimer = null;
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -95,7 +107,9 @@ async function loadStatus() {
     const s = await api("/api/status");
     const m = s.model;
     $("#model").className = "badge " + (m.ready ? "ok" : "warn");
-    $("#model").textContent = m.ready ? `model: ${m.model} (${m.provider === "ollama" ? "local" : "free-tier endpoint"})` : `model: ${m.model} not ready, using fallback`;
+    const roles = m.roles || {};
+    const others = m.ready ? [["fast", roles.fast], ["judge", roles.judge], ["critic", roles.critic]].filter(x => x[1] && x[1] !== m.model).map(x => `${x[0]}: ${x[1]}`) : [];
+    $("#model").textContent = m.ready ? `writer: ${m.model}${others.length ? " · " + others.join(" · ") : ""} (${m.provider === "ollama" ? "local" : "free-tier endpoint"})` : `model: ${m.model} not ready, using fallback`;
     modelReady = m.ready || m.provider === "none";
     const warn = $("#modelWarn");
     if (warn) warn.innerHTML = modelReady ? "" : `<b>The model is not ready yet</b> (${esc(m.detail)}). A run started now is written by deterministic templates, and every such step is labelled "model: none". Wait for the green badge to see the AI agents work.`;
@@ -154,6 +168,7 @@ async function render() {
       <p>System recommends <span class="badge ${recClass[g.recommendation]}">${g.recommendation.toUpperCase()}</span> ${g.pivot_to ? `→ pivot to <b>${esc(g.pivot_to)}</b>` : ""}</p>
       <ul>${g.reasons.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
       <table><tr><th>Check</th><th>Pass</th><th>Value</th><th>Threshold</th></tr>${g.checks.map(c => `<tr><td>${esc(c.name)}</td><td class="${c.passed ? "ok" : "bad"}">${c.passed ? "yes" : "NO"}</td><td>${esc(c.value)}</td><td>${esc(c.threshold)}</td></tr>`).join("")}</table>
+      ${g.debate ? debateHtml(g.debate) : ""}
       <p class="small muted">Thresholds were fixed in gates.py before the data came in. You make the final call; overrides are logged.</p>
       <input id="note" placeholder="Optional note (for pivot: describe the new idea)">
       <div class="row" style="margin-top:8px">${["go", "repeat", "pivot", "stop"].map(btn).join("")}</div></div>`;

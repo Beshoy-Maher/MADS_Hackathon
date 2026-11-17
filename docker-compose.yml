@@ -1,9 +1,14 @@
 # One command: docker compose up
-# Starts the local model server (Ollama), downloads the open-weight model once,
-# and serves the founder dashboard at http://localhost:8000
+# Starts the local model server (Ollama), downloads the open-weight models once (the small one first, so the
+# dashboard works within minutes), and serves the founder dashboard at http://localhost:8000.
+# NVIDIA GPU (optional): docker compose -f docker-compose.yml -f docker-compose.gpu.yml up
 services:
   ollama:
     image: ollama/ollama:latest
+    environment:
+      # Writer, fast/judge and critic models stay loaded together; GPU memory first, then system RAM.
+      - OLLAMA_MAX_LOADED_MODELS=3
+      - OLLAMA_KEEP_ALIVE=60m
     volumes:
       - ollama:/root/.ollama
     healthcheck:
@@ -19,8 +24,12 @@ services:
         condition: service_healthy
     environment:
       - OLLAMA_HOST=ollama:11434
-      - LLM_MODEL=${LLM_MODEL:-qwen3:4b-instruct-2507-q4_K_M}
-    # Pull the configured model. If that tag is unavailable, try the fallback Qwen3 tags.
+      - LLM_MODEL=${LLM_MODEL:-qwen3:30b-a3b-instruct-2507-q4_K_M}
+      - LLM_FAST_MODEL=${LLM_FAST_MODEL:-qwen3:4b-instruct-2507-q4_K_M}
+      - LLM_JUDGE_MODEL=${LLM_JUDGE_MODEL:-qwen3:4b-instruct-2507-q4_K_M}
+      - LLM_CRITIC_MODEL=${LLM_CRITIC_MODEL:-gpt-oss:20b}
+    # Pull the small model first, then the writer and the critic. A model that cannot be pulled is skipped;
+    # its steps use the small model, and the dashboard and decision log say which model did what.
     entrypoint: ["/bin/sh", "/pull-model.sh"]
     volumes:
       - ./scripts/pull-model.sh:/pull-model.sh:ro
@@ -36,12 +45,16 @@ services:
     environment:
       - LLM_PROVIDER=${LLM_PROVIDER:-ollama}
       - LLM_BASE_URL=${LLM_BASE_URL:-http://ollama:11434}
-      - LLM_MODEL=${LLM_MODEL:-qwen3:4b-instruct-2507-q4_K_M}
-      - LLM_FALLBACK_MODELS=${LLM_FALLBACK_MODELS:-qwen3:4b-instruct,qwen3:4b,qwen3:1.7b}
+      - LLM_MODEL=${LLM_MODEL:-qwen3:30b-a3b-instruct-2507-q4_K_M}
+      - LLM_FAST_MODEL=${LLM_FAST_MODEL:-qwen3:4b-instruct-2507-q4_K_M}
+      - LLM_JUDGE_MODEL=${LLM_JUDGE_MODEL:-qwen3:4b-instruct-2507-q4_K_M}
+      - LLM_CRITIC_MODEL=${LLM_CRITIC_MODEL:-gpt-oss:20b}
+      - LLM_FALLBACK_MODELS=${LLM_FALLBACK_MODELS:-qwen3:4b-instruct-2507-q4_K_M,qwen3:4b-instruct,qwen3:4b,qwen3:1.7b}
       - LLM_API_KEY=${LLM_API_KEY:-}
-      - LLM_TIMEOUT_SECONDS=${LLM_TIMEOUT_SECONDS:-180}
+      - LLM_TIMEOUT_SECONDS=${LLM_TIMEOUT_SECONDS:-300}
       - LLM_TEMPERATURE=${LLM_TEMPERATURE:-0.3}
       - LLM_COST_PER_MTOK=${LLM_COST_PER_MTOK:-0}
+      - DEBATE=${DEBATE:-true}
       - HTTP_TIMEOUT_SECONDS=${HTTP_TIMEOUT_SECONDS:-8}
       - RESEARCH_ONLINE=${RESEARCH_ONLINE:-true}
       - RESEARCH_SOURCES=${RESEARCH_SOURCES:-hackernews,reddit,github,stackexchange}

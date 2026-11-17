@@ -1,0 +1,12 @@
+# Optional: run the models on an NVIDIA GPU. Needs the NVIDIA Container Toolkit on the host.
+#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml up
+# Without this file everything runs on the CPU, so `docker compose up` works on any machine.
+services:
+  ollama:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

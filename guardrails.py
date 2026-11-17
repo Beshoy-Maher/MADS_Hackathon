@@ -811,9 +811,9 @@ def _ask_judge(prompt: str, user: str, fallback: dict) -> tuple[dict, object]:
     """Ask a judge for JSON. A reply that cannot be parsed is asked for once more; after that the caller fails closed."""
     import llm  # local import keeps the rule layer dependency-free
     # Temperature 0: a safety verdict should be the same every time the same text is checked.
-    data, res = llm.complete_json(prompt, user, fallback, max_tokens=200, temperature=0.0)
+    data, res = llm.complete_json(prompt, user, fallback, max_tokens=200, temperature=0.0, role="judge")
     if not res.model and _model_ready():
-        data, res = llm.complete_json(prompt, user, fallback, max_tokens=200, temperature=0.0)
+        data, res = llm.complete_json(prompt, user, fallback, max_tokens=200, temperature=0.0, role="judge")
     return data, res
 
 

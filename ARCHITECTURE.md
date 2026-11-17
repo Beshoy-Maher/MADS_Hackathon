@@ -20,7 +20,7 @@ flowchart LR
     G2 -->|go| P3[3 Build<br/>builder, verifier, QA]
     G2 -->|pivot| P1
     P3 --> G3{Build gate: tests}
-    G3 -->|go| P4[4 Commercial setup<br/>pricing, policy writer]
+    G3 -->|go| P4[4 Commercial setup<br/>pricing, policy writer, economist]
     G3 -->|repeat| P3
     P4 --> G4{Founder gate}
     G4 -->|go| P5[5 Launch<br/>copywriter, launcher, promise checker]
@@ -81,10 +81,10 @@ Layers
 
 ### Phase 4: Commercial setup (Core step: set the price and policies)
 
-- **Agents:** `pricing`, `policy_writer`.
+- **Agents:** `pricing`, `policy_writer`, `economist`.
 - **Tools:** price extraction from cited evidence; templates.
-- **Method:** *Set the price (Core):* anchor = median of prices found in cited sources (else a labelled `ASSUMPTION` by format), x0.8 for a new product, x0.8 again if the founder values affordability, clamped to $5-$49; the model writes the rationale and one price experiment with a pre-set threshold. No fake "was $X" anchors or countdown discounts. *Set the policies (Core):* draft terms of sale, privacy notice and refund policy (14 days, access revoked on refund, refunds approved by the founder), marked DRAFT / not legal advice. No payments of any kind in this phase.
-- **Output:** `phase4_step1_pricing.md`, `phase4_step2_policies.md`, `phase4_step3_debate.md`, `phase4_gate_decision.md`.
+- **Method:** *Set the price (Core):* anchor = median of prices found in cited sources (else a labelled `ASSUMPTION` by format), x0.8 for a new product, x0.8 again if the founder values affordability, clamped to $5-$49; the model writes the rationale and one price experiment with a pre-set threshold. No fake "was $X" anchors or countdown discounts. *Set the policies (Core):* draft terms of sale, privacy notice and refund policy (14 days, access revoked on refund, refunds approved by the founder), marked DRAFT / not legal advice. No payments of any kind in this phase. *Unit economics:* the economist (`agents/economist.py`, code, no model) works out what each sale keeps on average after the payment fee (the same fee model as the MOCKED provider) and an assumed 10% refund rate, both labelled `ASSUMPTION`; how many sales cover the founder's budget; and, only if the brief gives the optional `hourly_rate_usd`, how many sales a month pay for the founder's weekly hours. If either number is more than the Phase 2 demand target, the gate shows a warning: even if every sign-up bought, it would not be enough. It never forecasts sales or income, and it does not change the gate's recommendation.
+- **Output:** `phase4_step1_pricing.md`, `phase4_step2_policies.md`, `phase4_step3_debate.md`, `phase4_step4_unit-economics.md`, `phase4_gate_decision.md`.
 
 ### Phase 5: Launch (Core steps: open the store; deliver automatically)
 
@@ -112,7 +112,7 @@ Every phase ends with a gate. Thresholds live in `gates.THRESHOLDS`, are fixed b
 | 1 Evidence | evidence | >= 5 relevant sources, >= 4 independent voices, >= 2 pain posts, demand >= 40, founder fit >= 50, total >= 50, allowed category | **go** if all pass; **pivot** to an alternative that passes; **repeat** with broader queries if no candidate has enough evidence either way (or sources were unreachable); otherwise **stop** |
 | 2 Demand | evidence | Lean Canvas complete; real waitlist sign-ups vs. pre-registered target (default 100 in 14 days) | **go** at target; **repeat** while the window is open or the test hasn't run; **pivot/stop** below 50% at the end |
 | 3 Build | tests | all 12 MVP tests pass, including no errors left open by the verifier and the originality check | **go** / **repeat** (rebuild with feedback) |
-| 4 Commercial | founder | price with rationale, three policies drafted, no guardrail violations left | **go** / **repeat** |
+| 4 Commercial | founder | price with rationale, three policies drafted, no guardrail violations left; unit economics warnings are shown as reasons, not checks | **go** / **repeat** |
 | 5 Launch | founder | sale-to-cash tests pass; every page/post approved or rejected | **go** / **repeat** |
 | 6 Operate | evidence | >= 10 real buyers to judge; refund rate < 15% | **go** (persevere) / **repeat** (keep operating, review later) / **pivot** |
 
@@ -181,7 +181,7 @@ Personal data: only consented waitlist emails, stored locally and never logged. 
 | Guardrails (briefs, requests, outputs), trick-prompt tests | Built |
 | Evidence research on public APIs, scoring, market definition | Built |
 | Module verifier: model review with quoted errors, one revision, SQL examples executed in SQLite | Built. The SQL execution and format checks are the dependable part. The model review is limited by the small local model: in our tests it found few of the factual slips a human reviewer finds, and it does not look anything up online |
-| Lean Canvas, landing page, product build, QA tests, pricing, policy drafts, store page, posts, support, metrics, memo | Built |
+| Lean Canvas, landing page, product build, QA tests, pricing, policy drafts, unit economics, store page, posts, support, metrics, memo | Built |
 | Webhooks, idempotent delivery, refunds with approval, reconciliation | Built (against a MOCKED provider) |
 | Payment provider / checkout | **MOCKED** |
 | Publishing pages and posts, sending outreach, delivery emails | **STUBBED** (outbox) |

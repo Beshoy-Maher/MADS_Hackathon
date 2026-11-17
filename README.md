@@ -49,6 +49,7 @@ Then open **http://localhost:8000**, pick a sample founder (or paste any brief) 
 | 3 Build | MVP spec, product, user guide; verifier (facts, SQL run in SQLite); originality guard | **Working** |
 | 3 Gate | 12 deterministic MVP tests, all must pass | **Working** |
 | 4 Commercial | Rule-based price from sourced comparables; draft terms, privacy and refund policy | **Working** |
+| 4 Commercial | Unit economics: what each sale keeps after fees and refunds, how many sales cover the budget (and the founder's time, if an hourly rate is given), a warning when that is more than the demand target; arithmetic only, no forecast | **Working** (fee and refund rate are labelled assumptions) |
 | 5 Launch | Store page and launch posts in the founder's voice; promise checker | **Working** |
 | 5 Launch | Publishing the store page and posts | **STUBBED** (approval-gated, saved to outbox) |
 | 5 Launch | Checkout and payment provider | **MOCKED** (no payments of any kind) |

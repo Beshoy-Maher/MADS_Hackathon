@@ -28,9 +28,22 @@ def _ask(prompt: str, choices: tuple) -> str:
         print("Please type one of:", ", ".join(choices))
 
 
+def _load_brief(src: str) -> dict | str:
+    """A path to a .json or .txt brief, or the brief itself pasted as text (any length, any language)."""
+    try:
+        path = Path(src)
+        is_file = len(src) < 1024 and "\n" not in src and path.is_file()
+    except (OSError, ValueError):  # text too long or with characters that can't be a file name
+        is_file = False
+    if not is_file:
+        return src
+    text = path.read_text(encoding="utf-8")
+    return json.loads(text) if path.suffix.lower() == ".json" else text
+
+
 def cmd_run(args) -> int:
     src = args.brief
-    raw = json.loads(Path(src).read_text()) if Path(src).exists() else src
+    raw = _load_brief(src)
     status = llm.model_status(force=True)
     print(f"Model: {status['model']} ({status['detail']})")
     run = orchestrator.create_run(raw)

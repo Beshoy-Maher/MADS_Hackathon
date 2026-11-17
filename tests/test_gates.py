@@ -55,3 +55,14 @@ def test_no_evidence_repeats_then_stops():
     none = [_cand(relevant_sources=0, voices=0, pain=0, demand_score=0, total=30), _cand(title="alt", relevant_sources=1, voices=1, pain=0, demand_score=5, total=30)]
     assert gates.evidence_gate(none, attempt=1).recommendation == gates.REPEAT
     assert gates.evidence_gate(none, attempt=gates.MAX_ATTEMPTS).recommendation == gates.STOP
+
+
+def test_no_evidence_and_no_founder_fit_stops_at_once():
+    # A broader search can't fix founder fit, so there is no point recommending repeat.
+    weak = _cand(relevant_sources=0, voices=0, pain=0, demand_score=0, founder_fit=4, total=16)
+    assert gates.evidence_gate([weak, dict(weak, title="alt")], attempt=1).recommendation == gates.STOP
+
+
+def test_no_evidence_but_good_founder_fit_still_repeats_first():
+    thin = _cand(relevant_sources=1, voices=1, pain=0, demand_score=5, founder_fit=80, total=30)
+    assert gates.evidence_gate([thin], attempt=1).recommendation == gates.REPEAT

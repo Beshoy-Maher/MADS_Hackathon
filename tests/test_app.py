@@ -28,3 +28,12 @@ def test_founder_token_blocks_outsiders(monkeypatch):
     assert r.status_code == 403
     r = client.post("/api/runs/x/actions/y", json={"approve": True})
     assert r.status_code == 403
+
+
+def test_cli_accepts_a_long_pasted_brief_and_a_text_file(tmp_path):
+    import cli
+    long_brief = "Founder: Test\\nStarting idea: " + "a practice workbook for junior analysts " * 20
+    assert cli._load_brief(long_brief) == long_brief
+    f = tmp_path / "brief.txt"
+    f.write_text("Starting idea: lesson plans for tutors", encoding="utf-8")
+    assert cli._load_brief(str(f)) == "Starting idea: lesson plans for tutors"

@@ -4,6 +4,12 @@ An open-source team of AI agents that takes a founder's brief toward a validated
 
 Measured, not claimed: more than 380 tests that run with no model or network; guardrails refuse 37 of 40 trick prompts they were never tuned on (rules alone: 2 of 40) and wrongly refuse 0 of 62 normal requests ([`evals/results.md`](evals/results.md)); Phase 1 takes about 70 seconds on a 4-core laptop CPU; $0.00 per run.
 
+The committed demo run, produced by `scripts/run_demo.py` with the local model, shows the three outcomes that matter:
+
+- **Promising idea, GO:** an SQL interview workbook passes the evidence gate on 24 relevant sources, 23 independent voices and 5 pain posts ([gate](outputs/phase1_gate_decision.md)), then runs through all six phases to a [MOCKED sale-to-cash test](outputs/payment_test_log.md). The demand gate recommended repeat because no real visitor has seen the page; the demo founder overrode it to show the later phases, and the override is recorded ([gate](outputs/phase2_gate_decision.md)).
+- **Weak idea, STOP:** a paid daily-quotes email for developers fails on founder fit and total score, and no alternative passes, so the system says "do not launch this" ([gate](outputs/phase1_gate_decision_weak-idea.md)).
+- **Excluded idea, refused:** a crypto-signals channel is refused before any agent runs ([gate](outputs/phase1_gate_decision_excluded-idea.md)).
+
 ## Quickstart
 
 ```bash
@@ -55,7 +61,7 @@ An **orchestrator** (`orchestrator.py`) runs the six phases in order. Each phase
 - **Model:** `qwen3:4b-instruct-2507-q4_K_M` (Qwen3-4B-Instruct-2507, Apache-2.0, open weights) served locally by **Ollama**, started and downloaded automatically by `docker compose up`. If that tag is unavailable the downloader falls back to `qwen3:4b-instruct`, `qwen3:4b`, then `qwen3:1.7b`. Any Ollama model works (`qwen3:8b`, `gpt-oss:20b`, ...): set `LLM_MODEL`.
 - **No paid service is required.** Optionally, point `LLM_PROVIDER=openai_compatible` and `LLM_BASE_URL` at any free-tier OpenAI-compatible endpoint serving an open-weight model.
 - **Without any model** (`LLM_PROVIDER=none`), every agent falls back to deterministic templates; such steps are logged with `"model": null` and labelled in the outputs.
-- **Evidence sources:** free public APIs with no keys: Hacker News (Algolia), Reddit public JSON, GitHub search, Stack Exchange.
+- **Evidence sources:** free public APIs with no keys: Hacker News (Algolia), Reddit public JSON, GitHub search, Stack Exchange. An optional free `GITHUB_TOKEN` in `.env` raises GitHub's search rate limit. Each run reports per source what worked under "Source coverage": in the committed demo run Reddit refused the requests (HTTP 403) from our network, so its evidence comes from the other three.
 - **Decisions don't depend on the model:** scores, gates, QA tests, pricing and payments are deterministic code.
 
 ## Cost per run
@@ -85,5 +91,5 @@ These limits are code (`guardrails.py`, `approval.py`, `gates.py`). The rule lay
 
 - **Maintainers:** The Overfitters team maintains the repository; contributions are reviewed through pull requests.
 - **Roadmap:** real payment-provider adapter in test mode, hosted landing pages with founder approval, more evidence sources, and Arabic-first outputs. See the roadmap in [ARCHITECTURE.md](ARCHITECTURE.md#roadmap).
-- **Community:** MIT-licensed; new agents, evidence sources and guardrail tests are easy to add (one file each). Trick prompts from users become new tests.
+- **Community:** MIT-licensed; new agents, evidence sources and guardrail tests are easy to add (one file each), as described in [CONTRIBUTING.md](CONTRIBUTING.md). Trick prompts from users become new tests, and held-out prompts are kept apart from the rules by a test.
 - **Funding:** the software stays free and fully featured. Possible support: university and incubator partnerships, open-source grants, and optional paid hosting or setup help for founders who don't want to self-host. Core features are never paywalled.

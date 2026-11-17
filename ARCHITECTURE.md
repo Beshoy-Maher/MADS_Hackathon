@@ -8,13 +8,16 @@ Venture Builder is a pipeline of small, role-named agents run by one orchestrato
 flowchart LR
     B[Founder brief] --> I[Intake + guardrails<br/>screen_brief]
     I -->|excluded product| S0[STOP]
-    I --> P1[1 Discover<br/>researcher, scorer,<br/>market analyst, interviewer]
+    I -->|close to an excluded category| SC{Scope check<br/>founder confirms}
+    SC -->|go| P1
+    SC -->|stop| S0
+    I --> P1[1 Discover<br/>researcher, scorer,<br/>market analyst, interviewer,<br/>notes analyst]
     P1 --> G1{Evidence gate}
     G1 -->|go| P2[2 Validate<br/>strategist, copywriter, analyst]
     G1 -->|pivot| P1
     G1 -->|stop| S1[STOP + memo]
     P2 --> G2{Demand gate}
-    G2 -->|go| P3[3 Build<br/>builder, QA]
+    G2 -->|go| P3[3 Build<br/>builder, verifier, QA]
     G2 -->|pivot| P1
     P3 --> G3{Build gate: tests}
     G3 -->|go| P4[4 Commercial setup<br/>pricing, policy writer]
@@ -69,7 +72,7 @@ Layers
 - **Agents:** `builder`, `verifier`, `qa`.
 - **Tools:** local model; in-memory SQLite (`sqlite3`) to execute SQL examples; deterministic test suite in `agents/qa.py`.
 - **Method:** *Build the product (Core):* the builder writes an MVP spec sized to the founder's hours (3-4 modules, out-of-scope list, acceptance criteria), then the product itself: per module an intro, numbered steps, a worked example, a checklist and common mistakes; then a user guide (how to use, what you need, getting help, refunds). Founder feedback from a "repeat" decision is fed into the rebuild.
-- **Verifier:** after each module is written, the verifier lists its factual errors: wrong statements, code that would not run, invented facts. Every error must quote the wrong words; an error whose quote is not in the module is dropped, so the reviewer cannot invent one. SQL code blocks are also executed in an in-memory SQLite database whose tables and columns are inferred from the example; syntax errors and misused aggregates are reported, and a statement whose schema cannot be inferred is skipped silently. A query written outside a code block is executed too. Code also reports slips a reader would trip over, such as a number split in two in a table. A module with errors is revised by the builder once, with the error list as feedback, and reviewed a second time. There is no second revision. Each review is logged as agent `verifier`, action `review_module`; each revision as `builder`, `revise_module`. Without a model only the SQL check runs, and the report says so.
+- **Verifier:** after each module is written, the verifier lists its factual errors: wrong statements, code that would not run, invented facts. Every error must quote the wrong words; an error whose quote is not in the module is dropped, so the reviewer cannot invent one. SQL code blocks are also executed in an in-memory SQLite database whose tables and columns are inferred from the example; syntax errors and misused aggregates are reported, and a statement whose schema cannot be inferred is skipped silently. A query written outside a code block is executed too. Code also reports slips a reader would trip over, such as a number split in two in a table, a broken checklist box, or a module with no numbered steps or no checklist. If a module still has no numbered list after its revision, the builder numbers the module's own list items as a last resort: the text is not changed, the checklist stays, and the repair is logged as `builder`, `repair_module_format`. A module with errors is revised by the builder once, with the error list as feedback, and reviewed a second time. There is no second revision. Each review is logged as agent `verifier`, action `review_module`; each revision as `builder`, `revise_module`. Without a model only the SQL check runs, and the report says so.
 - **QA:** 11 deterministic tests: all modules present, >= 120 words each, numbered steps, checklists, no income promises / fake proof / urgency, no placeholder text, user guide sections, allowed category, readable sentence length, package builds (hash), and no errors left open by the verifier's last review of any module.
 - **Output:** `phase3_step1_spec.md`, `phase3_step2_product.md`, `phase3_step3_user-guide.md`, `phase3_step4_qa-report.md`, `phase3_gate_decision.md`.
 

@@ -1,186 +1,187 @@
-# SQL Interview Practice Workbook for Junior Data Analysts
+# SQL Interview Workbook for Junior Data Analysts
 
-A practical PDF (printable and digital) for Junior and aspiring data analysts preparing for SQL interviews, especially in Egypt and the wider MENA region. Made by Mariam.
+A practical PDF for Junior and aspiring data analysts preparing for SQL interviews, especially in Egypt and the wider MENA region. Made by Mariam.
 
 ## Contents
 1. Introduction to SQL Interview Questions
-2. Basic SELECT Queries with Examples
-3. Filtering and Sorting with WHERE and ORDER BY
-4. Grouping and Aggregations with GROUP BY and COUNT
+2. Basic SQL Queries: SELECT, WHERE, GROUP BY
+3. Real-World Example: Sales Data Analysis
+4. How to Prepare for Your Interview
 
 ## Module 1: Introduction to SQL Interview Questions
 
-SQL interview questions test your ability to write clear, efficient queries. These questions are common in tech companies, especially in Egypt and the wider MENA region, where data roles are growing fast. This module helps you understand what to expect and how to prepare.
+SQL interviews test your ability to write clear, correct queries. This module helps junior data analysts understand what to expect in SQL interviews—especially in Egypt and the wider MENA region.
 
-1. **Review basic SQL concepts**
-   Learn about tables, columns, SELECT, WHERE, JOINs, and GROUP BY. Use free online resources or beginner SQL tutorials.
+1. Review basic SQL concepts: tables, columns, SELECT, FROM, WHERE.
+2. Practice writing queries to filter, sort, and retrieve data.
+3. Study common interview questions like "Find all employees with salary over 5000" or "List customers from a specific city."
+4. Use SQLite to test queries. Download SQLite Browser or use online tools.
+5. Review sample answers and explain your logic step-by-step.
+6. Time yourself: aim for 5 minutes per question.
 
-2. **Study common question types**
-   Focus on: filtering data (WHERE), sorting (ORDER BY), aggregations (COUNT, SUM), and joining tables (INNER JOIN).
-
-3. **Practice with simple examples**
-   Try writing queries on sample datasets. Use a tool like DB Fiddle or SQLite online.
-
-4. **Check your answers against solutions**
-   Compare your output with provided answers. Look for errors in syntax or logic.
-
-5. **Track your progress**
-   Keep a log of questions you’ve solved and which ones you found hard.
-
-6. **Review one real interview question**
-   Study a sample question from a junior data analyst role in Egypt or the MENA region.
-
-**Worked Example**
-*Question:* Find the number of orders placed in each month.
-*Answer:*
+Worked example:
+Find all customers from Cairo.
 ```sql
-SELECT
-  EXTRACT(MONTH FROM order_date) AS month,
-  COUNT(*) AS order_count
-FROM orders
-GROUP BY EXTRACT(MONTH FROM order_date)
-ORDER BY month;
+SELECT name, email
+FROM customers
+WHERE city = 'Cairo';
 ```
+This query retrieves customer names and emails where city is Cairo.
 
-**Checklist**
-- [ ] Reviewed basic SQL concepts
-- [ ] Studied filtering, sorting, and joining
-- [ ] Practiced one query on a sample dataset
-- [ ] Checked answer against solution
-- [ ] Logged the question and difficulty
-- [ ] Reviewed a real interview example
+Checklist
+- [ ] Know what tables and columns hold
+- [ ] Can write a SELECT query with WHERE
+- [ ] Can filter data using a condition
+- [ ] Can sort results with ORDER BY
+- [ ] Can explain what a query does
+- [ ] Practiced 3 sample queries
 
-**Common Mistakes**
-- Using incorrect syntax (e.g., missing parentheses or semicolon)
-- Forgetting to GROUP BY when aggregating
-- Misunderstanding date functions like EXTRACT(MONTH FROM)
-- Skipping the ORDER BY clause when required
-- Not testing the query on sample data before submission
+Common mistakes
+- Using incorrect table or column names
+- Forgetting to use quotes around text values
+- Writing queries that don’t match the sample data
+- Not explaining the logic behind the query
+- Assuming data is always in a standard format
 
-## Module 2: Basic SELECT Queries with Examples
+
+## Module 2: Basic SQL Queries: SELECT, WHERE, GROUP BY
 
 **Intro**
-This module teaches you how to write simple SQL queries to pull data from tables. You’ll learn the basics of the SELECT statement—what it does and how to use it to get specific columns from a table.
+This module builds confidence with basic SQL commands used in interviews. You’ll practice SELECT, WHERE, and GROUP BY — the foundation of any SQL query.
 
 **Steps**
-1. Start with a table name (e.g., `employees`).
-2. Use `SELECT` followed by the column name(s) you want (e.g., `SELECT name, salary`).
-3. Add `FROM` and the table name (e.g., `FROM employees`).
-4. Run the query in your SQL environment (e.g., SQLFiddle, DB Fiddle, or a local tool).
-5. Check if the output shows the correct data.
-6. Try adding a WHERE clause to filter rows (e.g., `WHERE department = 'Sales'`).
+1. Open SQLite. Use the command `sqlite3` in your terminal or any SQL environment that supports standard SQL.
+2. Create a table named `employees` with columns: `id`, `name`, `department`, `salary`, and `hire_date`.
+3. Insert sample data: 5 employees with different departments and salaries.
+4. Write a SELECT query to list all employee names and departments.
+5. Add a WHERE clause to show only employees in the "Marketing" department.
+6. Use GROUP BY to show the average salary for each department.
 
 **Worked Example**
-Table: `employees`
-Columns: `name`, `department`, `salary`
-Query:
 ```sql
-SELECT name, department
+SELECT department, AVG(salary) AS avg_salary
 FROM employees
-WHERE department = 'Engineering';
-```
-Output:
-- Ahmed, Engineering
-- Sara, Engineering
-
-**Checklist**
-- [ ] Write a SELECT statement with at least one column
-- [ ] Add FROM followed by a table name
-- [ ] Test the query in a SQL tool
-- [ ] Verify output matches expected data
-- [ ] Add a WHERE clause to filter rows (optional)
-
-**Common Mistakes**
-- Forgetting the `FROM` clause → query won’t run
-- Using incorrect column names → wrong data appears
-- Missing quotes around text values (e.g., `WHERE department = 'Sales'`)
-- Using `SELECT *` without knowing what data you need
-- Running the query without checking the table structure first
-
-*Source: [SQLZoo - Basic SELECT](https://sqlzoo.net/sqlexamples/)*
-
-## Module 3: Filtering and Sorting with WHERE and ORDER BY
-
-**Intro**
-Filtering and sorting help you find specific data and arrange it in a useful order. This module teaches how to use `WHERE` to filter rows and `ORDER BY` to sort them — key skills for SQL interviews.
-
-**Steps**
-1. Start with a table (like `orders`).
-2. Use `WHERE` to filter rows. Example: `WHERE order_date > '2023-01-01'`.
-3. Add `ORDER BY` to sort results. Example: `ORDER BY order_date DESC`.
-4. Combine both: `SELECT * FROM orders WHERE order_date > '2023-01-01' ORDER BY order_date DESC`.
-5. Test with real data — check if results match your expectations.
-6. Try different filters and sorts (e.g., `WHERE amount > 100 ORDER BY amount ASC`).
-
-**Worked Example**
-Table: `sales` with columns `date`, `product`, `amount`.
-Query:
-```sql
-SELECT *
-FROM sales
-WHERE product = 'Laptop'
-ORDER BY amount DESC;
-```
-Result: Shows all laptop sales, sorted from highest to lowest amount.
-
-**Checklist**
-- [ ] Used `WHERE` to filter a specific condition
-- [ ] Used `ORDER BY` to sort results (ASC or DESC)
-- [ ] Tested query on sample data
-- [ ] Applied filter and sort in one query
-- [ ] Checked that results match expected output
-
-**Common Mistakes**
-- Forgetting to use parentheses when combining conditions (e.g., `WHERE price > 100 AND quantity > 5`)
-- Using `ORDER BY` without a column name (e.g., `ORDER BY` alone)
-- Misplacing `WHERE` or `ORDER BY` — they must come after `SELECT` and before `FROM`
-- Sorting by a column that doesn’t exist in the table
-- Using `ASC` or `DESC` without specifying which column to sort by
-
-*Source: [SQLZoo - Filtering and Sorting](https://sqlzoo.net/solution/where)*
-
-## Module 4: Grouping and Aggregations with GROUP BY and COUNT
-
-Grouping helps you summarize data by categories. For example, you might count how many orders came from each city. This is key in real-world data analysis.
-
-1. Use `GROUP BY` to split data into groups based on a column (like city or department).
-2. Add aggregate functions like `COUNT(*)` to count rows in each group.
-3. Choose the right column to group by—only one column per group unless using multiple columns.
-4. Always include the grouping column in your SELECT list if it’s not in the GROUP BY.
-5. Use `ORDER BY` to sort results, so you can see the most frequent groups first.
-6. Test your query with a small dataset to verify it returns expected counts.
-
-**Worked Example**
-You have a table `orders` with columns: `city`, `order_id`.
-Query:
-```sql
-SELECT city, COUNT(*) AS order_count
-FROM orders
-GROUP BY city
-ORDER BY order_count DESC;
+WHERE department = 'Marketing'
+GROUP BY department;
 ```
 Result:
-- Cairo: 120 orders
-- Alexandria: 45 orders
-- Giza: 30 orders
+- department: Marketing
+- avg_salary: 5000
 
-This shows which cities have the most orders.
+*Note: This example shows only one department because the sample data includes only Marketing employees. If multiple departments exist, the query would return one row per department.*
 
 **Checklist**
-- [ ] Use `GROUP BY` with a relevant column (e.g., city, department)
-- [ ] Include `COUNT(*)` or `COUNT(column)` in the SELECT
-- [ ] Add `ORDER BY` to sort results
-- [ ] Verify the output matches expected group counts
-- [ ] Test with a small dataset first
+- [ ] Created the employees table
+- [ ] Inserted 5 sample records
+- [ ] Ran a SELECT query for names and departments
+- [ ] Used WHERE to filter Marketing employees
+- [ ] Used GROUP BY to group by department
+- [ ] Verified output matches expected results
 
 **Common Mistakes**
-- Forgetting to include the grouping column in the SELECT
-- Using `COUNT(*)` on a column that has NULLs (it counts NULLs as zero)
-- Grouping by multiple columns without including all in SELECT
-- Not verifying the result matches real-world expectations
+- Using GROUP BY without an aggregate function (e.g., AVG, COUNT)
+- Forgetting to quote string values (e.g., 'Marketing')
+- Missing parentheses in WHERE clauses
+- Using GROUP BY on non-aggregated columns
+- Not testing queries with sample data before running
 
-*Source: [How to Group Data in SQL – Stack Overflow](https://stackoverflow.com/questions/15941082/group-by-in-sql)*
+
+## Module 3: Real-World Example: Sales Data Analysis
+
+**Intro**
+Sales data is common in data jobs. SQL helps you answer real questions about sales, like "Which product sold most last month?" This module shows how SQL skills apply to real sales data.
+
+**Steps**
+1. Load a sample sales table with columns: `product_id`, `product_name`, `sale_date`, `quantity`, `price`.
+2. Filter data to show only sales from last month using `WHERE sale_date >= '2024-03-01'`.
+3. Calculate total revenue per product using `SUM(quantity * price)`.
+4. Group results by `product_name` to see revenue per product.
+5. Order the results by total revenue, descending.
+6. Limit output to top 5 products using `LIMIT 5`.
+
+**Worked Example**
+Sample data:
+| product_id | product_name | sale_date | quantity | price |
+|-----------|--------------|-----------|----------|-------|
+| 101       | Laptop       | 2024-03-05 | 3        | 5000  |
+| 102       | Mouse        | 2024-03-04 | 10       | 100   |
+
+Query:
+```sql
+SELECT
+  product_name,
+  SUM(quantity * price) AS total_revenue
+FROM sales
+WHERE sale_date >= '2024-03-01'
+GROUP BY product_name
+ORDER BY total_revenue DESC
+LIMIT 5;
+```
+
+Result:
+| product_name | total_revenue |
+|-------------|---------------|
+| Laptop      | 15000         |
+| Mouse       | 1000          |
+
+**Checklist**
+- [ ] Data has `sale_date`, `product_name`, `quantity`, `price`
+- [ ] Filtered by date range
+- [ ] Used `SUM(quantity * price)`
+- [ ] Grouped by `product_name`
+- [ ] Ordered by revenue descending
+- [ ] Limited to top 5
+
+**Common Mistakes**
+- Forgetting to multiply `quantity` and `price`
+- Using `GROUP BY` without `SELECT` of grouped column
+- Not filtering by date range
+- Using `ORDER BY` without `DESC` for highest first
+
+## Module 4: How to Prepare for Your Interview
+
+Preparing for a SQL interview takes focused practice. This module gives you clear, step-by-step actions to build confidence and readiness.
+
+1. Review common SQL interview questions from trusted sources. Use open-access databases like DataCamp's SQL interview questions (unverified link removed) or Kaggle's SQL challenges (unverified link removed).
+
+2. Pick 5–10 questions that match your experience level. Focus on filtering, joins, aggregations, and basic queries.
+
+3. Practice each question with a real dataset. Use SQLite, which is standard and widely supported. Download sample data from public sources like Kaggle datasets (unverified link removed) or Google Dataset Search (unverified link removed).
+
+4. Write out your solution in standard SQL. Test it in SQLite using a local tool or online editor like SQLite Online (unverified link removed).
+
+5. Record a short explanation of your solution. Speak aloud or write a brief note. This helps you explain your logic clearly.
+
+6. Review your work after 24 hours. Identify gaps and revise.
+
+**Worked Example**
+*Question: Find the top 3 customers by total spending.*
+*Data: A table named "orders" with columns "customer_id", "amount".*
+*Query:*
+```sql
+SELECT customer_id, SUM(amount) AS total_spent
+FROM orders
+GROUP BY customer_id
+ORDER BY total_spent DESC
+LIMIT 3;
+```
+
+**Checklist**
+- [ ] Reviewed 5–10 interview questions
+- [ ] Selected questions from reliable sources
+- [ ] Practiced with a real dataset
+- [ ] Wrote and tested SQL in SQLite
+- [ ] Recorded a short explanation
+- [ ] Reviewed and revised after 24 hours
+
+**Common Mistakes**
+- Using complex joins without a clear need
+- Skipping data validation before writing queries
+- Not practicing explaining solutions aloud
+- Relying on memory instead of writing code
+- Using non-standard SQL syntax
 
 ## A note on results
 
 This product gives you a method and templates. Your results depend on your situation and effort; nothing here is a promise of any outcome.
+Claim check: 0 unsourced claim(s) labelled ASSUMPTION, 7 link(s) not found in the fetched evidence removed.

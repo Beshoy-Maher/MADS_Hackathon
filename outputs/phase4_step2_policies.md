@@ -1,9 +1,9 @@
-# Phase 4, step 2: Draft policies for 'SQL Interview Practice Workbook for Junior Data Analysts'
+# Phase 4, step 2: Draft policies for 'SQL Interview Workbook for Junior Data Analysts'
 
 **DRAFT generated from a template. This is not legal advice. Have it reviewed by a qualified person for your country before taking real payments.**
 
 ## Terms of sale (DRAFT)
-1. Mariam sells 'SQL Interview Practice Workbook for Junior Data Analysts', a digital product delivered as a download link after payment.
+1. Mariam sells 'SQL Interview Workbook for Junior Data Analysts', a digital product delivered as a download link after payment.
 2. Your purchase gives you a personal, non-transferable licence to use the product. You may not resell or share it publicly.
 3. The price is the one shown at checkout (USD), currently $11.99. Taxes may apply depending on your country.
 4. The product is educational material. It does not promise any specific result, income or outcome.

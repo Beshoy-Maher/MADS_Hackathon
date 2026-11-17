@@ -1,9 +1,9 @@
-# Phase 4, step 1: Pricing for 'SQL Interview Practice Workbook for Junior Data Analysts'
+# Phase 4, step 1: Pricing for 'SQL Interview Workbook for Junior Data Analysts'
 
 **Price: $11.99 (USD), one-time.**
 
 ## Anchor
-- ASSUMPTION: no sourced price found; typical price for a small pdf (printable and digital) assumed at $15
+- ASSUMPTION: no sourced price found; typical price for a small pdf assumed at $15
 
 ## Rule
 - New product discount: not applied (anchor is an ASSUMPTION, not a sourced price).
@@ -11,14 +11,11 @@
 - Clamp: $5 to $49.
 
 ## Rationale
-**Pricing Rationale**
-The price is set at $11.99 using a rule-based approach: median of comparable prices (assumed $15) × 0.8 (affordability adjustment), clamped within $5–$49. This reflects the product’s practical, student-focused value and aligns with affordability in the MENA region.
+Pricing rationale:
+Anchor: ASSUMPTION: typical small PDF price assumed at $15. $11.99 balances affordability for students in Egypt and MENA, where data tools are often costly. No discounts: no fake scarcity or deadlines. Price reflects founder’s skills and target market’s needs. No income promises or fake urgency. Price is fixed, transparent, and grounded in practicality.
 
-**Price Experiment**: Test $9.99 with a pre-set threshold of $10.00 — if demand exceeds 100 units in the first week, consider a further reduction.
-
-No discounts or countdowns are offered to avoid false scarcity, maintain trust, and ensure clarity. The price is fixed to reflect honest value, not perceived urgency. All decisions are grounded in product fit and accessibility, not psychological triggers.
-
-*No income projections, fake scarcity, or customer claims.*
+## Next price test (pre-set rule)
+- After the first 100 real store-page visits, compare purchases per 100 visitors. If fewer than 2 in 100 buy, test $9.99 for the next 100 visits and keep whichever price sells more per 100 visitors. The rule is fixed now, before any sales data exists. Visit and purchase counts must be real.
 
 ## Refunds
 - 14-day refund, no questions asked; download access is removed after a refund.

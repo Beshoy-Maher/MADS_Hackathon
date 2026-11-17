@@ -4,57 +4,64 @@
 
 The researcher sharpened the idea, proposed alternatives that fit the founder, and searched public discussions for evidence that people have this problem. Every item below links to its source.
 
-## Sharpened founder idea: SQL Interview Practice Workbook for Junior Data Analysts
+## Sharpened founder idea: SQL Interview Workbook for Junior Data Analysts
 
-- Problem: Junior data analysts in Egypt and the MENA region struggle to find clear, step-by-step solutions to common SQL interview questions
-- Format: Digital workbook with SQL queries, expected outputs, and annotated solutions in 
-- Search queries: struggling with sql interview, sql interview practice template, sql interview questions
+- Problem: Junior data analysts struggle with SQL interview questions
+- Format: PDF workbook with answers
+- Search queries: sql interview workbook, sql interview questions
+- Relevant items found: 13 (of 28 results)
+
+Evidence:
+- [Repository jenibavadiya-2510/sql-interview-workbook: 100 SQL Interview Questions with Reference Solutions for ](https://github.com/jenibavadiya-2510/sql-interview-workbook) (github, 0 pts/stars, 0 comments, 2026-07-09)
+- [SQL Interview Questions for Aspiring Data Scientist – The Histogram](https://news.ycombinator.com/item?id=18389273) (hackernews, 6 pts/stars, 0 comments, 2018-11-06)
+- [46 SQL Job Interview Questions for Data Scientists](https://news.ycombinator.com/item?id=13406474) (hackernews, 3 pts/stars, 0 comments, 2017-01-15)
+- [Medium-hard SQL interview questions](https://news.ycombinator.com/item?id=23053981) (hackernews, 1230 pts/stars, 287 comments, 2020-05-02)
+- [Our SQL interview questions](https://news.ycombinator.com/item?id=5779406) (hackernews, 194 pts/stars, 216 comments, 2013-05-28)
+- [Senior SQL Developer Interview Questions - Too Difficult?](https://stackoverflow.com/questions/6942904/senior-sql-developer-interview-questions-too-difficult) (stackexchange, 30 pts/stars, 1 comments, 2011-08-04)
+- [A guide to SQL interview questions](https://news.ycombinator.com/item?id=25709870) (hackernews, 8 pts/stars, 0 comments, 2021-01-10)
+- [SQL Interview Questions Cheat Sheet](https://news.ycombinator.com/item?id=19807354) (hackernews, 3 pts/stars, 0 comments, 2019-05-02)
+
+## Alternative 1: SQL Practice Sheets for Beginners
+
+- Problem: New data analysts lack hands-on SQL practice
+- Format: Interactive Excel sheets
+- Search queries: sql practice sheets
+- Relevant items found: 14 (of 26 results)
+
+Evidence:
+- [Issue: 07 SQL Problems using Google Sheets](https://github.com/Migracode-Barcelona/Module-Onboarding/issues/31) (github, 0 pts/stars, 24 comments, 2025-07-25)
+- [Repository ChauhanDivyanshu/SQL-Query-DataSheet: A collection of SQL queries, database scripts, and reference ](https://github.com/ChauhanDivyanshu/SQL-Query-DataSheet) (github, 2 pts/stars, 0 comments, 2026-07-02)
+- [Issue: 07 SQL Problems using Google Sheets](https://github.com/bdmtrs/My-Coursework-Planner/issues/22) (github, 0 pts/stars, 0 comments, 2026-10-28)
+- [Issue: SQL Problems using Google Sheets](https://github.com/Temceo/My-Coursework-Planner/issues/96) (github, 0 pts/stars, 0 comments, 2026-08-13)
+- [Repository CheatGrid-com/CheatGrid: Cheat sheets and printable PDFs for Python, SQL, Docker, TypeScript, React](https://github.com/CheatGrid-com/CheatGrid) (github, 6 pts/stars, 0 comments, 2026-03-22)
+- [Repository MMAR4/sql-practice: My SQL learning repository containing topic-wise practice problems, solutions, ](https://github.com/MMAR4/sql-practice) (github, 2 pts/stars, 0 comments, 2026-08-02)
+- [Repository harishsemwal/Oracle-MySQL-Practice-Sheets: ](https://github.com/harishsemwal/Oracle-MySQL-Practice-Sheets) (github, 1 pts/stars, 0 comments, 2024-01-25)
+- [Repository imShakil/python-sqlite-practice: Python SQLite cheat sheet](https://github.com/imShakil/python-sqlite-practice) (github, 6 pts/stars, 0 comments, 2020-08-16)
+
+## Alternative 2: SQL Problem Sets for Aspiring Analysts
+
+- Problem: Students find SQL interview prep overwhelming
+- Format: Step-by-step guided PDFs
+- Search queries: sql problem sets
 - Relevant items found: 12 (of 34 results)
 
 Evidence:
-- [Repository shawlu95/Beyond-LeetCode-SQL: Analysis of SQL Leetcode and classic interview questions, common pitf](https://github.com/shawlu95/Beyond-LeetCode-SQL) (github, 1345 pts/stars, 2 comments, 2019-03-02)
-- [Repository datadriven-io/data-engineer-interview-prep: An 8 week practice track for data engineering interview](https://github.com/datadriven-io/data-engineer-interview-prep) (github, 2 pts/stars, 0 comments, 2026-04-12)
-- [Issue: SQL interview pipeline](https://github.com/amfooladgar/leetcode-daily-cheatsheet/issues/2) (github, 0 pts/stars, 0 comments, 2026-08-25)
-- [Repository bregman-arie/devops-exercises: Linux, Jenkins, AWS, SRE, Prometheus, Docker, Python, Ansible, Git, ](https://github.com/bregman-arie/devops-exercises) (github, 86867 pts/stars, 59 comments, 2019-10-03)
-- [Repository OBenner/data-engineering-interview-questions: More than 2000+ Data engineer interview questions.](https://github.com/OBenner/data-engineering-interview-questions) (github, 1811 pts/stars, 3 comments, 2021-08-08)
-- [Issue: Upload private study resources and use them in ChatGPT practice and Learn](https://github.com/Vinosaamaa/interview-arc/issues/475) (github, 0 pts/stars, 10 comments, 2026-09-12)
-- [Issue: start working on SQL questions](https://github.com/rahul90500/SQLquestions/issues/1) (github, 0 pts/stars, 1 comments, 2026-10-05)
-- [Repository bharatagrawal/SQL-interview-library: Struggling to crack SQL interviews? Want to master real-world ](https://github.com/bharatagrawal/SQL-interview-library) (github, 0 pts/stars, 0 comments, 2026-10-21)
-
-## Alternative 1: Interactive SQL Interview Simulator for Beginners
-
-- Problem: Junior data analysts lack hands-on experience practicing SQL interview problems in a safe, guided environment
-- Format: Web-based interactive tool with clickable SQL questions and instant feedback on 
-- Search queries: practice sql queries online, sql interview drill problems
-- Relevant items found: 7 (of 16 results)
-
-Evidence:
-- [Repository yuvrajkushwaha01/Online-Bookstore-SQL-Project: PostgreSQL-based Online Bookstore database with 200+](https://github.com/yuvrajkushwaha01/Online-Bookstore-SQL-Project) (github, 3 pts/stars, 0 comments, 2025-09-09)
-- [Repository sarincr/SQL-Practice-Questions: Practice SQL querys with an online terminal. Solve SQL query questi](https://github.com/sarincr/SQL-Practice-Questions) (github, 2 pts/stars, 0 comments, 2024-03-11)
-- [Repository MohanPadala/OnlineBookstore_SQL_Project: An online bookstore database project using PostgreSQL. It ](https://github.com/MohanPadala/OnlineBookstore_SQL_Project) (github, 2 pts/stars, 0 comments, 2025-08-05)
-- [Issue: ###  Week 3 – Databases & SQL Practice](https://github.com/2001pawan/data-engineering/issues/3) (github, 0 pts/stars, 0 comments, 2025-05-31)
-- [Issue: practice_sql_websites.md](https://github.com/analyst-kesavan/SQL_Notes/issues/2) (github, 0 pts/stars, 0 comments, 2025-08-10)
-- [Issue: SQL Database Management: A Complete Beginner-to-Advanced Guide | Webliquid Infotech](https://github.com/digoal/blog/issues/331) (github, 0 pts/stars, 0 comments, 2026-10-09)
-- [Issue: sql_learning_resources.md](https://github.com/analyst-kesavan/SQL_Notes/issues/1) (github, 0 pts/stars, 0 comments, 2025-08-10)
-
-## Alternative 2: SQL Problem Bank with Real-World Examples
-
-- Problem: Junior data analysts in the MENA region find SQL interview questions too abstract or disconnected from real data scenarios
-- Format: Curated list of SQL problems derived from real company datasets, with explanatio
-- Search queries: sql interview questions real, sql problems from real
-- Relevant items found: 2 (of 16 results)
-
-Evidence:
-- [Repository mohankrishna02/interview-scenerios-spark-sql: This repository focuses on providing interview scenar](https://github.com/mohankrishna02/interview-scenerios-spark-sql) (github, 66 pts/stars, 1 comments, 2023-05-09)
-- [Repository amarkum/interview-refresher-java-bigdata: a one-stop repo to lookup for code snippets of core java ](https://github.com/amarkum/interview-refresher-java-bigdata) (github, 27 pts/stars, 4 comments, 2019-12-17)
+- [Repository alisharify7/CS50x: Solve All Cs50 - 2021  (Harvard University's introduction to the intellectual en](https://github.com/alisharify7/CS50x) (github, 19 pts/stars, 0 comments, 2022-01-31)
+- [Repository billwallis/advent-of-code-sql: Solutions to the Advent of Code problem sets.](https://github.com/billwallis/advent-of-code-sql) (github, 12 pts/stars, 0 comments, 2022-12-01)
+- [Repository BleeGleeWee/SQL-CS50: ✨This repository contains my complete coursework, problem sets, and final pro](https://github.com/BleeGleeWee/SQL-CS50) (github, 10 pts/stars, 0 comments, 2025-06-21)
+- [Show HN: GitHub Bot to Detect Duplicate Issues with OpenAI and Supabase](https://news.ycombinator.com/item?id=38984444) (hackernews, 7 pts/stars, 1 comments, 2024-01-13)
+- [Issue: Support batch SQL updates from IEnumerable parameter sets](https://github.com/twogood/Activout.DatabaseClient/issues/62) (github, 1 pts/stars, 0 comments, 2026-10-07)
+- [Issue: Data: re-executing a multi-result statement maps result sets to the wrong data sets](https://github.com/pocoproject/poco/issues/5660) (github, 0 pts/stars, 1 comments, 2026-11-07)
+- [Issue: PRAGMA journal_mode=mvcc sets changes() and total_changes() to 1](https://github.com/tursodatabase/turso/issues/11588) (github, 0 pts/stars, 0 comments, 2026-11-08)
+- [Issue: UPDATE that sets an integer primary key to NULL fails with "datatype mismatch"…](https://github.com/tursodatabase/turso/issues/11862) (github, 0 pts/stars, 0 comments, 2026-11-15)
 
 ## Source coverage
 
-- hackernews: 0 queries ok, error: ProxyError: 403 Forbidden
-- reddit: 0 queries ok, error: ProxyError: 403 Forbidden
-- github: 3 queries ok
-- stackexchange: 0 queries ok, error: ProxyError: 403 Forbidden
+- hackernews: 2 queries ok
+- reddit: 0 queries ok, error: HTTPStatusError: Client error '403 Blocked' for url 'https://old.reddit.com/login/?reason=lor2&dest=https%3A%2F%2Fold.reddit.com%2Fsearch
+- github: 1 queries ok, error: HTTPStatusError: Client error '403 rate limit exceeded' for url 'https://api.github.com/search/repositories?q=sql+interview+questions&sor
+- stackexchange: 2 queries ok
 
 ---
 Generated by the pipeline. Model: `qwen3:4b-instruct-2507-q4_K_M` (local open-weight model). Cost: $0.00.
-Sources cited: 21. Claims without a source are marked ASSUMPTION.
+Sources cited: 39. Claims without a source are marked ASSUMPTION.

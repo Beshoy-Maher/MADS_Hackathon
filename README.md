@@ -58,7 +58,7 @@ An **orchestrator** (`orchestrator.py`) runs the six phases in order. Each phase
 
 ## Cost per run
 
-**About $0.00 per run** (local model, ~17k tokens for all six phases in our demo run: 22 model calls; research APIs are free). The dashboard header shows the running cost, and every decision-log entry records `"cost": 0`.
+**About $0.00 per run** (local model, ~26k tokens for all three demo founders in our demo run: 30 model calls, including the verifier's reviews and two module revisions; research APIs are free). The dashboard header shows the running cost, and every decision-log entry records `"cost": 0`.
 
 ## Demo video
 

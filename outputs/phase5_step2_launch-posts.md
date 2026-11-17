@@ -2,11 +2,39 @@
 
 Each post is written for the founder to publish under their own name, after reading the community's rules. Nothing is posted by the system: each post is an approval-gated action, and posting is STUBBED.
 
-## github
+## GitHub Discussions of related open-source projects
 
-I’ve been working on a SQL interview practice workbook for junior data analysts. It includes real interview questions with step-by-step worked answers, focused on practical skills. I’m sharing it here as a public draft for feedback — especially from people in Egypt and the wider MENA region who are preparing for their first data analyst role. The workbook is a paid digital download at $11.99. I’m not claiming it’s perfect, but I’d really value your input on clarity, structure, and usefulness. If you have feedback, I’d love to hear it. Thanks for reading.
+Hi everyone, I'm Mariam. I've been working on a practice workbook for junior data analysts preparing for SQL interviews. It includes real interview questions with step-by-step worked answers, focused on practical, hands-on learning.
 
-Approval: `act_74a2b6be` (pending)
+I'm sharing it as a digital download for $11.99 — affordable for students, especially in Egypt and the wider MENA region.
+
+I built it myself using my experience in SQL, data analysis, and mentoring junior analysts. I'm not a SQL expert, just someone who's walked through the same process.
+
+I'd love your feedback on the content — is it clear? Is it helpful for someone starting out?
+
+No hype, no promises of results. Just a practical tool for practice.
+
+Thanks for reading. Let me know what you think.
+
+Approval: `act_1d464b22` (pending)
+
+## Hacker News (Show HN / Ask HN)
+
+I'm Mariam, a data analyst working part-time on a practice workbook for junior data analysts preparing for SQL interviews.
+
+The workbook includes real interview questions with worked answers, designed to help people practice without needing a mentor or expensive resources.
+
+It's a digital download at $11.99 or less — priced to be affordable for students, especially in Egypt and the wider MENA region.
+
+I created it myself using my experience in SQL, data analysis, and mentoring junior analysts.
+
+I'm sharing it as a simple tool for practice. No claims of results or income. Just honest, practical content.
+
+What do you think about practice workbooks like this for junior data analysts? Any feedback on the structure or content would be appreciated.
+
+Thanks for your time.
+
+Approval: `act_d349fa1f` (pending)
 
 
 ---

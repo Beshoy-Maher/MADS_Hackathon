@@ -7,17 +7,17 @@
 - Compliments and 'sounds great' are not evidence. Commitments (time, money, intro) are.
 
 ## Interview guide
-1. Tell me about the last time you failed to pass a SQL interview because of a specific question.
+1. Tell me about the last time you failed to pass a SQL interview due to not knowing how to write a query.
 2. What did you do when you realized you didn’t understand a SQL concept during a job interview?
 3. How much time did you spend practicing SQL questions before your first job interview?
 4. What have you tried to prepare for SQL interviews that didn’t work?
-5. How much money did you spend on SQL learning resources before landing a job?
-6. How did you handle a situation where you didn’t get a job offer after a SQL interview?
+5. How much money did you spend on SQL learning resources before landing a data analyst role?
+6. How did you handle not being able to answer a SQL question during a technical interview?
 
 What counts as a strong signal:
 - Spent over 10 hours practicing SQL questions.
-- Tried at least three different learning resources without success.
-- Failed a SQL interview due to a specific, identifiable gap in knowledge.
+- Tried at least two learning resources that failed.
+- Failed a SQL interview due to lack of practice.
 
 
 ## Who to interview
@@ -26,9 +26,9 @@ What counts as a strong signal:
 
 ## Outreach draft (written for the founder to send as themselves)
 
-> Hi! I'm Mariam. I'm talking to people about one problem I keep hearing about: "Junior data analysts struggle with SQL interview questions." If that sounds familiar, could I ask you about your own experience in a 15-minute call? I'm not selling anything. Thank you either way.
+> Hi! I'm Mariam. I'm talking to people about one problem I keep hearing about: "Junior data analysts struggle with SQL interview questions in Egypt and MENA." If that sounds familiar, could I ask you about your own experience in a 15-minute call? I'm not selling anything. Thank you either way.
 
-Status: waiting for founder approval (action `act_1e242bed`). Sending is STUBBED: after approval the message is saved to the outbox and the founder sends it personally.
+Status: waiting for founder approval (action `act_23b81659`). Sending is STUBBED: after approval the message is saved to the outbox and the founder sends it personally.
 
 ## Interview results
 

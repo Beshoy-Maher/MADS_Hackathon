@@ -2,11 +2,11 @@
 
 An open-source team of AI agents that takes a founder's brief toward a validated, sellable **digital** product, through six gated phases: Discover, Validate, Build, Commercial setup, Launch, Operate and learn. It runs on a free local open-weight model, cites a public source for every market claim (or labels it `ASSUMPTION`), and says **"don't launch this"** when the evidence is weak. The founder approves every gate, and nothing is published, sent, spent or refunded without a click. That rule is enforced in code. Before every gate a **critic agent debates the phase's outputs with the agents that wrote them**, and the founder sees what was conceded and what is still open.
 
-Measured, not claimed: more than 380 tests that run with no model or network; guardrails refuse 37 of 40 trick prompts they were never tuned on (rules alone: 2 of 40) and wrongly refuse 0 of 62 normal requests ([`evals/results.md`](evals/results.md)); Phase 1 takes about 70 seconds on a 4-core laptop CPU; $0.00 per run.
+Measured, not claimed: more than 380 tests that run with no model or network; guardrails refuse 37 of 40 trick prompts they were never tuned on (rules alone: 2 of 40) and wrongly refuse 0 of 62 normal requests ([`evals/results.md`](evals/results.md)); Phase 1 takes about 70 seconds on a 4-core laptop CPU (plus the debate before its gate); $0.00 per run.
 
 The committed demo run, produced by `scripts/run_demo.py` with the local model, shows the three outcomes that matter:
 
-- **Promising idea, GO:** an SQL interview workbook passes the evidence gate on 24 relevant sources, 23 independent voices and 5 pain posts ([gate](outputs/phase1_gate_decision.md)), then runs through all six phases to a [MOCKED sale-to-cash test](outputs/payment_test_log.md). The demand gate recommended repeat because no real visitor has seen the page; the demo founder overrode it to show the later phases, and the override is recorded ([gate](outputs/phase2_gate_decision.md)).
+- **Promising idea, GO:** an SQL interview workbook passes the evidence gate on 25 relevant sources, 24 independent voices and 5 pain posts ([gate](outputs/phase1_gate_decision.md)), a critic agent debates its findings before the gate ([debate](outputs/phase1_step6_debate.md)), then it runs through all six phases to a [MOCKED sale-to-cash test](outputs/payment_test_log.md). The demand gate recommended repeat because no real visitor has seen the page; the demo founder overrode it to show the later phases, and the override is recorded ([gate](outputs/phase2_gate_decision.md)).
 - **Weak idea, STOP:** a paid daily-quotes email for developers fails on founder fit and total score, and no alternative passes, so the system says "do not launch this" ([gate](outputs/phase1_gate_decision_weak-idea.md)).
 - **Excluded idea, refused:** a crypto-signals channel is refused before any agent runs ([gate](outputs/phase1_gate_decision_excluded-idea.md)).
 
@@ -80,7 +80,7 @@ An **orchestrator** (`orchestrator.py`) runs the six phases in order. Each phase
 
 ## Cost per run
 
-**About $0.00 per run** (local model, ~23k tokens for all three demo founders in our demo run: 28 model calls, including the verifier's reviews and one module revision; research APIs are free). The dashboard header shows the running cost, and every decision-log entry records `"cost": 0`.
+**About $0.00 per run** (local model, ~55k tokens for all three demo founders in our demo run: 43 model calls, including the verifier's reviews and the debate before each gate; research APIs are free). The dashboard header shows the running cost, and every decision-log entry records `"cost": 0`.
 
 ## Demo video
 

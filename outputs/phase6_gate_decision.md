@@ -15,7 +15,9 @@ Reasons:
 
 Gate type: evidence. Allowed outcomes: go, repeat, pivot, stop. Thresholds are fixed in `gates.py` before the data is seen.
 
-**Founder decision: REPEAT** at 2026-11-17T12:43:23Z. Note: Keep operating; review after 14 days of real sales data.
+Debate before this gate (`phase6_step4_debate.md`): 3 objection(s), 3 conceded, 0 open (0 high severity). It informs this decision; it does not change the recommendation.
+
+**Founder decision: REPEAT** at 2026-11-17T13:57:11Z. Note: Keep operating; review after 14 days of real sales data.
 
 ---
 Gate logic is deterministic code (no model). Cost: $0.00.

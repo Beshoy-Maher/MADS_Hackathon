@@ -6,11 +6,9 @@
 - Only sign-ups with consent, through the real form, count.
 
 ## How to get real visitors
-- Share 3 detailed, honest Figma case study breakdowns in local design Discord servers and LinkedIn groups, tagging relevant communities.
-- Post 2 short, raw video clips showing real Figma workflow struggles and how the templates solve them, on Instagram Stories and TikTok.
-- Ask 5 junior designers in your network to test the templates and share their honest feedback in exchange for a free copy.
-- Write 1 public thread on LinkedIn about the challenges of presenting case studies as a junior designer, linking to the waitlist as a resource.
-- Offer a free, limited-time Figma file with 3 core templates to anyone who shares the waitlist link with 2 peers in design communities.
+- Share your Figma template pack with 5 junior designers in your network who are actively job hunting, asking for honest feedback and a referral to their peers.
+- Collaborate with a junior designer in your network to co-create a quick case study using the template and share it as a real example in a design community.
+- Reach out to 3 local design meetups or online events in Egypt/Gulf and offer to share your template pack as a resource for attendees who are building portfolios.
 
 ## Result so far
 - Real sign-ups recorded: **none yet**. The landing page has not been published, so the test has not started. Waitlist collection is STUBBED in this demo (no public hosting).

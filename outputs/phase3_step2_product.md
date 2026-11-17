@@ -10,157 +10,179 @@ A practical PDF workbook for Junior and aspiring data analysts preparing for SQL
 
 ## Module 1: Get oriented: what good sql interview prep looks like
 
-Preparing for a SQL interview means showing you can write clean, correct queries that solve real data problems. This module helps you understand what good prep looks like—so you avoid common pitfalls.
+Preparing for a SQL interview means knowing what interviewers expect and avoiding common pitfalls. This module helps you start with clarity and focus.
 
-1. **Know the interview format**: Most junior analyst interviews include 2–3 SQL questions (ASSUMPTION) You’ll write queries on a whiteboard or in an online editor. Time is limited, so focus on clarity and correctness.
-
-2. **Use standard SQL**: Stick to basic syntax like `SELECT`, `FROM`, `WHERE`, `GROUP BY`, `HAVING`, and `JOIN`. Avoid database-specific features (e.g., `LIMIT` in PostgreSQL vs. `LIMIT` in SQLite—use only what works in SQLite).
-
-3. **Start with the question**: Read the prompt carefully. Identify the goal (e.g., “Find the top 3 customers by revenue”) and the data source (e.g., `sales` table).
-
-4. **Write step-by-step**: Break the query into parts. First, pick the columns. Then filter with `WHERE`. Group with `GROUP BY` if needed. Order results with `ORDER BY`.
-
-5. **Test your logic**: Run your query in SQLite. Check for syntax errors and logical flaws. For example, did you include `GROUP BY` when using an aggregate like `SUM()`?
-
-6. **Review for clarity**: Use aliases (`AS`) to name columns clearly. Avoid `SELECT *`. Only include needed data.
+1. **Review job postings from companies in Egypt and the MENA region** (e.g., from LinkedIn, Wuzzuf, or Bayt.com). Look for recurring SQL skills like `SELECT`, `JOIN`, `GROUP BY`, and filtering with `WHERE`.
+2. **Use free resources like SQLZoo or Mode Analytics’ SQL tutorial** to confirm you understand basic syntax. Practice writing queries that match the job descriptions.
+3. **Avoid memorizing answers**. Instead, learn how to break down questions: identify the goal, data sources, and required operations.
+4. **Practice with real-world datasets**. Use sample data like sales records or user activity logs. Write queries that answer typical questions (e.g., “Find the top 5 customers by order count”).
+5. **Time your practice**. Simulate interview conditions: 10–15 minutes per question.
+6. **Review your queries**. Check for correct syntax, proper table joins, and accurate filtering.
 
 **Worked example**:
-*Goal: Find total sales per customer, ordered by highest sales first.*
+*Question*: “List all customers who made more than 3 purchases in 2023.”
+*Steps*:
+- Use `SELECT customer_id` from `orders`
+- Filter with `WHERE order_date BETWEEN '2023-01-01' AND '2023-12-31'`
+- Group by `customer_id`
+- Use `HAVING COUNT(*) > 3`
+- Order by count descending
+
 ```sql
-SELECT customer_id, SUM(amount) AS total_sales
-FROM sales
+SELECT customer_id, COUNT(*) AS order_count
+FROM orders
+WHERE order_date BETWEEN '2023-01-01' AND '2023-12-31'
 GROUP BY customer_id
-ORDER BY total_sales DESC;
+HAVING COUNT(*) > 3
+ORDER BY order_count DESC;
 ```
 
-**Checklist**
-- [ ] Query uses only standard SQL
-- [ ] All column names are explicit
-- [ ] `GROUP BY` is used with aggregates
-- [ ] Results are ordered as expected
-- [ ] No `SELECT *` used
+- [ ] Reviewed 3 job posts from MENA region
+- [ ] Practiced 5 basic queries on SQLZoo
+- [ ] Wrote and tested 1 query under time limit
+- [ ] Checked syntax and logic in query
 
-**Common mistakes**
-- Forgetting `GROUP BY` when using `SUM()`
-- Using `ORDER BY` without `GROUP BY`
-- Writing `LIMIT` without `ORDER BY`
-- Not testing the query in a real environment
+**Common mistakes**:
+- Using `WHERE` instead of `HAVING` for grouped data
+- Forgetting `GROUP BY` when using aggregate functions
+- Misplacing parentheses or quotes in date filters
 
 ## Module 2: Step-by-step method for sql interview prep
 
-Start your SQL interview prep with a clear, repeatable method. This approach works for any interview question, whether you're in Cairo, Riyadh, or Dubai. Use it every time.
+Start with a clear plan. Use this method to prepare for SQL interviews step by step. It works for junior analysts in Egypt and the wider MENA region. Follow these steps to build confidence and clarity.
 
-1. **Read the question slowly.** Identify the key request: What data do you need? What filters apply? What output format is expected?
-2. **List the required columns.** Write them down before writing code. Example: `user_id`, `order_date`, `total_amount`.
-3. **Identify the tables involved.** Check the schema. Use `PRAGMA table_info(table_name)` in SQLite to see column names and types.
-4. **Build the query step by step.** Start with `SELECT * FROM table` to check data. Then add `WHERE` filters, `JOIN` conditions, and `GROUP BY` clauses.
-5. **Test each step.** Run the query after each change. Fix errors early.
-6. **Review the final output.** Does it match the expected result? Are all filters applied? Are duplicates removed?
+1. **Pick one SQL topic** – Choose a core skill like `SELECT`, `JOIN`, or `GROUP BY`. Focus on one at a time.
+2. **Find a real-world dataset** – Use public data from sources like Kaggle or open data platforms to find datasets. Avoid private or internal data.
+3. **Write 3 practice queries** – For each topic, write simple queries using standard SQL. Test them in SQLite. Example: `SELECT name FROM users WHERE age > 25;`
+4. **Explain your logic aloud** – Say out loud why you wrote each part. This builds communication skills for interviews.
+5. **Review and refactor** – Check if your query is clean. Use `AS` for aliases, avoid `SELECT *`, and order results with `ORDER BY`.
+6. **Repeat with a new topic** – Move to the next skill after mastering one. Track progress in a notebook.
 
-**Worked example:**
-*Question:* Find the total sales per customer in January 2023.
-- Tables: `orders` (order_id, customer_id, order_date, amount), `customers` (customer_id, name)
-- Steps:
-  - `SELECT customer_id, SUM(amount) FROM orders WHERE order_date LIKE '2023-01-%' GROUP BY customer_id`
-  - Join with `customers` to get names: `JOIN customers ON orders.customer_id = customers.customer_id`
-  - Final: `SELECT c.name, SUM(o.amount) FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE o.order_date LIKE '2023-01-%' GROUP BY c.name`
+**Worked example**:
+Topic: `JOIN`
+Dataset: Two tables – `employees` (id, name, department_id) and `departments` (id, name).
+Query:
+```sql
+SELECT e.name, d.name AS department
+FROM employees e
+JOIN departments d ON e.department_id = d.id;
+```
+This shows employee names and their departments.
 
-- [ ] Read the question fully
-- [ ] List required columns
-- [ ] Identify tables and relationships
-- [ ] Build query step by step
-- [ ] Test each part
-- [ ] Verify output matches the goal
+- [ ] Chose one SQL topic
+- [ ] Found a public dataset
+- [ ] Wrote 3 queries
+- [ ] Explained each step aloud
+- [ ] Refactored for clarity
+- [ ] Moved to next topic
 
-**Common mistakes:**
-- Skipping `GROUP BY` when using `SUM()`
-- Using `=` instead of `LIKE '2023-01-%'` for date filtering
-- Forgetting to join tables when needed
-- Not testing intermediate steps
-- Assuming data is clean (e.g., missing values, typos)
+**Common mistakes**:
+- Using `SELECT *` instead of naming columns
+- Forgetting `ON` in `JOIN` clauses
+- Not testing queries in SQLite first
+- Skipping explanation practice
+- Trying to learn too many topics at once
 
 ## Module 3: Worked example
 
-This module walks you through solving a full problem step by step, using actual data patterns seen in job interviews.
+This module walks you through solving a real-world SQL interview question step by step. You’ll practice writing queries using standard SQL that works in SQLite. The example is based on common data patterns seen in job postings and company datasets ASSUMPTION.
 
-1. Read the question carefully. Identify the key tables and required output.
-2. List the columns you need from each table. Use `SELECT` with only necessary columns.
-3. Join tables using `JOIN` on matching keys (e.g., `user_id`, `order_id`). Use `INNER JOIN` unless the question says otherwise.
-4. Apply filters with `WHERE` to narrow results. Use `AND` for multiple conditions.
-5. Group data with `GROUP BY` if you need counts, sums, or averages.
-6. Order results with `ORDER BY` if required. Use `LIMIT` only if the question asks for top N.
+1. **Understand the question**
+   Read the problem carefully. Identify the key data needed: which tables, what conditions, and what output is expected.
 
-**Worked Example:**
-*Find the top 5 cities by total order value in January 2024, where each order has a value > 100.*
+2. **List the required columns**
+   Decide which columns to select. Only include what’s asked—no extra data.
+
+3. **Apply filtering conditions**
+   Use `WHERE` to narrow down rows. Be specific: filter by date, region, or job type if needed.
+
+4. **Group or sort data if required**
+   Use `GROUP BY` for counts or summaries. Use `ORDER BY` to sort results by a column.
+
+5. **Test your query**
+   Run it in a SQLite environment. Check for syntax errors and logical issues.
+
+6. **Review the output**
+   Ensure results match the expected format and answer the question.
+
+**Worked Example**
+*Question:* Find the number of data analyst jobs posted in Egypt in 2023, grouped by month, sorted by month.
 
 ```sql
 SELECT
-    c.city,
-    SUM(o.order_value) AS total_value
-FROM orders o
-JOIN customers c ON o.customer_id = c.customer_id
-WHERE o.order_date >= '2024-01-01'
-  AND o.order_date < '2024-02-01'
-  AND o.order_value > 100
-GROUP BY c.city
-ORDER BY total_value DESC
-LIMIT 5;
+  strftime('%m', posted_date) AS month,
+  COUNT(*) AS job_count
+FROM job_postings
+WHERE
+  country = 'Egypt'
+  AND job_title LIKE '%analyst%'
+  AND posted_date BETWEEN '2023-01-01' AND '2023-12-31'
+GROUP BY month
+ORDER BY month;
 ```
 
 **Checklist**
-- [ ] Used `INNER JOIN` for related tables
-- [ ] Selected only needed columns
-- [ ] Filtered by date range using `>=` and `<`
-- [ ] Applied `GROUP BY` after `WHERE`
-- [ ] Ordered by total value descending
-- [ ] Used `LIMIT 5` as required
+- [ ] Query uses standard SQL
+- [ ] Runs in SQLite
+- [ ] Filters by country and job title
+- [ ] Groups by month
+- [ ] Orders by month
+- [ ] Returns only needed columns
 
 **Common mistakes**
-- Using `LIKE` or `IN` when `=` or `BETWEEN` is better
-- Placing `GROUP BY` before `WHERE`
-- Forgetting to include `GROUP BY` when using aggregate functions
-- Using `ORDER BY` without `LIMIT` when only top results are needed
-- Joining on incorrect or missing keys (e.g., `user_id` vs `customer_id`)
+- Using `GROUP BY` without `SELECT`ing the grouped column
+- Forgetting to filter by year
+- Using `LIKE` with `%` without proper context
+- Not testing in a real environment before submitting
 
 ## Module 4: Checklists and worksheet
 
-This module helps you practice SQL interview questions using real-world templates. Use these checklists and worksheets to test your skills before interviews. All examples use standard SQL that works in SQLite.
+This module helps you practice SQL interview questions using real-world templates. You’ll apply what you’ve learned in earlier modules to write queries that solve common analyst tasks. Use these worksheets to test your skills before interviews.
 
-1. Open a SQLite database or use an online tool like DB Fiddle.
-2. Copy the sample dataset (e.g., `sales`, `employees`, `products`) provided in the workbook.
-3. Write your query step by step using the template:
-   - Start with `SELECT`
-   - Add `FROM` and table name
-   - Use `WHERE` for filters
-   - Use `GROUP BY` if aggregating
-   - Use `ORDER BY` to sort results
-4. Run your query and check if it returns expected rows and columns.
-5. Compare your result with the solution in the answer key.
-6. Rewrite the query using a different approach (e.g., use `HAVING` instead of `WHERE` if filtering groups).
+1. Open your SQL environment (like SQLite or a web-based tool).
+2. Copy the sample dataset structure below into your database:
+   ```sql
+   CREATE TABLE sales (
+     id INTEGER,
+     date DATE,
+     region TEXT,
+     amount DECIMAL(10,2)
+   );
+   INSERT INTO sales VALUES
+     (1, '2023-01-05', 'Cairo', 120.50),
+     (2, '2023-01-06', 'Alexandria', 95.00),
+     (3, '2023-01-07', 'Cairo', 200.00);
+   ```
+3. Read each question in the worksheet. For each, write a query using standard SQL.
+4. Run your query and check the output. Compare it to the expected result shown in the answer key.
+5. If wrong, revise your query. Focus on syntax, column names, and filtering logic.
+6. Save your final version in a file named `sql_interview_worksheet.sql`.
 
 **Worked Example:**
-*Find the total sales per region, showing only regions with sales over 1000.*
+*Question:* Find total sales in Cairo.
+*Your Query:*
 ```sql
-SELECT region, SUM(sales) AS total_sales
+SELECT SUM(amount) AS total_cairo_sales
 FROM sales
-GROUP BY region
-HAVING SUM(sales) > 1000;
+WHERE region = 'Cairo';
 ```
+*Expected Output:* 320.50
 
-**Checklist:**
-- [ ] Query uses `SELECT`, `FROM`, and `GROUP BY`
-- [ ] `HAVING` is used instead of `WHERE` for grouped conditions
-- [ ] Column names match the sample data
-- [ ] No syntax errors (e.g., missing commas or semicolons)
-- [ ] Result matches expected output
+**Checklist**
+- [ ] Dataset created and loaded
+- [ ] Query uses standard SQL (no vendor-specific syntax)
+- [ ] All column names match the table exactly
+- [ ] `WHERE` clause filters correctly
+- [ ] `SUM()` used for totals
+- [ ] Query runs without errors
 
-**Common mistakes:**
-- Using `WHERE` instead of `HAVING` when filtering grouped data
-- Forgetting `GROUP BY` when using aggregate functions like `SUM()`
-- Typo in table or column names
-- Missing parentheses or quotes in string filters
-- Not testing with sample data before finalizing
+**Common mistakes**
+- Typo in column name (e.g., `regin` instead of `region`)
+- Missing `FROM` clause
+- Using `= 'Cairo'` instead of `= 'Cairo'` (case-sensitive in some systems)
+- Forgetting `GROUP BY` when using aggregate functions with non-aggregated columns
 
 ## A note on results
 
 This product gives you a method and templates. Your results depend on your situation and effort; nothing here is a promise of any outcome.
+Claim check: 0 unsourced claim(s) labelled ASSUMPTION, 2 link(s) not found in the fetched evidence removed.

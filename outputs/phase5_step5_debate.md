@@ -3,43 +3,31 @@
 Debated: `phase5_step1_store-page.html`, `phase5_step2_launch-posts.md`. Critic (devil's advocate): `gpt-oss:20b` configured; models that took part: `gpt-oss:20b`, `qwen3:30b-a3b-instruct-2507-q4_K_M`.
 The critic quotes the words it disputes (quotes not found in the document are dropped by code). The author concedes with replacement text or defends with a fetched source. A conceded replacement is written into the document only if the quote is found exactly once, it is at most about 3 times as long, and the guardrail scan and claim check leave it unchanged; code-computed lines are never changed. A defence without a fetched source stays open.
 
-**Result: 3 objection(s): 3 fixed, 0 conceded not applied, 0 defended, 0 open.** The debate informs the founder; it does not change the gate's recommendation.
+**Result: 2 objection(s): 1 fixed, 1 conceded not applied, 0 defended, 0 open.** The debate informs the founder; it does not change the gate's recommendation.
 
-## #1 [medium] FIXED: `phase5_step1_store-page.html`
+## #1 [high] FIXED: `phase5_step1_store-page.html`
 
-> Contains 15 real-world SQL interview questions commonly asked in Egypt and the MENA region, based on actual job postings and technical screens.
+> real-world SQL interview questions commonly asked in junior data analyst roles across Egypt and the MENA region.
 
-**Critic:** The claim that the workbook contains 15 real‑world questions specifically from Egypt/MENA job postings is not supported by any of the fetched evidence URLs, which list unrelated GitHub repositories. (evidence: ASSUMPTION)
+**Critic:** The claim that the workbook contains real‑world questions commonly asked in junior data analyst roles in Egypt/MENA is not supported by any evidence provided. No source lists interview questions specific to that region, nor does any of the fetched URLs confirm that the workbook’s content is tailored to local interview practices. (evidence: ASSUMPTION)
 
-**Author (copywriter), concede:** The claim that the workbook contains 15 real-world SQL interview questions specifically from Egypt/MENA job postings is not supported by the evidence. The provided URLs do not confirm the geographic origin or sourcing of the questions.
+**Author (copywriter), concede:** The claim that the workbook contains real-world questions commonly asked in junior data analyst roles in Egypt and the MENA region is not supported by the evidence provided. No source lists interview questions specific to that region, nor does any of the fetched URLs confirm that the workbook’s content is tailored to local interview practices.
 
-Correction written into `phase5_step1_store-page.html`: Contains 15 SQL interview questions inspired by common patterns in entry-level data analyst roles, based on publicly available technical interview resources.
-
-**Verdict:** correction written into the document
-
-## #2 [medium] FIXED: `phase5_step2_launch-posts.md`
-
-> I made a SQL interview prep workbook for junior data analysts, based on my own experience as a data analyst in Egypt and the challenges I saw new candidates face during interviews.
-
-**Critic:** The statement that the author’s experience as a data analyst in Egypt informed the workbook is unsupported by the evidence; none of the provided URLs confirm the author’s background or location. (evidence: ASSUMPTION)
-
-**Author (copywriter), concede:** The statement that the author’s experience as a data analyst in Egypt informed the workbook is not supported by the evidence. None of the provided URLs confirm the author’s background, location, or professional experience.
-
-Correction written into `phase5_step2_launch-posts.md`: I made a SQL interview prep workbook for junior data analysts, based on my own experience with technical interviews and the challenges I’ve seen new candidates face.
+Correction written into `phase5_step1_store-page.html`: real-world SQL interview questions drawn from publicly available sources relevant to junior data analyst roles
 
 **Verdict:** correction written into the document
 
-## #3 [medium] FIXED: `phase5_step1_store-page.html`
+## #2 [high] CONCEDED, NOT APPLIED: `phase5_step1_store-page.html`
 
-> Designed for beginners: no prior interview prep experience needed.
+> $11.99 One-time purchase.
 
-**Critic:** The claim that the workbook is suitable for absolute beginners is not substantiated by any evidence; the evidence set contains no information about the workbook’s difficulty level or target audience. (evidence: ASSUMPTION)
+**Critic:** The stated price is a factual claim about the product’s cost. No source confirms that the workbook is sold for $11.99; the evidence list contains only GitHub repositories, none of which provide pricing information. (evidence: ASSUMPTION)
 
-**Author (copywriter), concede:** The claim that the workbook is designed for absolute beginners is not substantiated by the evidence. The provided URLs do not contain information about the workbook’s difficulty level or target audience.
+**Author (copywriter), concede:** The stated price of $11.99 is a factual claim about the product’s cost. No source confirms that the workbook is sold for $11.99; the evidence list contains only GitHub repositories, none of which provide pricing information.
 
-Correction written into `phase5_step1_store-page.html`: Designed for those new to SQL interview prep: no prior interview prep experience needed.
+Replacement offered (not applied): $11.99 One-time purchase
 
-**Verdict:** correction written into the document
+**Verdict:** not applied: the quote is found 0 times in the file, not exactly once
 
 ---
 Generated by the pipeline. Models: gpt-oss:20b, qwen3:30b-a3b-instruct-2507-q4_K_M (local open-weight models). Cost: $0.00.

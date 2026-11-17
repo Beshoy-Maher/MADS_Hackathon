@@ -9,15 +9,15 @@
 ## Interview guide
 1. Tell me about the last time you tried to showcase a design project in your portfolio.
 2. What did you do when you realized your case study wasn’t clearly communicating your process?
-3. How did you decide what to include—or leave out—when building a case study?
-4. What have you tried to improve how your case studies look or feel to hiring managers?
-5. How much time or money have you spent trying to make your case studies stand out?
-6. What’s one thing you wish you’d known earlier about presenting your work in a portfolio?
+3. How did you decide what to include or leave out when building a case study?
+4. What have you tried to make your case studies stand out to hiring managers?
+5. How much time did you spend on a single case study before submitting it?
+6. How much money, if any, have you spent on tools, templates, or courses to improve your case studies?
 
 **What counts as a strong signal:**
-- Spent time or money on tools, templates, or courses to improve case studies
-- Repeatedly revised case studies after feedback
-- Shared work with peers or mentors for critique
+- Spent time editing a case study multiple times
+- Paid for a template, course, or design tool
+- Asked for feedback from peers or mentors on a case study
 
 ## Who to interview
 - 5 to 8 people from: communities the founder already belongs to.
@@ -27,7 +27,7 @@
 
 > Hi! I'm Laila. I'm talking to people about one problem I keep hearing about: "Junior designers struggle to present their work clearly in portfolios." If that sounds familiar, could I ask you about your own experience in a 15-minute call? I'm not selling anything. Thank you either way.
 
-Status: waiting for founder approval (action `act_e34151d0`). Sending is STUBBED: after approval the message is saved to the outbox and the founder sends it personally.
+Status: waiting for founder approval (action `act_73bf46aa`). Sending is STUBBED: after approval the message is saved to the outbox and the founder sends it personally.
 
 ## Interview results
 

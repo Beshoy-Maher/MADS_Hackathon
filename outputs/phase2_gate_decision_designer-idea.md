@@ -16,9 +16,9 @@ Reasons:
 
 Gate type: evidence. Allowed outcomes: go, pivot, stop. Thresholds are fixed in `gates.py` before the data is seen.
 
-Debate before this gate (`phase2_step4_debate.md`): 2 objection(s): 2 fixed, 0 conceded not applied, 0 defended, 0 open (0 open with high severity). Fixed corrections were written into the documents before this gate was shown. It informs this decision; it does not change the recommendation.
+Debate before this gate (`phase2_step4_debate.md`): 0 objection(s): 0 fixed, 0 conceded not applied, 0 defended, 0 open (0 open with high severity). Fixed corrections were written into the documents before this gate was shown. It informs this decision; it does not change the recommendation.
 
-**Founder decision: STOP** at 2026-11-17T17:55:34Z.
+**Founder decision: STOP** at 2026-11-17T19:15:42Z.
 
 ## Attempt 1
 
@@ -36,9 +36,9 @@ Reasons:
 
 Gate type: evidence. Allowed outcomes: go, repeat, pivot, stop. Thresholds are fixed in `gates.py` before the data is seen.
 
-Debate before this gate (`phase2_step4_debate.md`): 0 objection(s): 0 fixed, 0 conceded not applied, 0 defended, 0 open (0 open with high severity). Fixed corrections were written into the documents before this gate was shown. It informs this decision; it does not change the recommendation.
+Debate before this gate (`phase2_step4_debate.md`): 1 objection(s): 1 fixed, 0 conceded not applied, 0 defended, 0 open (0 open with high severity). Fixed corrections were written into the documents before this gate was shown. It informs this decision; it does not change the recommendation.
 
-**Founder decision: REPEAT** at 2026-11-17T17:55:00Z.
+**Founder decision: REPEAT** at 2026-11-17T19:15:26Z.
 
 ---
 Gate logic is deterministic code (no model). Cost: $0.00.

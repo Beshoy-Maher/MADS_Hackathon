@@ -15,4 +15,4 @@ Run the larger set with `docker compose --env-file models-large.env up` (32+ GB 
 
 ## Cost per run
 
-`decision_log.json` counts agent actions, not calls, so it has 67 entries with a model: the product is one entry for several calls, while each debate transcript (10) and each applied debate correction (8) is an entry that names its model without a new call.
+`decision_log.json` counts agent actions, not calls, so it has 70 entries with a model: the product is one entry for several calls, while each debate transcript (10) and each applied debate correction (8) is an entry that names its model without a new call.

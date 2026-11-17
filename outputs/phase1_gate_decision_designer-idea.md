@@ -20,10 +20,9 @@ Reasons:
 
 Gate type: evidence. Allowed outcomes: go, repeat, pivot, stop. Thresholds are fixed in `gates.py` before the data is seen.
 
-Debate before this gate (`phase1_step6_debate.md`): 1 objection(s): 0 fixed, 1 conceded not applied, 0 defended, 0 open (0 open with high severity). Fixed corrections were written into the documents before this gate was shown. It informs this decision; it does not change the recommendation.
-- CONCEDED, NOT APPLIED [high] The identification of the target market as junior UX designers in Egypt and the Gulf is an unsupported assumption with no fetched source confirming this demographic.
+Debate before this gate (`phase1_step6_debate.md`): 1 objection(s): 1 fixed, 0 conceded not applied, 0 defended, 0 open (0 open with high severity). Fixed corrections were written into the documents before this gate was shown. It informs this decision; it does not change the recommendation.
 
-**Founder decision: GO** at 2026-11-17T17:54:44Z.
+**Founder decision: GO** at 2026-11-17T19:14:59Z.
 
 ---
 Gate logic is deterministic code (no model). Cost: $0.00.

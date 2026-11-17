@@ -14,9 +14,10 @@ Reasons:
 
 Gate type: founder. Allowed outcomes: go, repeat, pivot, stop. Thresholds are fixed in `gates.py` before the data is seen.
 
-Debate before this gate (`phase5_step5_debate.md`): 3 objection(s): 3 fixed, 0 conceded not applied, 0 defended, 0 open (0 open with high severity). Fixed corrections were written into the documents before this gate was shown. It informs this decision; it does not change the recommendation.
+Debate before this gate (`phase5_step5_debate.md`): 2 objection(s): 1 fixed, 1 conceded not applied, 0 defended, 0 open (0 open with high severity). Fixed corrections were written into the documents before this gate was shown. It informs this decision; it does not change the recommendation.
+- CONCEDED, NOT APPLIED [high] The stated price is a factual claim about the product’s cost. No source confirms that the workbook is sold for $11.99; the evidence list contains only GitHub repositories, none of which provide pricing information.
 
-**Founder decision: GO** at 2026-11-17T17:58:16Z.
+**Founder decision: GO** at 2026-11-17T19:19:04Z.
 
 ---
 Gate logic is deterministic code (no model). Cost: $0.00.

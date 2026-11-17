@@ -15,9 +15,9 @@ Reasons:
 
 Gate type: founder. Allowed outcomes: go, repeat, pivot, stop. Thresholds are fixed in `gates.py` before the data is seen.
 
-Debate before this gate (`phase4_step3_debate.md`): 0 objection(s): 0 fixed, 0 conceded not applied, 0 defended, 0 open (0 open with high severity). Fixed corrections were written into the documents before this gate was shown. It informs this decision; it does not change the recommendation.
+Debate before this gate (`phase4_step5_debate.md`): 1 objection(s): 1 fixed, 0 conceded not applied, 0 defended, 0 open (0 open with high severity). Fixed corrections were written into the documents before this gate was shown. It informs this decision; it does not change the recommendation.
 
-**Founder decision: GO** at 2026-11-17T17:57:45Z.
+**Founder decision: GO** at 2026-11-17T19:18:33Z.
 
 ---
 Gate logic is deterministic code (no model). Cost: $0.00.

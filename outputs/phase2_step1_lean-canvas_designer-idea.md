@@ -2,43 +2,42 @@
 
 ## Problem
 - Junior designers lack clear, professional templates to structure their case studies.
-- Presenting design work effectively is a barrier to landing first jobs.
+- Presenting design work effectively is a barrier to landing their first job.
 
 ## Customer Segments
-- Junior UX designers in Egypt
-- Junior UX designers in the Gulf region
+- Junior UX designers in Egypt and the Gulf
 - Freelance designers transitioning to full-time roles
+- Design students preparing job applications
 
 ## Unique Value Proposition
-A simple, honest Figma template pack built for junior designers by a practicing UX designer, focused on clarity over complexity.
+A simple, honest Figma template pack tailored for junior designers in Egypt and the Gulf, built with local context and minimal friction.
 
 ## Solution
-- A Figma template pack with pre-built, customizable case study pages.
-- Templates designed specifically for junior designers with minimal design experience.
-- Simple, clean layout focused on storytelling and clarity.
+- A Figma template pack with pre-designed case study layouts for portfolio presentation.
+- Templates optimized for clarity and ease of use, reflecting the founder’s freelance UX experience.
+- Designed with a minimalist aesthetic aligned with the founder’s values.
 
 ## Channels
-- Reddit communities (e.g., r/UXDesign, r/DesignStudents)
-- LinkedIn groups for designers in Egypt and the Gulf
+- LinkedIn groups for Egyptian and Gulf designers
 - Founder’s personal network (freelance UX community in Alexandria)
 
 ## Revenue Streams
 - One-time purchase of the digital Figma template pack
 
 ## Cost Structure
-- Figma Pro subscription (required for publishing templates)
-- Domain and hosting for a simple landing page (estimated $10/year)
-- Time investment (8 hours/week, 40 hours total over ~5 weeks)
+- Figma Pro plan (required for publishing templates)
+- Domain and hosting for a simple landing page (estimated under $40)
+- Time investment (8 hours/week for development and outreach)
 
 ## Key Metrics
 - Number of template downloads
-- Conversion rate from landing page to purchase
-- Customer feedback on usability and clarity
+- Conversion rate from free preview to paid purchase
+- Customer feedback on usability and relevance
 
 ## Unfair Advantage
-- ASSUMPTION: The founder has experience as a junior designer in the target market (Alexandria, Egypt)
-- ASSUMPTION: The founder has an existing network in the regional freelance UX community
-- ASSUMPTION: The founder’s real-world experience gives her insight into pain points that generic templates miss
+- First-hand experience as a junior designer in Alexandria transitioning to full-time work
+- Deep familiarity with the local job market and portfolio expectations in Egypt and the Gulf
+- Simple, honest design approach that resonates with the target audience’s values
 
 Riskiest assumption to test next: that enough of the target customers will leave their email for this product (tested in step 2 and 3 with a landing page).
 

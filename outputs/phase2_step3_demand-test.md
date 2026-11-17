@@ -6,11 +6,10 @@
 - Only sign-ups with consent, through the real form, count.
 
 ## How to get real visitors
-- Share a detailed, honest breakdown of a real SQL interview question from your experience on Hacker News, linking to your waitlist page as a resource.
-- Write a short, practical tip on solving a common SQL interview mistake, using a real example from your work, and include the waitlist link.
-- Engage with 5–10 relevant threads on Hacker News by offering thoughtful commentary on data analysis or SQL challenges, subtly mentioning the workbook as a tool you use to prepare.
-- Post a brief, no-fluff update about your journey as a junior analyst in Egypt, highlighting the gaps you’re addressing with the workbook, and invite others to join the waitlist.
-- Offer a free sample chapter via email to early sign-ups, with a clear, honest note that it’s a real, tested piece of the full workbook.
+- Share a detailed, honest breakdown of a real SQL interview question with a worked solution on Hacker News, linking to the waitlist as a resource for more practice.
+- Post a short, practical tip on using SQL to solve a common data analysis problem in a public forum, with a link to the waitlist for more guided exercises.
+- Write a transparent, no-fluff post about her journey as a junior analyst in Egypt, including the challenges she faced with SQL interviews, and how the workbook helped her.
+- Offer a free sample chapter via email to those who join the waitlist, emphasizing real, job-ready practice over gimmicks.
 
 ## Result so far
 - Real sign-ups recorded: **none yet**. The landing page has not been published, so the test has not started. Waitlist collection is STUBBED in this demo (no public hosting).

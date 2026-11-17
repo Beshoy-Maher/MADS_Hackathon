@@ -9,7 +9,7 @@ Most AI business tools promise income, lock founders into closed platforms and s
 - **Excluded idea, refused:** a crypto-signals channel is refused before any agent runs ([gate](outputs/phase1_gate_decision_excluded-idea.md)).
 - **Unseen brief:** a Figma case-study template pack for junior UX designers passes the evidence gate on 14 relevant sources and 3 pain posts, all from one platform ([gate](outputs/phase1_gate_decision_designer-idea.md)); the demand gate recommended repeat and then stop, because no real visitor has seen the page, and the founder accepted it ([gate](outputs/phase2_gate_decision_designer-idea.md)).
 
-**Measured, not claimed:** more than 480 tests that run with no model or network, on every push ([CI](.github/workflows/ci.yml)); guardrails refuse 37 of 40 trick prompts they were never tuned on (rules alone: 2 of 40) and wrongly refuse 0 of 62 normal requests ([`evals/results.md`](evals/results.md)); Phase 1, including its debate, took 32 seconds on an NVIDIA RTX 4080 in the committed run; $0.00 per run.
+**Measured, not claimed:** 491 tests that run with no model or network, on every push ([CI](.github/workflows/ci.yml)); guardrails refuse 37 of 40 trick prompts they were never tuned on (rules alone: 2 of 40) and wrongly refuse 0 of 62 normal requests ([`evals/results.md`](evals/results.md)); Phase 1, including its debate, took 64 seconds on an NVIDIA RTX 4080 in the committed run; $0.00 per run.
 
 | Claim | Where to check it |
 |---|---|
@@ -17,8 +17,8 @@ Most AI business tools promise income, lock founders into closed platforms and s
 | Nothing goes out without the founder | [`approval.py`](approval.py), [`tests/test_approval.py`](tests/test_approval.py) |
 | Every market claim sourced or `ASSUMPTION` | [opportunities](outputs/phase1_step1_opportunities.md), [market](outputs/phase1_step3_market.md), [`tools/claims.py`](tools/claims.py) |
 | 12 deterministic build tests, originality included | [QA report](outputs/phase3_step4_qa-report.md), [`agents/qa.py`](agents/qa.py) |
-| Store-page and post promises matched to the product: 11 checked, 9 kept, 0 broken, 2 for the founder to confirm | [promise check](outputs/phase5_step4_promise-check.md) |
-| A critic challenges each phase before its gate: 7 objections, 6 corrected in the documents, 1 conceded but not applied, 0 open (example: a launch post that called the founder a data analyst in Egypt, which the brief does not say, was corrected) | [Phase 5 debate](outputs/phase5_step5_debate.md), [`agents/critic.py`](agents/critic.py) |
+| Store-page and post promises matched to the product: 11 checked, 10 kept, 0 broken, 1 for the founder to confirm | [promise check](outputs/phase5_step4_promise-check.md) |
+| A critic challenges each phase before its gate: 9 objections, 5 corrected in the documents, 3 conceded but not applied, 1 open (example: a store-page claim that the questions are commonly asked in Egypt and the MENA region, which no source shows, was corrected) | [Phase 5 debate](outputs/phase5_step5_debate.md), [`agents/critic.py`](agents/critic.py) |
 | Payment triggers delivery, refunds revoke access, books reconcile (MOCKED provider) | [payment test log](outputs/payment_test_log.md), [`tests/test_payments.py`](tests/test_payments.py) |
 | Every agent action logged with sources, model, cost and approver | [`decision_log.json`](decision_log.json) |
 
@@ -88,7 +88,7 @@ flowchart TD
 
 ## Cost per run
 
-**About $0.00 per run** (local models; ~74k tokens and 53 model calls for all four demo founders in the committed run; research APIs are free). The dashboard header shows the running cost; how the decision log counts model entries: [docs/models.md](docs/models.md#cost-per-run).
+**About $0.00 per run** (local models; ~81k tokens and 56 model calls for all four demo founders in the committed run; research APIs are free). The dashboard header shows the running cost; how the decision log counts model entries: [docs/models.md](docs/models.md#cost-per-run).
 
 ## Demo video
 

@@ -4,9 +4,9 @@ Each post is written for one community, for the founder to publish under their o
 
 ## Hacker News (Show HN)
 
-Show HN: I made a SQL interview prep workbook for junior data analysts, based on my own experience with technical interviews and the challenges I’ve seen new candidates face. It includes real SQL questions I’ve seen in actual interviews, with step-by-step worked answers that show how to think through each problem. I wrote it to be practical and honest—no fluff, just clear explanations. I’m sharing it at $11.99 because I want it to be affordable for students. I’d appreciate feedback on the structure and clarity of the explanations—especially whether the reasoning in the answers feels accessible to someone just starting out.
+Show HN: I made a SQL interview prep workbook with step-by-step answers to common questions junior data analysts get asked. It’s for people who want to practice without needing a mentor or expensive course. The workbook focuses on the kind of problems you’ll actually see in entry-level roles, especially in Egypt and the MENA region. What’s one thing I could improve in the structure or examples?
 
-Approval: `act_5cc732c2` (pending)
+Approval: `act_04a7b3a1` (pending)
 
 
 ---

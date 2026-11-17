@@ -1,16 +1,18 @@
 # Phase 1, step 3: Market definition for 'SQL Interview Prep Workbook for Junior Analysts'
 
 ## Ideal customer profile
-- ASSUMPTION (no fetched source mentions Egypt): Junior data analysts in Egypt/MENA seeking first roles, often with limited interview practice.
-- Trigger: Receiving a SQL interview invite with tight prep time [Ask HN: SQL interview in 2 weeks, how to best prepare?](https://news.ycombinator.com/item?id=24659490).
-- Tried free GitHub repos and LeetCode, but found explanations unclear or overly technical [Repository sanketrs/sql-interview-preparation-questions-with-answers](https://github.com/sanketrs/sql-interview-preparation-questions-with-answers).
+- ASSUMPTION (no fetched source mentions Egypt): Junior data analysts in Egypt/MENA seeking first jobs, often self-taught or recent bootcamp grads.
+- Facing SQL interviews with limited practice resources tailored to real-world scenarios.
+- Trigger: Receiving a job interview invite or seeing a job post requiring SQL.
+- Tried: Free GitHub repos like [sanketrs/sql-interview-preparation](https://github.com/sanketrs/sql-interview-preparation-questions-with-answers) and [rohanmistry231/SQL-Interview-Preparation](https://github.com/rohanmistry231/SQL-Interview-Preparation), but found them inconsistent or lacking explanations.
 
 ## What they use today
-- Open-source GitHub repos with SQL questions and solutions [Repository rohanmistry231/SQL-Interview-Preparation](https://github.com/rohanmistry231/SQL-Interview-Preparation).
-- Gaps: Lack of structured explanations, no focus on real-world interview context, inconsistent quality [Repository shawlu95/Beyond-LeetCode-SQL](https://github.com/shawlu95/Beyond-LeetCode-SQL).
+- Open-source GitHub repos with SQL questions (e.g., [Aafreen29/SQL-Interview-Prep-Question](https://github.com/Aafreen29/SQL-Interview-Prep-Question)), but often lack worked answers or context.
+- LeetCode-style platforms, but many questions are abstract or not aligned with real analyst roles.
+- Gaps: No curated, beginner-friendly workbook with step-by-step solutions and practical interview framing.
 
 ## Market size
-ASSUMPTION: Could be measured via job board searches for “junior data analyst Egypt” and estimated via LinkedIn or local tech community engagement.
+ASSUMPTION: Can be measured via job board data (e.g., LinkedIn, Wuzzuf) showing SQL-related entry-level analyst roles in Egypt/MENA, or by tracking GitHub repo stars and forks for SQL prep resources.
 
 ## Where these people talk (from the evidence)
 

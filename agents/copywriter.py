@@ -60,6 +60,24 @@ class Copywriter(Agent):
             if s.text.strip():
                 clean_bullets.append(s.text)
         out["bullets"] = clean_bullets or fb["bullets"]
+        # Code, not the model, decides what the page may claim: counts and formats the product cannot back
+        # ("15 questions", "PDF, 45 pages") and experience the brief does not state are removed.
+        from tools import honesty
+        removed = 0
+        for k in ("headline", "subheadline", "who_for"):
+            t, a = honesty.strip_counts(str(out[k]))
+            t, b = honesty.strip_experience(t, self.brief)
+            removed += a + b
+            out[k] = t or honesty.strip_counts(str(fb[k]))[0]
+        bullets = []
+        for b0 in out["bullets"]:
+            t, a = honesty.strip_counts(str(b0))
+            t, b = honesty.strip_experience(t, self.brief)
+            removed += a + b
+            if t.strip():
+                bullets.append(t)
+        out["bullets"] = bullets or [honesty.strip_counts(str(x))[0] for x in fb["bullets"]]
+        self.copy_removed = getattr(self, "copy_removed", 0) + removed
         return out
 
     def landing_page(self, candidate: dict, canvas: dict) -> StepResult:
@@ -94,6 +112,8 @@ class Copywriter(Agent):
     def store_page(self, candidate: dict, canvas: dict, pricing: dict, policies_file: str) -> StepResult:
         c = self._copy(candidate, canvas, "store")
         price = pricing.get("price_usd")
+        # The button states what happens, nothing about pages or file formats.
+        c["cta"] = "Buy and download"
         page = f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{html.escape(c['headline'])}</title><style>{PAGE_CSS}</style></head>
@@ -111,7 +131,8 @@ class Copywriter(Agent):
 """
         act = approval.request_action(self.run, "publish", "store page", f"Publish the store page at ${price}.",
                                       {"file": "phase5_step1_store-page.html"}, agent=self.role)
-        return self.result("store-page", "open_store_page", page, ext="html", data={"copy": c, "publish_action": act["id"]})
+        return self.result("store-page", "open_store_page", page, ext="html",
+                           data={"copy": c, "publish_action": act["id"], "claims_removed_by_code": getattr(self, "copy_removed", 0)})
 
     def _one_post(self, place: str, candidate: dict, price: float | None, avoid: list[str] | None = None) -> str | None:
         """One post, written for this one community. None when no model answered: posts are never filled from a template."""
@@ -145,7 +166,10 @@ class Copywriter(Agent):
             text = re.sub(rf"(\${re.escape(str(price))})\s*(?:or (?:less|lower|under|so|more)|and (?:up|under|below)|\+)", r"\1", text)
             text = re.sub(rf"\b(?:from|starting (?:at|from)|as low as|only|just|under|up to)\s+(\${re.escape(str(price))})", r"\1", text,
                           flags=re.IGNORECASE)
-        return text.strip()
+        from tools import honesty
+        text, _ = honesty.strip_counts(text)
+        text, _ = honesty.strip_experience(text, self.brief)
+        return honesty.complete_sentences(text).strip()
 
     def launch_posts(self, candidate: dict, communities: dict, price: float | None = None) -> StepResult:
         places = launch_places(communities)

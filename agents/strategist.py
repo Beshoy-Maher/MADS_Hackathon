@@ -1,6 +1,8 @@
 """Phase 2, step 1 (Core step): design the business with a Lean Canvas."""
 from __future__ import annotations
 
+import re
+
 from agents.base import Agent, StepResult, brief_summary, budget_text, footer, hours_text
 
 BOXES = ["problem", "customer_segments", "unique_value_proposition", "solution", "channels",
@@ -36,6 +38,16 @@ class Strategist(Agent):
                 "channels: only the communities listed in the evidence and the founder's own network.")
         data = self.ask_json(task, fb, max_tokens=900)
         canvas = {k: data.get(k) or fb[k] for k in BOXES}
+        # Channels: only places found in the research. A subreddit (or Reddit) that is not in the evidence is dropped.
+        found = {str(n).lower() for n in market.get("communities", {})}
+        def researched(item) -> bool:
+            s = str(item).lower()
+            subs = set(re.findall(r"\br/\w+", s))
+            if subs and not subs <= found:
+                return False
+            return not ("reddit" in s and not any(f.startswith("r/") or "reddit" in f for f in found))
+        if isinstance(canvas.get("channels"), list):
+            canvas["channels"] = [c for c in canvas["channels"] if researched(c)] or fb["channels"]
         complete = all(canvas[k] for k in BOXES)
         md = [f"# Phase 2, step 1: Lean Canvas for '{candidate['title']}'", ""]
         for k in BOXES:

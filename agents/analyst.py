@@ -44,6 +44,9 @@ class Analyst(Agent):
             subs = {m.lower() for m in re.findall(r"\br/\w+", line)}
             return not subs or subs <= allowed
         plan = "\n".join(l for l in plan.splitlines() if fits(l)) or fallback
+        # No covert promotion, fake urgency or speaking as someone the founder is not.
+        from tools import honesty
+        plan = honesty.drop_covert_lines(plan)[0].strip() or fallback
         signups = waitlist.get("count")
         md = [f"# Phase 2, step 3: Demand test for '{candidate['title']}'", "",
               "## Pre-registered target (set before any data comes in)",
@@ -95,7 +98,8 @@ class Analyst(Agent):
                 "next. Write it without any digits: do not restate any number or count, do not add evidence that is not listed, "
                 "do not spin weak data, no income projections.")
         body = self.write(task, fallback, max_tokens=300)
-        body = reasoning_only(body) or fallback
+        from tools import honesty
+        body = honesty.complete_sentences(reasoning_only(body) or "") or fallback
         from tools import claims
         body, _ = claims.check(body, self.evidence_urls())
         md = [f"# Phase 6, step 3: Persevere-or-pivot memo for '{candidate['title']}'", "",

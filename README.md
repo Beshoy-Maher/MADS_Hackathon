@@ -1,6 +1,6 @@
 # Venture Builder by The Overfitters
 
-An open-source team of AI agents that takes a founder's brief toward a validated, sellable **digital** product, through six gated phases: Discover, Validate, Build, Commercial setup, Launch, Operate and learn. It runs on a free local open-weight model, cites a public source for every market claim (or labels it `ASSUMPTION`), and says **"don't launch this"** when the evidence is weak. The founder approves every gate, and nothing is published, sent, spent or refunded without a click. That rule is enforced in code. Before every gate a **critic agent on a different model family debates the phase's outputs with the agents that wrote them**, and the founder sees what was conceded and what is still open.
+An open-source team of AI agents that takes a founder's brief toward a validated, sellable **digital** product, through six gated phases: Discover, Validate, Build, Commercial setup, Launch, Operate and learn. It runs on a free local open-weight model, cites a public source for every market claim (or labels it `ASSUMPTION`), and says **"don't launch this"** when the evidence is weak. The founder approves every gate, and nothing is published, sent, spent or refunded without a click. That rule is enforced in code. Before every gate a **critic agent debates the phase's outputs with the agents that wrote them**, and the founder sees what was conceded and what is still open.
 
 Measured, not claimed: more than 380 tests that run with no model or network; guardrails refuse 37 of 40 trick prompts they were never tuned on (rules alone: 2 of 40) and wrongly refuse 0 of 62 normal requests ([`evals/results.md`](evals/results.md)); Phase 1 takes about 70 seconds on a 4-core laptop CPU; $0.00 per run.
 
@@ -18,8 +18,9 @@ docker compose up
 
 Then open **http://localhost:8000**. Pick a sample founder (or paste any brief) and click **Run Phase 1**. After each phase, read the gate's recommendation and click **Go / Repeat / Pivot / Stop**. Launch items wait in the **Approval queue** for Approve / Reject.
 
-- The first start downloads the models once, smallest first: `qwen3:4b-instruct-2507-q4_K_M` (2.5 GB, the app is fully usable as soon as it is there), then the writer `qwen3:30b-a3b-instruct-2507-q4_K_M` (18 GB) and the critic `gpt-oss:20b` (14 GB). Until a model is there its steps use the 4B model, and the dashboard and decision log say which model did what. Before any model is ready the agents use a labelled deterministic fallback.
-- Small laptop (under 32 GB RAM): use the 4B model for every role, for example with a `.env` holding `LLM_MODEL`, `LLM_CRITIC_MODEL` set to `qwen3:4b-instruct-2507-q4_K_M` (see `.env.example`).
+- The first start downloads the model (`qwen3:4b-instruct-2507-q4_K_M`, about 2.5 GB) once. Until it is ready the dashboard says so and the agents use a labelled deterministic fallback, so the app works right away.
+- Larger models (32+ GB RAM or a GPU, about 34 GB download): `docker compose --env-file models-large.env up` runs a 30B writer and a different-family critic (see [Models and free resources](#models-and-free-resources)).
+- On a slow laptop, use a smaller model: `LLM_MODEL=qwen3:1.7b docker compose up`.
 - NVIDIA GPU (optional, needs the NVIDIA Container Toolkit): `docker compose -f docker-compose.yml -f docker-compose.gpu.yml up`.
 - Command line instead of the dashboard: `docker compose run --rm app python cli.py run briefs/strong_founder.json`.
 - Regenerate `outputs/` and `decision_log.json`: `docker compose run --rm app python scripts/run_demo.py`.
@@ -51,25 +52,26 @@ Then open **http://localhost:8000**. Pick a sample founder (or paste any brief) 
 | 6 Operate | Support kit, metrics (real vs. MOCKED kept apart), persevere-or-pivot memo | **Working** |
 | All | Guardrails (requests, briefs, every output), secret redaction, decision log, founder approval | **Working** |
 | All | Scope check: an idea close to an excluded category (money, health, legal) waits for the founder's confirmation | **Working** |
-| All | Debate before each gate: a critic (devil's advocate, different model family) challenges the phase's outputs, the authors concede with a correction or defend with a fetched source; shown to the founder, never changes the gate | **Working** |
+| All | Debate before each gate: a critic (devil's advocate) challenges the phase's outputs, the authors concede with a correction or defend with a fetched source; shown to the founder, never changes the gate | **Working** |
 | All | Claim check on every agent's text: unsourced statistics labelled `ASSUMPTION`, links not in fetched evidence removed | **Working** |
 
 ## Architecture
 
-An **orchestrator** (`orchestrator.py`) runs the six phases in order. Each phase is a few role-named agents (`agents/<role>.py`, prompts in `prompts/`) that call a local model through `llm.py` and public evidence sources through `tools/sources.py`. After every phase a **gate** (`gates.py`) compares the results with thresholds fixed in code before the data arrives and recommends go, repeat, pivot or stop; the run then pauses until the founder decides. Anything outbound goes through `approval.py`, which refuses to execute without the founder's approval. Before the gate, a **critic** (`agents/critic.py`) on a different model family debates the phase's main outputs with the agents that wrote them; code keeps only objections that quote the document and keeps unsourced defences open, and the result is shown to the founder without changing the recommendation. `guardrails.py` screens briefs, requests and every generated text, and every agent action is appended to `decision_log.json`. Full design: [ARCHITECTURE.md](ARCHITECTURE.md).
+An **orchestrator** (`orchestrator.py`) runs the six phases in order. Each phase is a few role-named agents (`agents/<role>.py`, prompts in `prompts/`) that call a local model through `llm.py` and public evidence sources through `tools/sources.py`. After every phase a **gate** (`gates.py`) compares the results with thresholds fixed in code before the data arrives and recommends go, repeat, pivot or stop; the run then pauses until the founder decides. Anything outbound goes through `approval.py`, which refuses to execute without the founder's approval. Before the gate, a **critic** (`agents/critic.py`) debates the phase's main outputs with the agents that wrote them; code keeps only objections that quote the document and keeps unsourced defences open, and the result is shown to the founder without changing the recommendation. `guardrails.py` screens briefs, requests and every generated text, and every agent action is appended to `decision_log.json`. Full design: [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## Models and free resources
 
-- **Models:** open-weight models served locally by **Ollama**, downloaded automatically by `docker compose up`. One model per kind of work:
+- **Default model:** `qwen3:4b-instruct-2507-q4_K_M` (Qwen3-4B-Instruct-2507, Apache-2.0, open weights) for every role, served locally by **Ollama** and downloaded automatically by `docker compose up` (2.5 GB). If that tag is unavailable the downloader falls back to `qwen3:4b-instruct`, `qwen3:4b`, then `qwen3:1.7b`.
+- **Optional larger models, one per kind of work** (`models-large.env`, for 32+ GB RAM or a GPU):
 
-  | Role | Model | Licence | Download | Used for |
-  |---|---|---|---|---|
-  | Writer | `qwen3:30b-a3b-instruct-2507-q4_K_M` (Qwen3-30B-A3B-Instruct-2507, MoE, 3.3B active) | Apache-2.0 | 18 GB | research, analysis, product, every text the founder reads, the authors' side of the debate |
-  | Fast | `qwen3:4b-instruct-2507-q4_K_M` (Qwen3-4B-Instruct-2507) | Apache-2.0 | 2.5 GB | intake (brief to fields) |
-  | Judge | `qwen3:4b-instruct-2507-q4_K_M` | Apache-2.0 | (same) | the two safety judges, temperature 0 |
-  | Critic | `gpt-oss:20b` (OpenAI gpt-oss-20b) | Apache-2.0 | 14 GB | devil's advocate in the debate before each gate |
+  | Role | Default | `models-large.env` | Used for |
+  |---|---|---|---|
+  | Writer | `qwen3:4b-instruct-2507-q4_K_M` | `qwen3:30b-a3b-instruct-2507-q4_K_M` (Qwen3-30B-A3B-Instruct-2507, MoE, 3.3B active, 18 GB) | research, analysis, product, every text the founder reads, the authors' side of the debate |
+  | Fast | `qwen3:4b-instruct-2507-q4_K_M` | same | intake (brief to fields) |
+  | Judge | `qwen3:4b-instruct-2507-q4_K_M` | same | the two safety judges, temperature 0 |
+  | Critic | `qwen3:4b-instruct-2507-q4_K_M` | `gpt-oss:20b` (OpenAI gpt-oss-20b, 14 GB) | devil's advocate in the debate before each gate |
 
-  The critic is deliberately a different model family from the writer, so it does not share the writer's blind spots. A model that is missing or cannot be loaded (for example, not enough memory) hands over to the next one in `LLM_FALLBACK_MODELS` (`qwen3:4b-instruct-2507-q4_K_M`, `qwen3:4b-instruct`, `qwen3:4b`, `qwen3:1.7b`), and the decision log records the model that really answered. Every model is set in `.env` (`LLM_MODEL`, `LLM_FAST_MODEL`, `LLM_JUDGE_MODEL`, `LLM_CRITIC_MODEL`). The committed demo run in `outputs/` and `decision_log.json` was produced with `qwen3:4b-instruct-2507-q4_K_M` for every role, before the debate step was added.
+  All are Apache-2.0. With `models-large.env` the critic is a different model family from the writer, so it does not share the writer's blind spots. A model that is missing or cannot be loaded (for example, not enough memory) hands over to the next one in `LLM_FALLBACK_MODELS`, and the decision log records the model that really answered. Each role's model can also be set on its own in `.env` (`LLM_MODEL`, `LLM_FAST_MODEL`, `LLM_JUDGE_MODEL`, `LLM_CRITIC_MODEL`).
 - **Hardware:** everything runs on a CPU. With an NVIDIA GPU, add `docker-compose.gpu.yml`; the models use GPU memory first, then system RAM.
 - **No paid service is required.** Optionally, point `LLM_PROVIDER=openai_compatible` and `LLM_BASE_URL` at any free-tier OpenAI-compatible endpoint serving an open-weight model.
 - **Without any model** (`LLM_PROVIDER=none`), every agent falls back to deterministic templates; such steps are logged with `"model": null` and labelled in the outputs.

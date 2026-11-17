@@ -2,7 +2,7 @@
 
 ## Overview
 
-Venture Builder is a pipeline of small, role-named agents run by one orchestrator. A founder brief goes in; six phases run one at a time; after each phase a gate measures the results against thresholds fixed in code **before** the data arrives and recommends **go, repeat, pivot or stop**. The run then pauses until the founder decides. Models only write text (ideas, copy, product content). Every decision that matters (scores, gates, tests, prices, payments, approvals) is deterministic code, so it is reproducible and can't be talked into a different answer. Before each gate, a critic agent on a different model family **debates** the phase's main outputs with the agents that wrote them; the founder sees what was conceded and what is still open, and the recommendation stays with the code. Each kind of work runs on its own local open-weight model: a 30B mixture-of-experts writer, a 4B model for intake and the safety judges, and gpt-oss-20b as the critic. Guardrails screen the brief, every free-text request and every generated text. Every action is appended to the decision log.
+Venture Builder is a pipeline of small, role-named agents run by one orchestrator. A founder brief goes in; six phases run one at a time; after each phase a gate measures the results against thresholds fixed in code **before** the data arrives and recommends **go, repeat, pivot or stop**. The run then pauses until the founder decides. Models only write text (ideas, copy, product content). Every decision that matters (scores, gates, tests, prices, payments, approvals) is deterministic code, so it is reproducible and can't be talked into a different answer. Before each gate, a critic agent **debates** the phase's main outputs with the agents that wrote them; the founder sees what was conceded and what is still open, and the recommendation stays with the code. Each kind of work (writer, fast intake, safety judge, critic) has its own model setting. The default is the local Qwen3-4B model for all of them, so it runs on any laptop; `models-large.env` switches the writer to a 30B mixture-of-experts model and the critic to gpt-oss-20b, a different model family. Guardrails screen the brief, every free-text request and every generated text. Every action is appended to the decision log.
 
 ```mermaid
 flowchart LR
@@ -28,7 +28,7 @@ flowchart LR
     G5 -->|go| P6[6 Operate and learn<br/>support, analyst]
     P6 --> G6{Persevere / pivot gate}
     G6 -->|pivot| P1
-    C[[Debate before each gate<br/>critic gpt-oss-20b vs. authors]] -. open objections .-> G1 & G2 & G3 & G4 & G5 & G6
+    C[[Debate before each gate<br/>critic vs. authors]] -. open objections .-> G1 & G2 & G3 & G4 & G5 & G6
     F((Founder)) -. decides every gate .-> G1 & G2 & G3 & G4 & G5 & G6
     F -. approves every publish / send / refund .-> Q[(Approval queue)]
     P1 & P2 & P5 -->|outbound drafts| Q
@@ -128,7 +128,7 @@ After a phase's steps and before its gate is shown, `orchestrator._debate` hands
 | 6 | persevere-or-pivot memo (analyst); the critic argues for the **opposite** decision | `phase6_step4_debate.md` |
 
 ```
-Round 1  critic  (gpt-oss-20b)   up to 4 objections: exact quote, problem, severity, evidence URL or ASSUMPTION
+Round 1  critic                  up to 4 objections: exact quote, problem, severity, evidence URL or ASSUMPTION
          code                    drops an objection whose quote is not in the document, one that attacks a line computed
                                  by code (counts, scores, check tables) or a fetched evidence title, and one that calls
                                  a fetched link fake; an evidence URL that was never fetched becomes ASSUMPTION
@@ -140,7 +140,7 @@ Moderator (code)                 transcript file, one decision-log entry per tur
 
 - **It informs, it does not decide.** The gate's recommendation comes from `gates.py` alone; the debate is shown next to it. A test runs the same brief with and without the debate and checks the recommendation is identical.
 - **REPEAT uses it.** A REPEAT with no founder note feeds the corrections and open objections into the next attempt (Phase 3 rebuilds from them).
-- **Different model family.** The critic (`LLM_CRITIC_MODEL`, default `gpt-oss:20b`) is not a Qwen model, so it does not share the writer's blind spots. If it is not available, the next model in `LLM_FALLBACK_MODELS` plays the critic and the transcript names it.
+- **Critic model.** `LLM_CRITIC_MODEL` defaults to the same 4B model as the writer. With `models-large.env` it is `gpt-oss:20b`, a different model family that does not share the writer's blind spots. If the configured critic is not available, the next model in `LLM_FALLBACK_MODELS` plays the critic and the transcript names it.
 - **Same safety as every other text.** Every turn passes the guardrail output scan; the transcript passes the claim check. Without any model the debate is not run and the gate card says so: objections are never written by templates.
 - Switch off with `DEBATE=false`.
 

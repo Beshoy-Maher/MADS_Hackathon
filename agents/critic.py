@@ -5,8 +5,8 @@
     Round 3  critic   -> verdict on each defended objection: resolved or open
     Moderator (code)  -> transcript, open objections shown on the gate card
 
-The critic runs on a different model family from the writer (see config.LLM_CRITIC_MODEL), so it does not share
-the writer's blind spots. The debate informs the founder; it never changes a gate's recommendation. Every turn
+The critic's model is set separately (config.LLM_CRITIC_MODEL); with models-large.env it is a different model
+family from the writer, so it does not share the writer's blind spots. The debate informs the founder; it never changes a gate's recommendation. Every turn
 goes through the guardrail output scan and gets its own decision-log entry. Without a model the debate is not
 run, and the output says so: objections are never made up by templates.
 """

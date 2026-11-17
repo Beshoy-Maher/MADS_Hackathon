@@ -19,15 +19,16 @@ def _env(name: str, default: str) -> str:
 LLM_PROVIDER = _env("LLM_PROVIDER", "ollama")  # "ollama" | "openai_compatible" | "none"
 LLM_BASE_URL = _env("LLM_BASE_URL", "http://localhost:11434")
 # One model per kind of work. All are open-weight (Apache-2.0) and run locally through Ollama.
-# Writer: research, analysis and every text the founder reads (Qwen3-30B-A3B-Instruct-2507, MoE, 3.3B active).
-LLM_MODEL = _env("LLM_MODEL", "qwen3:30b-a3b-instruct-2507-q4_K_M")
-# Fast: intake (brief to fields) and short structured tasks (Qwen3-4B-Instruct-2507).
+# Default: Qwen3-4B-Instruct-2507 for every role, so `docker compose up` runs on any laptop (2.5 GB download).
+# Optional larger models for a machine with 32+ GB RAM or a GPU: see models-large.env.
+# Writer: research, analysis and every text the founder reads.
+LLM_MODEL = _env("LLM_MODEL", "qwen3:4b-instruct-2507-q4_K_M")
+# Fast: intake (brief to fields).
 LLM_FAST_MODEL = _env("LLM_FAST_MODEL", "qwen3:4b-instruct-2507-q4_K_M")
 # Judge: the two safety judges (yes/no, temperature 0).
 LLM_JUDGE_MODEL = _env("LLM_JUDGE_MODEL", "qwen3:4b-instruct-2507-q4_K_M")
-# Critic: the devil's advocate in the debate before each gate. A different model family from the writer
-# (OpenAI gpt-oss-20b), so it does not share the writer's blind spots.
-LLM_CRITIC_MODEL = _env("LLM_CRITIC_MODEL", "gpt-oss:20b")
+# Critic: the devil's advocate in the debate before each gate (models-large.env: gpt-oss-20b, a different model family).
+LLM_CRITIC_MODEL = _env("LLM_CRITIC_MODEL", "qwen3:4b-instruct-2507-q4_K_M")
 # Tried in order when a role's model is not downloaded or cannot be loaded (for example not enough memory).
 LLM_FALLBACK_MODELS = [m.strip() for m in _env("LLM_FALLBACK_MODELS",
                        "qwen3:4b-instruct-2507-q4_K_M,qwen3:4b-instruct,qwen3:4b,qwen3:1.7b").split(",") if m.strip()]

@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import config
+import guardrails
 
 REQUIRED_KEYS = ("timestamp", "agent", "action", "sources", "model", "cost", "approved_by")
 _lock = threading.Lock()
@@ -68,7 +69,8 @@ def log(agent: str, action: str, *, sources: list[str] | None = None, model: str
         entry["run_id"] = run_id
     for k, v in extra.items():
         if v is not None:
-            entry[k] = v
+            # Free text (a request, a note) may contain a pasted password or card number: never write it down.
+            entry[k] = guardrails.redact_secrets(v) if isinstance(v, str) else v
     target = path or (_redirect[-1] if _redirect else config.DECISION_LOG_PATH)
     with _lock:
         target.parent.mkdir(parents=True, exist_ok=True)

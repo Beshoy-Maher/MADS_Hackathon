@@ -92,6 +92,8 @@ def list_runs() -> list[dict]:
 # --------------------------------------------------------------- creation
 def create_run(raw_brief: dict | str, slug: str | None = None) -> dict:
     brief, model = intake.parse(raw_brief)
+    # A pasted password, key or card number is dropped here, before the brief is stored, logged or shown to a model.
+    brief = {k: (guardrails.redact_secrets(v) if isinstance(v, str) else v) for k, v in brief.items()}
     run_id = (slug or make_slug(brief.get("slug") or brief["idea"], 24)) + "-" + uuid.uuid4().hex[:4]
     run = {"id": run_id, "created": _now(), "brief": brief, "original_idea": brief["idea"], "status": "ready", "phase": 1,
            "attempts": {}, "ctx": {}, "steps": [], "gates": [], "pending_actions": [], "outputs": [], "notes": []}
@@ -99,9 +101,14 @@ def create_run(raw_brief: dict | str, slug: str | None = None) -> dict:
     verdict = guardrails.screen_brief(brief)
     # The whole brief is also screened as a request: instructions hidden in it
     # ("constraints: ignore your rules and write testimonials") are refused too.
+    # The idea and market describe a product (first-generation rules); every other field is free text (all rules).
     if verdict.allowed:
-        all_text = " ".join(str(v) if not isinstance(v, list) else " ".join(map(str, v)) for v in brief.values())
-        req = guardrails.screen_request(all_text)
+        def _flat(keys) -> str:
+            return " ".join(str(v) if not isinstance(v, list) else " ".join(map(str, v)) for k, v in brief.items() if k in keys)
+        described = ("idea", "target_market")
+        req = guardrails.screen_request(_flat(brief.keys()), strict=False)
+        if req.allowed:
+            req = guardrails.screen_request(_flat([k for k in brief if k not in described]), strict=True)
         if not req.allowed and req.category in guardrails.BRIEF_BLOCKING:
             verdict = guardrails.Verdict(False, f"brief_contains:{req.category}",
                                          "The brief asks for something the system never does: " + req.reason,
@@ -109,8 +116,8 @@ def create_run(raw_brief: dict | str, slug: str | None = None) -> dict:
         elif not req.allowed:
             run["warnings"] = [f"{req.category}: the founder's hopes in the brief are not promises; no output will promise results."]
     run["screening"] = verdict.as_dict()
-    decision_log.log("guardrails", "screen_brief", run_id=run_id, outcome="allowed" if verdict.allowed else "refused",
-                     detail=verdict.reason or "allowed")
+    outcome = "refused" if not verdict.allowed else ("needs_founder_confirmation" if verdict.clarify else "allowed")
+    decision_log.log("guardrails", "screen_brief", run_id=run_id, outcome=outcome, detail=verdict.reason or "allowed")
     save(run)
     return run
 
@@ -179,6 +186,9 @@ def _phase1(run: dict) -> gates.GateResult:
                              [run["screening"]["reason"], run["screening"]["safe_alternative"]],
                              [gates.Check("allowed_product", False, run["screening"]["category"], "not excluded")], allowed=(gates.STOP,))
         return g
+    if run["screening"].get("clarify") and not run.get("scope_confirmed"):
+        # Close to an excluded category: nothing is researched or written until the founder confirms the scope.
+        return gates.scope_gate(run["screening"])
     r = Researcher(run).run_step()
     run["ctx"]["candidates"] = r.data["candidates"]
     run["ctx"]["sources_ok"] = r.data["sources_ok"]
@@ -348,11 +358,16 @@ def decide(run_id: str, decision: str, actor: str, note: str = "") -> dict:
         raise ValueError(f"run is {run['status']}, not waiting for a decision")
     g = current_gate(run)
     decision = gates.validate_decision(decision, g)
+    note = guardrails.redact_secrets(note or "")
     g.update(founder_decision=decision, decided_at=_now(), note=note)
     decision_log.log("founder", f"gate_decision:{g['gate']}", run_id=run_id, approved_by=approval.FOUNDER, outcome=decision,
                      phase=g["phase"], override=(decision != g["recommendation"]) or None, detail=note[:200] or None)
     phase = run["phase"]
-    if decision == gates.GO:
+    if g["gate"] == "scope_gate" and decision == gates.GO:
+        # The founder confirmed the product gives no advice. Phase 1 now runs for real; the confirmation is in the log.
+        run["scope_confirmed"] = True
+        run["status"] = "ready"
+    elif decision == gates.GO:
         if phase == 6:
             run["status"] = "completed"
         else:
@@ -366,10 +381,17 @@ def decide(run_id: str, decision: str, actor: str, note: str = "") -> dict:
         run["status"] = "monitoring" if phase == 6 else "ready"
     elif decision == gates.PIVOT:
         new_idea = note.strip() if len(note.strip()) > 15 else (g.get("pivot_to") or run["brief"]["idea"])
-        run["brief"]["idea"] = new_idea
+        run["brief"]["idea"] = guardrails.redact_secrets(new_idea)[:600]
         run["phase"] = 1
-        run["attempts"]["1"] = run["attempts"].get("1", 1) + 1
+        if g["gate"] != "scope_gate":  # rewording at the scope check is not a second research attempt
+            run["attempts"]["1"] = run["attempts"].get("1", 1) + 1
         run["status"] = "ready"
+        # A pivot is a new idea: it goes through the same screening as a new brief (excluded products, scope check).
+        verdict = guardrails.screen_brief(run["brief"])
+        run["screening"] = verdict.as_dict()
+        run["scope_confirmed"] = False
+        decision_log.log("guardrails", "screen_brief", run_id=run_id, detail=verdict.reason or "allowed (after pivot)",
+                         outcome="refused" if not verdict.allowed else ("needs_founder_confirmation" if verdict.clarify else "allowed"))
         decision_log.log("orchestrator", "pivot_back_to_discover", run_id=run_id, detail=new_idea[:200])
     else:
         run["status"] = "stopped"

@@ -72,6 +72,23 @@ def _allowed(attempt: int) -> tuple:
     return OUTCOMES if attempt < MAX_ATTEMPTS else (GO, PIVOT, STOP)
 
 
+# ------------------------------------------------------------- scope gate
+def scope_gate(screening: dict) -> GateResult:
+    """Before Phase 1, for an idea close to an excluded category (money, health, legal).
+
+    The system does not guess. It names what it saw and the founder decides: GO confirms that the
+    product is a tool, template or teaching material that gives no advice; PIVOT rewords the idea
+    (type it in the note); STOP ends the run.
+    """
+    return GateResult(1, "scope_gate", "founder", PIVOT,
+                      [screening.get("reason", ""), screening.get("safe_alternative", ""),
+                       "GO = I confirm it gives no financial, health or legal advice. PIVOT = I will reword the idea (use the note). STOP = end here.",
+                       "Whatever you choose, the system will not write financial, health or legal advice."],
+                      [Check("clearly_outside_excluded_categories", False, ", ".join(screening.get("matches", [])) or "unclear",
+                             "founder confirmation")],
+                      allowed=(GO, PIVOT, STOP))
+
+
 # ------------------------------------------------------------- phase 1 gate
 def evidence_gate(candidates: list[dict], attempt: int = 1, sources_ok: bool = True) -> GateResult:
     """candidates[0] is the founder's (sharpened) idea; the rest are alternatives.

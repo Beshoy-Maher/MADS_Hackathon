@@ -183,11 +183,18 @@ def log(run_id: str | None = None):
 @app.post("/api/ask")
 def ask(payload: dict = Body(...)):
     """'Ask the team': any free-text request goes through the guardrails first."""
-    text = str(payload.get("text", ""))[:2000]
+    # Five layers: (1) secrets are redacted before anything else sees the text, (2) rules on the request,
+    # (3) the model's second opinion on the request, (4) rules on the draft, (5) the model's second opinion on the draft.
+    # The assistant has no tools: whatever it writes is a draft, and it cannot publish, send, charge or change a gate.
+    raw = str(payload.get("text", ""))[:2000]
+    text = guardrails.redact_secrets(raw)
     run_id = payload.get("run_id") or None
-    verdict = guardrails.screen_request_deep(text)
+    verdict = guardrails.screen_request(raw)
+    if verdict.allowed:
+        verdict = guardrails.screen_request_deep(text)
     if not verdict.allowed:
-        decision_log.log("guardrails", "refuse_request", run_id=run_id, outcome="refused", detail=f"{verdict.category}: {text[:120]}")
+        decision_log.log("guardrails", "refuse_request", run_id=run_id, outcome="refused", detail=f"{verdict.category}: {text[:120]}",
+                         model=llm.model_status().get("model") if "model-judge" in verdict.matches else None)
         return {"allowed": False, "category": verdict.category, "reply": guardrails.refusal_message(verdict), "matches": verdict.matches}
     context = ""
     if run_id:
@@ -199,11 +206,18 @@ def ask(payload: dict = Body(...)):
                        "The local model is not available right now, so I can't draft this yet. The request passed the safety check; "
                        "try again once the model has finished downloading.", max_tokens=700)
     scan = guardrails.scan_output(res.text)
+    draft, claims = guardrails.scrub_action_claims(scan.text)
+    removed = len(scan.violations) + claims
+    check = guardrails.judge_output(draft) if res.model else guardrails.Verdict(True)
+    if not check.allowed:
+        decision_log.log("guardrails", "withhold_draft", run_id=run_id, model=res.model, cost=res.cost, outcome="refused",
+                         detail=f"{check.category}: {text[:120]}")
+        return {"allowed": False, "category": check.category, "reply": guardrails.refusal_message(check), "matches": check.matches}
     decision_log.log("assistant", "answer_request", run_id=run_id, model=res.model, cost=res.cost, outcome="answered",
-                     detail=text[:120], guardrail_removals=len(scan.violations) or None)
-    note = " (Some sentences were removed by the guardrails.)" if scan.violations else ""
-    return {"allowed": True, "reply": scan.text + note, "model": res.model,
-            "note": "Draft only. Nothing is published or sent without your approval."}
+                     detail=text[:120], guardrail_removals=removed or None)
+    note = " (Some sentences were removed by the guardrails.)" if removed else ""
+    return {"allowed": True, "reply": (draft or "Nothing could be drafted for this request.") + note, "model": res.model,
+            "note": "Draft only. The assistant cannot publish, send, charge or change a gate. Nothing goes out without your approval."}
 
 
 @app.exception_handler(Exception)

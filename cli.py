@@ -61,7 +61,7 @@ def cmd_run(args) -> int:
 
 
 def cmd_ask(args) -> int:
-    v = guardrails.screen_request(args.text)
+    v = guardrails.screen_request_deep(args.text)
     print(guardrails.refusal_message(v) if not v.allowed else "Allowed: this request passes the guardrails.")
     return 0 if v.allowed else 1
 

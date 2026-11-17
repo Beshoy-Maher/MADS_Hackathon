@@ -68,3 +68,35 @@ def test_instructions_hidden_in_brief_are_refused():
 def test_income_hopes_in_brief_only_warn():
     run = orchestrator.create_run(dict(STRONG, values=["honest", "I hope for passive income"]))
     assert run["screening"]["allowed"] and run.get("warnings")
+
+
+def test_borderline_idea_pauses_at_scope_gate_until_the_founder_confirms():
+    run = orchestrator.create_run({"idea": "A budgeting spreadsheet template for university students", "founder_name": "N",
+                                   "skills": ["Excel"], "hours_per_week": 6, "budget_usd": 20})
+    assert run["screening"]["allowed"] and run["screening"]["clarify"]
+    run = orchestrator.advance(run["id"])
+    g = orchestrator.current_gate(run)
+    assert g["gate"] == "scope_gate" and g["allowed"] == ["go", "pivot", "stop"]
+    assert not run["steps"]  # no agent works before the founder confirms the scope
+    run = orchestrator.decide(run["id"], "go", "founder", "It is a template only, no advice.")
+    assert run["scope_confirmed"] and run["phase"] == 1 and run["status"] == "ready"
+    run = orchestrator.advance(run["id"])
+    assert orchestrator.current_gate(run)["gate"] == "evidence_gate" and run["steps"]
+    log = decision_log.read(run_id=run["id"])
+    assert any(e["action"] == "gate_decision:scope_gate" and e["approved_by"] == "founder" for e in log)
+
+
+def test_pivot_to_an_excluded_idea_is_screened_again():
+    run = orchestrator.create_run(WEAK)
+    run = orchestrator.advance(run["id"])
+    run = orchestrator.decide(run["id"], "pivot", "founder", "Daily crypto trading signals channel for developers")
+    assert not run["screening"]["allowed"]
+    run = orchestrator.advance(run["id"])
+    g = orchestrator.current_gate(run)
+    assert g["recommendation"] == "stop" and g["allowed"] == ["stop"]
+
+
+def test_secrets_in_a_brief_are_not_stored():
+    run = orchestrator.create_run({"idea": "A Notion template for tutors", "founder_name": "S",
+                                   "constraints": "my gumroad password is hunter2"})
+    assert "hunter2" not in json.dumps(run)

@@ -241,6 +241,33 @@ def test_a_model_that_cannot_load_hands_over_to_the_next(monkeypatch):
     llm._status_cache["value"] = None
 
 
+def test_an_empty_critic_answer_hands_over_to_the_next_model(monkeypatch):
+    """A reasoning critic that answers nothing (even after its larger-budget retry) is not a template fallback:
+    the next model for the role answers, the result names it, and the empty model is not marked failed."""
+    monkeypatch.setattr(config, "LLM_PROVIDER", "ollama")
+    monkeypatch.setattr(config, "LLM_MODEL", "big:30b")
+    monkeypatch.setattr(config, "LLM_CRITIC_MODEL", "other:20b")
+    monkeypatch.setattr(config, "LLM_FALLBACK_MODELS", ["small:4b"])
+    monkeypatch.setattr(llm, "_installed", lambda: {"big:30b", "other:20b", "small:4b"})
+    llm._failed.clear()
+    llm._status_cache["value"] = None
+    asked = []
+
+    def chat(model, *a):
+        asked.append(model)
+        return ("", 5, 0) if model == "other:20b" else ('{"objections": []}', 5, 2)
+    monkeypatch.setattr(llm, "_ollama_chat", chat)
+    before = llm.STATS.fallbacks
+    res = llm.complete("s", "u", "fallback", role="critic")
+    assert res.model == "small:4b" and res.text == '{"objections": []}' and llm.STATS.fallbacks == before
+    assert asked == ["other:20b", "small:4b"] and not llm._recently_failed("other:20b")
+    monkeypatch.setattr(llm, "_ollama_chat", lambda model, *a: ("", 5, 0))  # every model empty: an honest fallback
+    res = llm.complete("s", "u", "fallback", role="critic")
+    assert res.model is None and res.text == "fallback" and "empty completion" in res.error
+    llm._failed.clear()
+    llm._status_cache["value"] = None
+
+
 def test_gpt_oss_reasons_at_medium_effort_and_qwen_does_not_think():
     assert llm._think_value("gpt-oss:20b") == "medium"
     assert llm._think_value("qwen3:30b-a3b-instruct-2507-q4_K_M") is False

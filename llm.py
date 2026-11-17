@@ -232,20 +232,32 @@ def complete(system: str, user: str, fallback: str, *, json_mode: bool = False, 
     try:
         if config.LLM_PROVIDER == "ollama":
             tried: list[str] = []
+
+            def _next_model() -> str | None:
+                names = _installed()
+                return next((c for c in _candidates(role) if c not in tried and not _recently_failed(c)
+                             and (c if ":" in c else c + ":latest") in names), None)
             while True:
                 try:
                     text, pt, ct = _ollama_chat(model_name, system, user, json_mode, max_tokens, temp)
-                    break
                 except _LoadError:
                     tried.append(model_name)
                     _mark_failed(model_name)
                     _status_cache["value"] = None
-                    names = _installed()
-                    nxt = next((c for c in _candidates(role) if c not in tried and not _recently_failed(c)
-                                and (c if ":" in c else c + ":latest") in names), None)
+                    nxt = _next_model()
                     if not nxt:
                         raise
                     model_name = nxt
+                    continue
+                if text:
+                    break
+                # An empty answer even after the larger-budget retry: the next model for this role answers instead,
+                # and the result names it. The model is not marked failed; it is asked again on the next call.
+                tried.append(model_name)
+                nxt = _next_model()
+                if not nxt:
+                    break  # still empty: handled below as a fallback
+                model_name = nxt
         else:
             headers = {"Authorization": f"Bearer {config.LLM_API_KEY}"} if config.LLM_API_KEY else {}
             body = {

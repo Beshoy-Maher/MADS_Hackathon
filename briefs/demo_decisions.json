@@ -7,7 +7,7 @@
     "2": {"decision": "go", "default_action": "approve", "note": "Founder override: build the MVP in parallel with the waitlist test, accepting the risk; re-check demand before launch."},
     "3": {"decision": "accept", "default_action": "approve"},
     "4": {"decision": "accept", "default_action": "approve"},
-    "5": {"decision": "accept", "default_action": "approve", "actions": {"launch post: hackernews": "reject"}, "action_note": "Reviewed by founder."},
+    "5": {"decision": "accept", "default_action": "approve", "actions": {"launch post: Hacker News (Show HN)": "reject"}, "action_note": "Reviewed by founder."},
     "6": {"decision": "accept", "default_action": "approve", "note_if_accepted": "Keep operating; review after 14 days of real sales data."}
   },
   "designer_founder": {

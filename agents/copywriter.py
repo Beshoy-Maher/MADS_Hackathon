@@ -12,7 +12,7 @@ import html
 
 import approval
 from tools.text import wrong_money
-from agents.base import Agent, StepResult, brief_summary, footer, launch_places
+from agents.base import Agent, StepResult, brief_summary, DETERMINISTIC, footer, launch_places
 
 PAGE_CSS = """body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:720px;margin:40px auto;padding:0 16px;color:#1d2433;line-height:1.55}
 h1{font-size:2rem;line-height:1.2}.sub{font-size:1.15rem;color:#4a5568}.card{border:1px solid #e2e8f0;border-radius:12px;padding:16px 20px;margin:18px 0}
@@ -197,7 +197,7 @@ class Copywriter(Agent):
             md += ["## No launch place found in the research", "",
                    "None of the communities found in the evidence allow posting about your own work, so no launch post was drafted. "
                    "Start with your own network instead: people you know who fit the customer profile, in your own words.", "",
-                   footer(None)]
+                   footer(DETERMINISTIC)]
             return self.result("launch-posts", "write_launch_posts", "\n".join(md), data={"post_actions": [], "notes": []},
                                buyer_facing=True)
         posts: dict[str, str] = {}

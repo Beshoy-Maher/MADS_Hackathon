@@ -358,3 +358,23 @@ def test_demo_decisions_are_keyed_by_phase_and_never_override_the_designer():
     assert all(set(v) <= {"1", "2", "3", "4", "5", "6"} for v in plan.values())
     overrides = {(f, p) for f, v in plan.items() for p, d in v.items() if d["decision"] != "accept"}
     assert overrides == {("strong_founder", "2")}
+
+
+def test_a_misspelt_item_decision_stops_instead_of_approving():
+    """A scripted reject whose item name matches nothing must not fall back to the default approve."""
+    plan = json.loads((ROOT / "briefs" / "demo_decisions.json").read_text())["strong_founder"]
+    run = orchestrator.create_run(STRONG)
+    bad = {**plan, "5": {**plan["5"], "actions": {"launch post: hackernews": "reject"}}}
+    with pytest.raises(ValueError, match="misspelt"):
+        orchestrator.run_with_phase_decisions(run["id"], bad)
+
+
+def test_demo_reject_reaches_the_show_hn_post_when_it_is_queued():
+    import approval
+    plan = json.loads((ROOT / "briefs" / "demo_decisions.json").read_text())["strong_founder"]["5"]
+    run = orchestrator.create_run(STRONG)
+    approval.request_action(run, "publish", "launch post: Hacker News (Show HN)", "Post in Hacker News", {"text": "Show HN: x"}, agent="copywriter")
+    orchestrator.save(run)
+    run = orchestrator._apply_decision(run["id"], run, {**plan, "decision": "accept"})
+    hn = [a for a in run["pending_actions"] if a["target"] == "launch post: Hacker News (Show HN)"]
+    assert hn and all(a["status"] == "rejected" for a in hn)

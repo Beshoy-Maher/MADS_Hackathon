@@ -560,9 +560,22 @@ def decide_action(run_id: str, action_id: str, approve: bool, actor: str, note: 
     return run
 
 
+def _possible_launch_post(target: str) -> bool:
+    """A launch-post item name the copywriter can queue; whether it is queued depends on where the evidence was found."""
+    from agents.base import LAUNCH_NAMES, SELF_PROMOTION_OK
+    place = target.removeprefix("launch post: ")
+    return place != target and (place in LAUNCH_NAMES.values()
+                                or (place.lower() in SELF_PROMOTION_OK and place.lower() not in LAUNCH_NAMES))
+
+
 def _apply_decision(run_id: str, run: dict, d: dict) -> dict:
     """At a gate: settle pending approval items, then make the founder's call given in advance.
-    "accept" follows the recommendation; any other allowed outcome is an override and carries the note."""
+    "accept" follows the recommendation; any other allowed outcome is an override and carries the note.
+    A per-item choice whose name can never match an item stops the run: a misspelt name must not fall back to the default."""
+    queued = {a["target"] for a in run.get("pending_actions", [])}
+    unknown = sorted(t for t in d.get("actions", {}) if t not in queued and not _possible_launch_post(t))
+    if unknown:
+        raise ValueError(f"Decisions given for items that no run can queue (misspelt?): {unknown}")
     for a in approval.pending(run):
         choice = d.get("actions", {}).get(a["target"], d.get("default_action"))
         if choice in ("approve", "reject"):

@@ -17,7 +17,7 @@ from __future__ import annotations
 import math
 
 import payments
-from agents.base import Agent, StepResult, footer
+from agents.base import Agent, StepResult, DETERMINISTIC, footer
 
 REFUND_RATE = 0.10        # ASSUMPTION: share of buyers who ask for a refund
 WEEKS_PER_MONTH = 52 / 12
@@ -98,5 +98,5 @@ class Economist(Agent):
                "- No sales or income forecast, no projections, no 'you will sell' numbers.",
                "- The fee and the refund rate are assumptions until real orders exist; Phase 6 reports the real ones.",
                "- To change the price, choose Repeat at the Phase 4 gate: pricing recomputes it and this step reruns.",
-               footer(None)]
+               footer(DETERMINISTIC)]
         return self.result("unit-economics", "unit_economics", "\n".join(md), data=e)

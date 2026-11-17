@@ -9,7 +9,7 @@ from __future__ import annotations
 import re
 
 import gates
-from agents.base import Agent, StepResult, brief_summary, community_places, footer
+from agents.base import Agent, StepResult, brief_summary, community_places, DETERMINISTIC, footer
 
 
 # Sites that forbid self-promotion, and someone else's repository (GitHub issues and discussions).
@@ -76,7 +76,7 @@ class Analyst(Agent):
               "These come from the sale-to-cash test and are excluded from every decision.", "",
               "## What we will track once real",
               "- Visitor to sign-up rate, sign-up to buyer rate, refund rate, support questions per buyer, module completion (self-reported).",
-              footer(None)]
+              footer(DETERMINISTIC)]
         return self.result("metrics", "report_metrics", "\n".join(md), data={"real_orders": real_orders})
 
     def pivot_memo(self, candidate: dict, gate: gates.GateResult, history: list[dict], real_buyers: int = 0,

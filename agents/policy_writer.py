@@ -5,7 +5,7 @@ refund terms match what refunds.py actually does (access revoked on refund).
 """
 from __future__ import annotations
 
-from agents.base import Agent, StepResult, footer
+from agents.base import Agent, StepResult, DETERMINISTIC, footer
 
 
 class PolicyWriter(Agent):
@@ -41,5 +41,5 @@ class PolicyWriter(Agent):
         ])
         md = "\n\n".join([f"# Phase 4, step 2: Draft policies for '{product}'",
                           "**DRAFT generated from a template. This is not legal advice. Have it reviewed by a qualified person "
-                          "for your country before taking real payments.**", terms, privacy, refund, footer(None)])
+                          "for your country before taking real payments.**", terms, privacy, refund, footer(DETERMINISTIC)])
         return self.result("policies", "draft_policies", md, data={"refund_days": days, "complete": True})

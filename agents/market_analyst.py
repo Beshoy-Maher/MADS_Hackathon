@@ -30,6 +30,18 @@ def label_customer_line(body: str, items: list[dict]) -> str:
     return "\n".join(lines)
 
 
+def label_unsourced_bullets(body: str) -> str:
+    """Every bullet that cites no link and is not already marked ends with '(ASSUMPTION)', so no market statement
+    reads as sourced when it is not."""
+    out = []
+    for line in body.splitlines():
+        s = line.strip()
+        if re.match(r"^([-*]|\d+\.)\s+\S", s) and "](http" not in s and "ASSUMPTION" not in s:
+            line = line.rstrip() + " (ASSUMPTION)"
+        out.append(line)
+    return "\n".join(out)
+
+
 class MarketAnalyst(Agent):
     role = "market_analyst"
     check_claims = True
@@ -65,7 +77,7 @@ class MarketAnalyst(Agent):
                 "otherwise write ASSUMPTION. Only say what a cited source shows; do not generalise from one item to 'most people'. "
                 "The brief's constraints describe the founder, not the customer. Max 150 words in total: short bullets, no introduction.")
         body = self.write(task, fallback, max_tokens=420)
-        body = label_customer_line(body, ev)
+        body = label_unsourced_bullets(label_customer_line(body, ev))
         md = [f"# Phase 1, step 3: Market definition for '{candidate['title']}'", "", body, "",
               "## Where these people talk (from the evidence)", ""]
         md += [f"- {name}: {n} relevant item(s)" for name, n in communities.most_common(8)] or ["- No communities found (ASSUMPTION)."]

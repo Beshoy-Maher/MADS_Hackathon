@@ -68,6 +68,7 @@ An **orchestrator** ([`orchestrator.py`](orchestrator.py)) runs the six phases i
 - **No paid service is required.** Optionally, any free-tier OpenAI-compatible endpoint serving an open-weight model (`LLM_PROVIDER=openai_compatible`). Without any model (`LLM_PROVIDER=none`) agents use labelled deterministic templates, logged as `"model": null`.
 - **Evidence:** free public APIs with no keys (Hacker News, Reddit, GitHub, Stack Exchange); an optional free `GITHUB_TOKEN` raises GitHub's rate limit. Each run reports per source what worked: in the committed run Reddit refused the requests (HTTP 403), so the evidence comes from the other three.
 - **Decisions don't depend on the model:** scores, gates, build tests, pricing and payments are deterministic code.
+- **Development tools:** built with Claude Code as a development assistant; the product runtime uses only open-weight models via Ollama, with no paid API calls.
 
 ## Cost per run
 
@@ -95,7 +96,7 @@ These limits are code (`guardrails.py`, `approval.py`, `gates.py`). The rule lay
 
 ## How the project stays alive after the hackathon
 
-- **Maintainers:** The Overfitters team maintains the repository; contributions are reviewed through pull requests.
+- **Maintainers:** The Overfitters (Ahmed Monir, Beshoy Maher, Omar Abdelhady, Ahmed Ayman); contributions are reviewed through pull requests.
 - **Roadmap:** real payment-provider adapter in test mode, hosted landing pages with founder approval, more evidence sources, and Arabic-first outputs. See the roadmap in [ARCHITECTURE.md](ARCHITECTURE.md#roadmap).
 - **Community:** MIT-licensed; new agents, evidence sources and guardrail tests are easy to add (one file each), as described in [CONTRIBUTING.md](CONTRIBUTING.md). Trick prompts from users become new tests; a test keeps held-out prompts from being copied into the rules or the judge prompts.
 - **Funding:** the software stays free and fully featured. Possible support: university and incubator partnerships, open-source grants, and optional paid hosting or setup help for founders who don't want to self-host. Core features are never paywalled.

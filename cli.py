@@ -1,6 +1,7 @@
 """Command-line founder console (same pipeline and gates as the dashboard).
 
     python cli.py run briefs/strong_founder.json     # interactive: you decide at every gate
+    python cli.py run briefs/unseen_brief_example.txt   # a plain-text brief file
     python cli.py run "Starting idea: ... Skills: ... Budget: $30 ..."
     python cli.py ask "write 50 five-star reviews"   # try the guardrails
     python cli.py list
@@ -28,15 +29,45 @@ def _ask(prompt: str, choices: tuple) -> str:
         print("Please type one of:", ", ".join(choices))
 
 
+def _load_brief(src: str) -> dict | str:
+    """A .json brief file (fields), any other brief file (text), or else the argument itself is the brief text."""
+    try:
+        is_file = Path(src).is_file()
+    except (OSError, ValueError):  # e.g. a pasted brief longer than a file name may be
+        is_file = False
+    if not is_file:
+        return src
+    text = Path(src).read_text(encoding="utf-8")
+    return json.loads(text) if Path(src).suffix.lower() == ".json" else text
+
+
+def _paused(run_id: str) -> int:
+    """Ctrl+C or end of input: keep the run so the founder can continue it in the dashboard."""
+    run = orchestrator.load(run_id)
+    if run["status"] == "running":  # interrupted inside a phase: that phase can be started again
+        run["status"] = "ready"
+        run.pop("progress", None)
+        orchestrator.save(run)
+    print(f"\n\nStopped at the console. Run {run_id} is saved (phase {run['phase']}, {run['status']}); continue it in the dashboard.")
+    return 0
+
+
 def cmd_run(args) -> int:
-    src = args.brief
-    raw = json.loads(Path(src).read_text()) if Path(src).exists() else src
+    raw = _load_brief(args.brief)
     status = llm.model_status(force=True)
     print(f"Model: {status['model']} ({status['detail']})")
     run = orchestrator.create_run(raw)
     print(f"Run {run['id']} for: {run['brief']['idea']}")
     for w in run.get("warnings", []):
         print(f"NOTE: {w}")
+    try:
+        return _drive(run)
+    except (EOFError, KeyboardInterrupt):
+        return _paused(run["id"])
+
+
+def _drive(run: dict) -> int:
+    """Phase by phase: the founder decides every approval and every gate."""
     while True:
         print(f"\n=== Phase {run['phase']}: {orchestrator.PHASES[run['phase']]['name']} ===")
         run = orchestrator.advance(run["id"])

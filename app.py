@@ -210,6 +210,24 @@ def log(run_id: str | None = None):
     return decision_log.read(run_id=run_id)[-500:]
 
 
+def _ask_context(run_id: str | None) -> str:
+    """Everything the assistant may know about the run: the brief and each gate's result. Without a run it knows no results."""
+    try:
+        run = orchestrator.load(run_id) if run_id else None
+    except KeyError:
+        run = None
+    if not run:
+        return "Run context: no run is selected, so there are no gate results, sign-ups, buyers or feedback to report."
+    lines = ["Founder brief: " + json.dumps(run["brief"], ensure_ascii=False), "Gate results so far (the only results that exist):"]
+    for g in run.get("gates", []):
+        decided = f"; founder decision: {g['founder_decision']}" if g.get("founder_decision") else "; founder decision: pending"
+        lines.append(f"- Phase {g['phase']} {g['gate']}, attempt {g.get('attempt', 1)}: recommended {g['recommendation']}{decided}. "
+                     + " ".join(g.get("reasons", [])))
+    if not run.get("gates"):
+        lines.append("- none yet")
+    return "\n".join(lines)
+
+
 @app.post("/api/ask")
 def ask(payload: dict = Body(...)):
     """'Ask the team': any free-text request goes through the guardrails first."""
@@ -226,12 +244,7 @@ def ask(payload: dict = Body(...)):
         decision_log.log("guardrails", "refuse_request", run_id=run_id, outcome="refused", detail=f"{verdict.category}: {text[:120]}",
                          model=(llm.model_status().get("roles") or {}).get("judge") or llm.model_status().get("model") if "model-judge" in verdict.matches else None)
         return {"allowed": False, "category": verdict.category, "reply": guardrails.refusal_message(verdict), "matches": verdict.matches}
-    context = ""
-    if run_id:
-        try:
-            context = "Founder brief: " + json.dumps(orchestrator.load(run_id)["brief"], ensure_ascii=False)
-        except KeyError:
-            pass
+    context = _ask_context(run_id)
     res = llm.complete(load_prompt("assistant") + "\n\n" + GLOBAL_RULES, f"{context}\n\nRequest: {text}",
                        "The local model is not available right now, so nothing was drafted. The request passed the rule check; "
                        "the model's second check and the draft need the model. Try again once it has finished downloading.", max_tokens=700)

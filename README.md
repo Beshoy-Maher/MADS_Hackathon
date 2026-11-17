@@ -9,7 +9,7 @@ Most AI business tools promise income, lock founders into closed platforms and s
 - **Excluded idea, refused:** a crypto-signals channel is refused before any agent runs ([gate](outputs/phase1_gate_decision_excluded-idea.md)).
 - **Unseen brief:** a Figma case-study template pack for junior UX designers passes the evidence gate on 14 relevant sources and 3 pain posts, all from one platform ([gate](outputs/phase1_gate_decision_designer-idea.md)); the demand gate recommended repeat and then stop, because no real visitor has seen the page, and the founder accepted it ([gate](outputs/phase2_gate_decision_designer-idea.md)).
 
-**Measured, not claimed:** 491 tests that run with no model or network, on every push ([CI](.github/workflows/ci.yml)); guardrails refuse 37 of 40 trick prompts they were never tuned on (rules alone: 2 of 40) and wrongly refuse 0 of 62 normal requests ([`evals/results.md`](evals/results.md)); Phase 1, including its debate, took 64 seconds on an NVIDIA RTX 4080 in the committed run; $0.00 per run.
+**Measured, not claimed:** 499 tests that run with no model or network, on every push ([CI](.github/workflows/ci.yml)); guardrails refuse 37 of 40 trick prompts they were never tuned on (rules alone: 2 of 40) and wrongly refuse 0 of 62 normal requests ([`evals/results.md`](evals/results.md)); Phase 1, including its debate, took 64 seconds on an NVIDIA RTX 4080 in the committed run; $0.00 per run.
 
 | Claim | Where to check it |
 |---|---|
@@ -18,7 +18,7 @@ Most AI business tools promise income, lock founders into closed platforms and s
 | Every market claim sourced or `ASSUMPTION` | [opportunities](outputs/phase1_step1_opportunities.md), [market](outputs/phase1_step3_market.md), [`tools/claims.py`](tools/claims.py) |
 | 12 deterministic build tests, originality included | [QA report](outputs/phase3_step4_qa-report.md), [`agents/qa.py`](agents/qa.py) |
 | Store-page and post promises matched to the product: 11 checked, 10 kept, 0 broken, 1 for the founder to confirm | [promise check](outputs/phase5_step4_promise-check.md) |
-| A critic challenges each phase before its gate: 9 objections, 5 corrected in the documents, 3 conceded but not applied, 1 open (example: a store-page claim that the questions are commonly asked in Egypt and the MENA region, which no source shows, was corrected) | [Phase 5 debate](outputs/phase5_step5_debate.md), [`agents/critic.py`](agents/critic.py) |
+| A critic challenges each phase before its gate: 9 objections across the SQL run's six debates, 5 corrected in the documents, 3 conceded but not applied, 1 open (example from Phase 5: a store-page claim that the questions are commonly asked in Egypt and the MENA region, which no source shows, was rewritten; other regional wording on the page was not challenged) | [Phase 5 debate](outputs/phase5_step5_debate.md), [`agents/critic.py`](agents/critic.py) |
 | Payment triggers delivery, refunds revoke access, books reconcile (MOCKED provider) | [payment test log](outputs/payment_test_log.md), [`tests/test_payments.py`](tests/test_payments.py) |
 | Every agent action logged with sources, model, cost and approver | [`decision_log.json`](decision_log.json) |
 
@@ -38,7 +38,7 @@ Then open **http://localhost:8000**, pick a sample founder (or paste any brief) 
 
 | Phase | Step | Status |
 |---|---|---|
-| 1 Discover | Sharpen the idea, 2 alternatives, public evidence (Hacker News, Reddit, GitHub, Stack Exchange) | **Working** |
+| 1 Discover | Sharpen the idea, 2 alternatives, public evidence (Hacker News, Reddit, GitHub, Stack Exchange; each run reports which sources answered) | **Working** (committed run: Hacker News and GitHub answered, Reddit 403, Stack Exchange 429) |
 | 1 Discover | Score vs. alternatives (fixed formulas); define the market (sourced or `ASSUMPTION`) | **Working** |
 | 1 Discover | Mom Test interview guide; founder's real notes sorted into commitments vs. compliments | **Working** |
 | 1 Discover | Sending outreach / running interviews | **STUBBED** (the founder does it; answers are never simulated) |
@@ -48,7 +48,7 @@ Then open **http://localhost:8000**, pick a sample founder (or paste any brief) 
 | 2 Gate | Demand gate: pre-registered sign-up target, real sign-ups only | **Working** |
 | 3 Build | MVP spec, product, user guide; verifier (facts, SQL run in SQLite); originality guard | **Working** |
 | 3 Gate | 12 deterministic MVP tests, all must pass | **Working** |
-| 4 Commercial | Rule-based price from sourced comparables; draft terms, privacy and refund policy | **Working** |
+| 4 Commercial | Rule-based price from sourced comparables, or a labelled `ASSUMPTION` anchor when none is found (the committed run found none); draft terms, privacy and refund policy | **Working** |
 | 4 Commercial | Unit economics: what each sale keeps and how many sales cover the budget; arithmetic only, no forecast | **Working** (fee and refund rate labelled `ASSUMPTION`) |
 | 5 Launch | Store page and launch posts for the founder to post; unbacked claims removed by code; promise checker | **Working** |
 | 5 Launch | Publishing the store page and posts | **STUBBED** (approval-gated, saved to outbox) |
@@ -82,7 +82,7 @@ flowchart TD
 - **Default:** `qwen3:4b-instruct-2507-q4_K_M` (Qwen3-4B-Instruct-2507, Apache-2.0, open weights) for every role, served by **Ollama** and downloaded by `docker compose up`; fallbacks `qwen3:4b-instruct`, `qwen3:4b`, `qwen3:1.7b`.
 - **Committed demo run:** `qwen3:30b-a3b-instruct-2507-q4_K_M` for writing, `gpt-oss:20b` as the critic, and the 4B model for intake and the safety judges, on an NVIDIA RTX 4080 via [`models-large.env`](models-large.env). All Apache-2.0. Roles and settings: [docs/models.md](docs/models.md).
 - **No paid service is required.** Optionally, any free-tier OpenAI-compatible endpoint serving an open-weight model (`LLM_PROVIDER=openai_compatible`). Without any model (`LLM_PROVIDER=none`) agents use labelled deterministic templates, logged as `"model": null`.
-- **Evidence:** free public APIs with no keys (Hacker News, Reddit, GitHub, Stack Exchange); an optional free `GITHUB_TOKEN` raises GitHub's rate limit. Each run reports per source what worked: in the committed run Reddit refused the requests (HTTP 403), so the evidence comes from the other three.
+- **Evidence:** free public APIs with no keys (Hacker News, Reddit, GitHub, Stack Exchange); an optional free `GITHUB_TOKEN` raises GitHub's rate limit. Each run reports per source what worked: in the committed run Reddit refused the requests (HTTP 403) and Stack Exchange rate-limited them (HTTP 429), so the evidence comes from Hacker News and GitHub only ([source coverage](outputs/phase1_step1_opportunities.md#source-coverage)).
 - **Decisions don't depend on the model:** scores, gates, build tests, pricing and payments are deterministic code.
 - **Development tools:** built with Claude Code as a development assistant; the product runtime uses only open-weight models via Ollama, with no paid API calls.
 

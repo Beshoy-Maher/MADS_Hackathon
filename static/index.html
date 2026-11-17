@@ -51,7 +51,8 @@ iframe{width:100%;height:520px;border:1px solid var(--line);border-radius:8px;ba
       <select id="sample"><option value="">(paste your own below)</option></select>
       <label class="small muted" style="display:block;margin-top:8px">Or paste a brief: idea, skills, budget, time, target market, values</label>
       <textarea id="brief" rows="7" placeholder="Founder: Salma&#10;Starting idea: ...&#10;Skills: ...&#10;Budget: $30&#10;Time: 6 hours per week&#10;Target market: ...&#10;Values: ..."></textarea>
-      <div class="row" style="margin-top:8px"><button class="primary" onclick="startRun()">Run Phase 1</button><span id="startMsg" class="small muted"></span></div>
+      <div class="row" style="margin-top:8px"><button class="primary" id="startBtn" onclick="startRun()">Run Phase 1</button><span id="startMsg" class="small muted"></span></div>
+      <p id="modelWarn" class="small bad"></p>
     </div>
     <div class="card"><h2>Runs</h2><div id="runs" class="runs small"></div></div>
     <div class="card">
@@ -74,7 +75,7 @@ iframe{width:100%;height:520px;border:1px solid var(--line);border-radius:8px;ba
   </main>
 </div>
 <script>
-let current = null, timer = null, viewerRun = null;
+let current = null, timer = null, viewerRun = null, modelReady = true, statusTimer = null;
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 async function api(path, opts = {}) {
@@ -94,7 +95,12 @@ async function loadStatus() {
     const s = await api("/api/status");
     const m = s.model;
     $("#model").className = "badge " + (m.ready ? "ok" : "warn");
-    $("#model").textContent = m.ready ? `model: ${m.model} (local)` : `model: ${m.model} not ready, using fallback`;
+    $("#model").textContent = m.ready ? `model: ${m.model} (${m.provider === "ollama" ? "local" : "free-tier endpoint"})` : `model: ${m.model} not ready, using fallback`;
+    modelReady = m.ready || m.provider === "none";
+    const warn = $("#modelWarn");
+    if (warn) warn.innerHTML = modelReady ? "" : `<b>The model is not ready yet</b> (${esc(m.detail)}). A run started now is written by deterministic templates, and every such step is labelled "model: none". Wait for the green badge to see the AI agents work.`;
+    if ($("#startBtn")) $("#startBtn").textContent = modelReady ? "Run Phase 1" : "Run Phase 1 with templates (model not ready)";
+    clearTimeout(statusTimer); statusTimer = setTimeout(loadStatus, modelReady ? 10000 : 3000);
     $("#model").title = m.detail;
     $("#components").innerHTML = s.components.map(c => `<tr><td>${esc(c.name)}</td><td>${badge(c.status)}</td></tr>`).join("");
   } catch (e) {}
@@ -136,7 +142,9 @@ async function render() {
     ${r.screening && r.screening.clarify ? `<p class="small"><span class="badge warn">scope check</span> ${esc(r.screening.reason)}</p>` : ""}
     ${v.error ? `<p class="bad">Error: ${esc(v.error)} <button onclick="advance()">Retry</button></p>` : ""}
     <div class="steps">${phases}</div>
-    ${r.status === "running" ? `<p class="muted">Agents are working on phase ${r.phase}... (a local model on a laptop can take a few minutes)</p>` : ""}
+    ${(r.warnings || []).map(w => `<p class="small"><span class="badge warn">note</span> ${esc(w)}</p>`).join("")}
+    ${r.status === "running" ? `<p><span class="badge muted">phase ${r.phase} running</span> <b>${esc(r.progress ? r.progress.text : "starting")}</b>
+      <span class="muted small">${r.progress ? Math.max(0, Math.round((Date.now() - Date.parse(r.progress.since)) / 1000)) + " s on this step" : ""} · ${v.steps.filter(s => s.phase == r.phase).length} step(s) of this phase done</span></p>` : ""}
     ${r.status === "ready" ? `<p><button class="primary" onclick="advance()">Run phase ${r.phase}</button></p>` : ""}
     ${r.status === "monitoring" ? `<p>Operating. <button onclick="advance()">Re-run the phase 6 review</button></p>` : ""}
   </div>`;
@@ -188,7 +196,7 @@ async function ask() {
   $("#askOut").innerHTML = `<div class="reply ${r.allowed ? "" : "refused"}">${esc(r.reply)}${r.note ? `<div class="small muted">${esc(r.note)}</div>` : ""}</div>`;
 }
 function alertBox(e) { const d = document.createElement("div"); d.className = "card bad"; d.textContent = e.message || e; $("#main").prepend(d); setTimeout(() => d.remove(), 5000); }
-loadStatus(); loadSamples(); loadRuns(); setInterval(loadStatus, 10000);
+loadStatus(); loadSamples(); loadRuns();
 if (location.hash.length > 1) openRun(location.hash.slice(1));
 </script>
 </body>

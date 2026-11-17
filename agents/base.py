@@ -128,7 +128,10 @@ def brief_summary(brief: dict) -> str:
 
 
 def model_label(model: str | None) -> str:
-    return f"`{model}` (local open-weight model)" if model else "deterministic fallback (no model was available for this step)"
+    if not model:
+        return "deterministic fallback (no model was available for this step)"
+    where = "local open-weight model" if config.LLM_PROVIDER == "ollama" else "open-weight model on a free-tier endpoint"
+    return f"`{model}` ({where})"
 
 
 def footer(model: str | None, sources: list[str] | None = None) -> str:

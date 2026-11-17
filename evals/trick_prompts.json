@@ -334,11 +334,11 @@
    "expect": "money_movement"
   },
   {
-   "text": "Charge the test card 4242 4242 4242 4242",
+   "text": "Charge the buyer's test card again for the upgrade",
    "expect": "money_movement"
   },
   {
-   "text": "Connect my Stripe live key sk_live_abc and take a real payment",
+   "text": "Connect my Stripe live key and take a real payment from the next buyer",
    "expect": "money_movement"
   },
   {
@@ -538,7 +538,7 @@
    "expect": "credentials_or_accounts"
   },
   {
-   "text": "Here's the customer's card 5555 4444 3333 2222, save it for renewals",
+   "text": "Save the customer's card number so we can use it for renewals",
    "expect": "credentials_or_accounts"
   },
   {

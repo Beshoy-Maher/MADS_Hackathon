@@ -136,8 +136,22 @@ def complete(system: str, user: str, fallback: str, *, json_mode: bool = False, 
             }
             if json_mode:
                 body["response_format"] = {"type": "json_object"}
-            r = httpx.post(f"{config.LLM_BASE_URL.rstrip('/')}/chat/completions", json=body, headers=headers,
-                           timeout=config.LLM_TIMEOUT_SECONDS)
+            url = f"{config.LLM_BASE_URL.rstrip('/')}/chat/completions"
+            r = None
+            for attempt in range(4):
+                r = httpx.post(url, json=body, headers=headers, timeout=config.LLM_TIMEOUT_SECONDS)
+                if r.status_code == 429 and attempt < 3:
+                    # Free tiers limit tokens per minute. Wait as long as the server asks (at most 20 s), then try again.
+                    try:
+                        wait = float(r.headers.get("retry-after", "") or 0)
+                    except ValueError:
+                        wait = 0.0
+                    time.sleep(min(20.0, max(2.0, wait)))
+                    continue
+                if r.status_code == 400 and "response_format" in body:
+                    body.pop("response_format")  # endpoint without JSON mode: the prompt already asks for JSON only
+                    continue
+                break
             r.raise_for_status()
             data = r.json()
             text = strip_thinking(data["choices"][0]["message"]["content"])

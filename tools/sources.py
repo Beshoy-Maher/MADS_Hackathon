@@ -174,21 +174,30 @@ def search(queries: list[str], sources: list[str] | None = None) -> tuple[list[E
         for s in sources:
             report[s]["error"] = "online research disabled (RESEARCH_ONLINE=false)"
         return [], report
-    for q in queries:
-        for s in sources:
-            fn = SOURCES.get(s)
-            if not fn:
-                continue
-            if report[s]["failed"] >= 2:  # source is down, stop hammering it
-                continue
+    def one_source(s: str) -> list[Evidence]:
+        """All queries for one source, in order. A source that fails twice is left alone."""
+        fn, items = SOURCES.get(s), []
+        if not fn:
+            return items
+        for q in queries:
+            if report[s]["failed"] >= 2:
+                break
             try:
-                for ev in fn(q):
-                    if ev.url and ev.url not in found:
-                        found[ev.url] = ev
+                items += fn(q)
                 report[s]["ok"] += 1
             except Exception as e:
                 report[s]["failed"] += 1
                 report[s]["error"] = f"{type(e).__name__}: {str(e)[:120]}"
+        return items
+
+    # Sources are independent sites, so they are queried side by side: one slow or blocked site no longer holds up the rest.
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=max(1, len(sources))) as pool:
+        results = list(pool.map(one_source, sources))
+    for items in results:  # merged in source order, so the result does not depend on which site answered first
+        for ev in items:
+            if ev.url and ev.url not in found:
+                found[ev.url] = ev
     return list(found.values()), report
 
 

@@ -90,8 +90,11 @@ class Researcher(Agent):
     def run_step(self) -> StepResult:
         cands = self.candidates()
         all_sources: list[str] = []
-        for i, c in enumerate(cands):
-            c.update(self.gather(c, main=(i == 0)))
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=len(cands)) as pool:  # the candidates are searched side by side
+            gathered = list(pool.map(lambda ic: self.gather(ic[1], main=(ic[0] == 0)), enumerate(cands)))
+        for c, got in zip(cands, gathered):
+            c.update(got)
             all_sources += [e["url"] for e in c["evidence"]]
         reports = [c["source_report"] for c in cands]
         sources_ok = any(r.get("ok") for rep in reports for r in rep.values())

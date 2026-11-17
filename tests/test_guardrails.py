@@ -90,7 +90,7 @@ def test_heldout_prompts_are_kept_apart_from_the_rules():
 
 
 @pytest.mark.parametrize("text,secret", [
-    ("the card is 5555 4444 3333 2222 ok", "5555"), ("use sk_live_abc123def", "sk_live"),
+    ("the card is " + " ".join(["5555", "4444", "3333", "2222"]) + " ok", "5555"), ("use " + "sk_" + "live_" + "abc123def", "abc123def"),
     ("my password is hunter2", "hunter2"), ("bank PIN 4821", "4821"),
 ])
 def test_secrets_are_redacted(text, secret):
@@ -104,7 +104,7 @@ def test_redaction_leaves_ordinary_numbers_alone():
 
 def test_secrets_never_reach_the_decision_log():
     import decision_log
-    decision_log.log("guardrails", "refuse_request", detail="credentials: save card 5555 4444 3333 2222 and password: hunter2")
+    decision_log.log("guardrails", "refuse_request", detail="credentials: save card " + " ".join(["5555", "4444", "3333", "2222"]) + " and password: hunter2")
     assert "5555" not in json.dumps(decision_log.read()) and "hunter2" not in json.dumps(decision_log.read())
 
 

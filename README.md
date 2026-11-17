@@ -39,8 +39,9 @@ Then open **http://localhost:8000**. Pick a sample founder (or paste any brief) 
 | 5 Launch | Automatic delivery, idempotent webhooks, refunds revoke access, reconciliation | **Working** (against the MOCKED provider) |
 | 5 Launch | Delivery emails | **STUBBED** (recorded, not sent) |
 | 6 Operate | Support kit, metrics (real vs. MOCKED kept apart), persevere-or-pivot memo | **Working** |
-| All | Guardrails (requests, briefs, every output), decision log, founder approval | **Working** |
-| All | Claim check: unsourced statistics labelled `ASSUMPTION`, links not in fetched evidence removed | **Working** |
+| All | Guardrails (requests, briefs, every output), secret redaction, decision log, founder approval | **Working** |
+| All | Scope check: an idea close to an excluded category (money, health, legal) waits for the founder's confirmation | **Working** |
+| All | Claim check on every agent's text: unsourced statistics labelled `ASSUMPTION`, links not in fetched evidence removed | **Working** |
 
 ## Architecture
 
@@ -75,7 +76,7 @@ Demo video (3 minutes): link coming soon.
 - Spin weak evidence: a missed target is reported as missed, with a pivot or stop recommendation.
 - Move a gate's threshold after seeing the data, or pretend a gate passed.
 
-These limits are code (`guardrails.py`, `approval.py`, `gates.py`), tested by `tests/` with 85 trick prompts and controls in `evals/trick_prompts.json` (results: `evals/results.md`).
+These limits are code (`guardrails.py`, `approval.py`, `gates.py`). The rule layer is tested by `tests/` on 255 cases in `evals/trick_prompts.json`; prompts the rules have never seen are in `evals/heldout_prompts.json` and are measured together with the model's second opinion by `python scripts/run_evals.py --deep` (results: `evals/results.md`).
 
 ## How the project stays alive after the hackathon
 

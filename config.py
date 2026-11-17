@@ -31,7 +31,7 @@ LLM_COST_PER_MTOK = float(_env("LLM_COST_PER_MTOK", "0"))
 RESEARCH_ONLINE = _env("RESEARCH_ONLINE", "true").lower() == "true"
 RESEARCH_SOURCES = [s.strip() for s in _env("RESEARCH_SOURCES", "hackernews,reddit,github,stackexchange").split(",") if s.strip()]
 GITHUB_TOKEN = _env("GITHUB_TOKEN", "")  # optional, raises GitHub search rate limits
-HTTP_TIMEOUT_SECONDS = float(_env("HTTP_TIMEOUT_SECONDS", "15"))
+HTTP_TIMEOUT_SECONDS = float(_env("HTTP_TIMEOUT_SECONDS", "8"))
 HTTP_USER_AGENT = _env("HTTP_USER_AGENT", "venture-builder-research/0.1 (open-source research agent)")
 
 # Where runs, caches and the decision log live.

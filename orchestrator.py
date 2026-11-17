@@ -175,6 +175,12 @@ def add_waitlist_signup(run_id: str, email: str, consent: bool) -> int:
 
 
 # --------------------------------------------------------------- phases
+def _progress(run: dict, text: str) -> None:
+    """What is happening right now, shown in the dashboard while a phase runs."""
+    run["progress"] = {"text": text, "since": _now()}
+    save(run)
+
+
 def _chosen(run: dict) -> dict:
     return run["ctx"]["candidates"][0]
 
@@ -189,16 +195,20 @@ def _phase1(run: dict) -> gates.GateResult:
     if run["screening"].get("clarify") and not run.get("scope_confirmed"):
         # Close to an excluded category: nothing is researched or written until the founder confirms the scope.
         return gates.scope_gate(run["screening"])
+    _progress(run, "researcher: sharpening the idea and searching public sources")
     r = Researcher(run).run_step()
     run["ctx"]["candidates"] = r.data["candidates"]
     run["ctx"]["sources_ok"] = r.data["sources_ok"]
     _record_step(run, 1, 1, r)
+    _progress(run, "scorer: scoring the idea against the alternatives")
     s = Scorer(run).run_step(run["ctx"]["candidates"])
     run["ctx"]["scores"] = s.data["scores"]
     _record_step(run, 1, 2, s)
+    _progress(run, "market analyst: defining the customer from the evidence")
     m = MarketAnalyst(run).run_step(_chosen(run))
     run["ctx"]["market"] = m.data
     _record_step(run, 1, 3, m)
+    _progress(run, "interviewer: writing the Mom Test interview guide")
     i = Interviewer(run).run_step(_chosen(run), m.data.get("communities", {}))
     _record_step(run, 1, 4, i)
     return gates.evidence_gate(run["ctx"]["scores"], attempt, run["ctx"]["sources_ok"])
@@ -207,11 +217,14 @@ def _phase1(run: dict) -> gates.GateResult:
 def _phase2(run: dict) -> gates.GateResult:
     cand, market = _chosen(run), run["ctx"].get("market", {})
     score = run["ctx"]["scores"][0]
+    _progress(run, "strategist: filling the Lean Canvas")
     c = Strategist(run).run_step(cand, market, score)
     run["ctx"]["canvas"] = c.data["canvas"]
     _record_step(run, 2, 1, c)
+    _progress(run, "copywriter: writing the landing page")
     lp = Copywriter(run).landing_page(cand, c.data["canvas"])
     _record_step(run, 2, 2, lp)
+    _progress(run, "analyst: setting the demand test target")
     d = Analyst(run).demand_plan(cand, market.get("communities", {}), _waitlist(run))
     run["ctx"]["demand"] = d.data
     _record_step(run, 2, 3, d)
@@ -222,14 +235,18 @@ def _phase2(run: dict) -> gates.GateResult:
 def _phase3(run: dict) -> gates.GateResult:
     cand = _chosen(run)
     b = Builder(run)
+    _progress(run, "builder: writing the MVP spec")
     sp = b.spec(cand, run["ctx"].get("canvas", {}))
     run["ctx"]["spec"] = sp.data["spec"]
     _record_step(run, 3, 1, sp)
     feedback = run["ctx"].get("feedback", {}).get("3", "")
+    _progress(run, "builder: writing the product, module by module (the longest step)")
     prod = Builder(run).build(cand, sp.data["spec"], feedback)
     _record_step(run, 3, 2, prod)
+    _progress(run, "builder: writing the user guide")
     guide = Builder(run).user_guide(sp.data["spec"])
     _record_step(run, 3, 3, guide)
+    _progress(run, "qa: running the MVP tests")
     qa = QA(run).run_step(prod.content, guide.content, prod.data["modules"], sp.data["spec"]["product_name"])
     _record_step(run, 3, 4, qa)
     return gates.build_gate(qa.data["tests"], run["attempts"].get("3", 1))
@@ -237,9 +254,11 @@ def _phase3(run: dict) -> gates.GateResult:
 
 def _phase4(run: dict) -> gates.GateResult:
     spec = run["ctx"]["spec"]
+    _progress(run, "pricing: applying the price rule")
     p = Pricing(run).run_step(_chosen(run), spec)
     run["ctx"]["pricing"] = p.data
     _record_step(run, 4, 1, p)
+    _progress(run, "policy writer: drafting terms, privacy and refund policy")
     pol = PolicyWriter(run).run_step(spec, p.data)
     _record_step(run, 4, 2, pol)
     # Re-scan the final texts: anything the guardrails already removed is gone, anything left counts.
@@ -254,10 +273,13 @@ def _phase5_gate(run: dict) -> gates.GateResult:
 
 def _phase5(run: dict) -> gates.GateResult:
     cand, spec, pricing = _chosen(run), run["ctx"]["spec"], run["ctx"]["pricing"]
+    _progress(run, "copywriter: writing the store page")
     sp = Copywriter(run).store_page(cand, run["ctx"].get("canvas", {}), pricing, "phase4_step2_policies.md")
     _record_step(run, 5, 1, sp)
+    _progress(run, "copywriter: drafting launch posts for your approval")
     posts = Copywriter(run).launch_posts(cand, run["ctx"].get("market", {}).get("communities", {}), pricing.get("price_usd"))
     _record_step(run, 5, 2, posts)
+    _progress(run, "launcher: running the MOCKED sale-to-cash test")
     res, log_md = Launcher(run).run_step(spec["product_name"], pricing["price_usd"])
     run["ctx"]["payment_tests"] = res.data["tests"]
     run["ctx"]["mock_sales"] = {"reconciliation": res.data["reconciliation"]}
@@ -268,6 +290,7 @@ def _phase5(run: dict) -> gates.GateResult:
 
 def _phase6(run: dict) -> gates.GateResult:
     spec, pricing = run["ctx"]["spec"], run["ctx"]["pricing"]
+    _progress(run, "support: writing the support kit")
     s = Support(run).run_step(spec, pricing)
     _record_step(run, 6, 1, s)
     wl = _waitlist(run)
@@ -341,6 +364,7 @@ def advance(run_id: str) -> dict:
             save(run)
             raise
         run.pop("error", None)
+        run.pop("progress", None)
         save(run)
         return run
 

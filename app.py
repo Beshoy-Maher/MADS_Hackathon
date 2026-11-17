@@ -57,7 +57,8 @@ def _founder_only(token: str | None) -> None:
 
 def _view(run: dict) -> dict:
     return {
-        "run": {k: run[k] for k in ("id", "status", "phase", "created", "updated", "brief", "original_idea", "screening", "attempts")},
+        "run": {k: run[k] for k in ("id", "status", "phase", "created", "updated", "brief", "original_idea", "screening", "attempts")}
+               | {"progress": run.get("progress"), "warnings": run.get("warnings", [])},
         "error": run.get("error"),
         "phases": orchestrator.PHASES,
         "gates": run["gates"],
@@ -203,8 +204,8 @@ def ask(payload: dict = Body(...)):
         except KeyError:
             pass
     res = llm.complete(load_prompt("assistant") + "\n\n" + GLOBAL_RULES, f"{context}\n\nRequest: {text}",
-                       "The local model is not available right now, so I can't draft this yet. The request passed the safety check; "
-                       "try again once the model has finished downloading.", max_tokens=700)
+                       "The local model is not available right now, so nothing was drafted. The request passed the rule check; "
+                       "the model's second check and the draft need the model. Try again once it has finished downloading.", max_tokens=700)
     scan = guardrails.scan_output(res.text)
     draft, claims = guardrails.scrub_action_claims(scan.text)
     removed = len(scan.violations) + claims

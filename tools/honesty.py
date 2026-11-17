@@ -32,7 +32,15 @@ EXPERIENCE = re.compile(r"\b(i(?:'|’)?ve (?:seen|been|faced|hired|interviewed|
                         r"when i (?:was starting|started|first started|began)|starting out|"
                         r"(?:struggles?|problems?|challenges?|pain) you (?:faced|had|went through)|you(?:'|’)?ve (?:faced|been through)|"
                         r"when you were (?:a|an|starting|junior|new)|when i was (?:learning|new|junior)|i(?:'|’)?d have (?:wanted|loved|liked)|"
-                        r"(?:actual|real) job postings)\b", re.IGNORECASE)
+                        r"(?:actual|real) job postings|"
+                        r"(?:her|his|their) (?:own )?(?:journey|story|experience|path) as an?|"
+                        r"(?:challenges?|struggles?|problems?|pain) (?:she|he|they) (?:faced|had|went through)|"
+                        r"how (?:the|this|my|her|his) \w+ helped (?:her|him|them|me|others))\b", re.IGNORECASE)
+# "10 minutes per question", "in 15 minutes a day": a time the product cannot back. The sentence goes.
+TIME_CLAIM = re.compile(r"\b(?:\d+|one|two|three|five|ten|fifteen|twenty|thirty)\s*(?:[–-]\s*\d+\s*)?[–-]?\s*(?:minutes?|mins?|hours?)\s+"
+                        r"(?:per|a|each|for each|every)\b", re.IGNORECASE)
+# The memo's reasoning never restates the MOCKED tests: code reports them in the lists, and a model got them wrong.
+MOCK_TEST = re.compile(r"sale[- ]to[- ]cash|payment test|delivery test|test (?:orders?|buyers?|purchases?)|\bmocked\b", re.IGNORECASE)
 
 COVERT = re.compile(r"\b(subtl\w*|covert\w*|disguis\w*|without (?:saying|disclosing|mentioning|revealing)|pretend\w*|"
                     r"limited[- ]time|for a limited|only \w+ (?:spots?|copies|seats?) (?:left|available)|hurry|act now|"
@@ -71,6 +79,10 @@ def strip_counts(text: str) -> tuple[str, int]:
     t = drop(COUNT, lambda m: m.group(1) + m.group(2), t)
     t = drop(PDF_ADJ, "", t)
     t = drop(PDF_WORD, "file", t)
+    sents = _SENT.split(t)
+    keep = [s for s in sents if not TIME_CLAIM.search(s)]
+    n += len(sents) - len(keep)
+    t = " ".join(keep)
     t = re.sub(r"\s{2,}", " ", t).strip()
     if t[:1].islower() and (text or "")[:1].isupper():
         t = t[0].upper() + t[1:]
@@ -124,6 +136,7 @@ def clean_memo(text: str, recommendation: str) -> str:
     sents = [s for s in _SENT.split(t.strip()) if s]
     if recommendation.lower() != "stop":
         sents = [s for s in sents if not PAUSE.search(s) and not MEMO_PAUSE.search(s)]
+    sents = [s for s in sents if not MOCK_TEST.search(s)]
     t = " ".join(sents)
     t = _DANGLING.sub("", t)
     t = t[:1].upper() + t[1:]

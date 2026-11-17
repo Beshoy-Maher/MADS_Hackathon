@@ -101,7 +101,9 @@ class Analyst(Agent):
                 "do not spin weak data, no income projections.")
         body = self.write(task, fallback, max_tokens=300)
         from tools import honesty
-        body = honesty.clean_memo(reasoning_only(body) or "", gate.recommendation) or fallback
+        body = (honesty.clean_memo(reasoning_only(body) or "", gate.recommendation)
+                or honesty.clean_memo(reasoning_only(fallback), gate.recommendation)
+                or "The recommendation follows from the gate's checks above; review it again when real numbers come in.")
         from tools import claims
         body, _ = claims.check(body, self.evidence_urls())
         md = [f"# Phase 6, step 3: Persevere-or-pivot memo for '{candidate['title']}'", "",

@@ -190,3 +190,24 @@ def test_unbacked_learning_and_job_posting_claims_are_removed():
     brief = {"constraints": "Works full time as a data analyst.", "skills": ["SQL"]}
     for s in ("It's something I'd have wanted when I was learning.", "Questions based on actual job postings in the region."):
         assert honesty.strip_experience(s, brief)[1] == 1
+
+
+# Third round: text from the rerun on fd2f8ea (b6163a2 outputs).
+def test_third_person_journey_and_testimonial_lines_are_dropped():
+    line = ("- Write a transparent, no-fluff post about her journey as a junior analyst in Egypt, including the challenges "
+            "she faced with SQL interviews, and how the workbook helped her.")
+    assert honesty.unbacked_experience(line, BRIEF)
+
+
+def test_time_per_item_claims_are_removed():
+    t, n = honesty.strip_counts("Designed for evening study — 10–minutes per question so you can practice without overwhelming your schedule.")
+    assert t == "" and n >= 1
+    s = "Each question comes with a fully worked answer."
+    assert honesty.strip_counts(s) == (s, 0)
+
+
+def test_memo_never_restates_the_mocked_tests():
+    raw = ("No buyers have made purchases. The lack of measurable outcomes means the product has not passed the sale-to-cash test. "
+           "The founder should repeat the demand test with a live landing page.")
+    out = honesty.clean_memo(raw, "repeat")
+    assert "sale-to-cash" not in out and out.endswith("live landing page.")

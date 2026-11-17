@@ -208,8 +208,8 @@ def save_interview_notes(run_id: str, notes: str, actor: str) -> dict:
             raise ValueError("run phase 1 first: the notes are read against the idea it researched")
         (run_dir(run_id) / "interview_notes.txt").write_text(notes, encoding="utf-8")
         res = NotesAnalyst(run).run_step(notes, _chosen(run)["title"])
-        run["ctx"]["interview_notes"] = {"commitments": len(res.data["commitments"]), "compliments": len(res.data["compliments"]),
-                                         "at": _now()}
+        run["ctx"]["interview_notes"] = {"commitments": len(res.data["commitments"]), "problems": len(res.data["problems"]),
+                                         "compliments": len(res.data["compliments"]), "at": _now()}
         _record_step(run, 1, 5, res)
         decision_log.log("founder", "add_interview_notes", run_id=run_id, approved_by=approval.FOUNDER,
                          detail=f"{len(notes.split())} words of interview notes added (text not logged)")

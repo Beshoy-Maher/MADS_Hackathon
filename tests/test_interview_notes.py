@@ -100,3 +100,23 @@ def test_api_adds_notes_and_respects_the_founder_token(monkeypatch):
     assert client.post("/api/runs/nope/interview-notes", json={"notes": NOTES}).status_code == 404
     monkeypatch.setattr(config, "FOUNDER_TOKEN", "s3cret")
     assert client.post(f"/api/runs/{run['id']}/interview-notes", json={"notes": NOTES}).status_code == 403
+
+
+def test_what_people_already_do_is_problem_evidence_not_a_compliment():
+    out = na.classify_by_rules("Omar: spent three weekends on LeetCode before his interview.\nSara: sounds great, I would buy it.")
+    assert any("three weekends" in p["quote"] for p in out["problems"])
+    assert not any("three weekends" in c["quote"] for c in out["compliments"])
+    assert not any("three weekends" in c["quote"] for c in out["commitments"])
+
+
+def test_a_model_compliment_about_past_effort_is_moved_to_problem_evidence(monkeypatch):
+    notes = "Omar: spent three weekends on LeetCode before his interview.\nSara: sounds great."
+    monkeypatch.setattr(llm, "complete_json", lambda *a, **k: (
+        {"commitments": [], "compliments": [{"quote": "Omar: spent three weekends on LeetCode before his interview."},
+                                            {"quote": "Sara: sounds great."}]},
+        llm.LLMResult(text="{}", model="m")))
+    run = _run_after_phase1()
+    res = na.NotesAnalyst(run).run_step(notes, "SQL workbook")
+    assert [p["quote"] for p in res.data["problems"]] == ["Omar: spent three weekends on LeetCode before his interview."]
+    assert [c["quote"] for c in res.data["compliments"]] == ["Sara: sounds great."]
+    assert "Problem evidence: 1" in res.content

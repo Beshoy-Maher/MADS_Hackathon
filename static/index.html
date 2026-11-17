@@ -173,7 +173,7 @@ async function render() {
       <p class="small muted">Paste what people actually said. An agent separates commitments (time, money, introductions) from compliments and quotes only your notes. It never writes an answer for anyone.</p>
       <textarea id="notes" rows="5" style="width:100%" placeholder="e.g. Ahmed: showed me his spreadsheet and booked a second call for Thursday. Sara: said it sounds great.">${esc(keep)}</textarea>
       <div class="row" style="margin-top:8px"><button onclick="saveNotes()" ${r.status === "running" ? "disabled" : ""}>Analyse notes</button>
-      <span id="notesMsg" class="small muted">${n ? `Last analysis: ${n.commitments} commitment(s), ${n.compliments} compliment(s). See phase1_step5_interview-notes.md below.` : "No notes added yet."}</span></div></div>`;
+      <span id="notesMsg" class="small muted">${n ? `Last analysis: ${n.commitments} commitment(s), ${n.problems || 0} problem signal(s), ${n.compliments} compliment(s). See phase1_step5_interview-notes.md below.` : "No notes added yet."}</span></div></div>`;
   }
   html += `<div class="card"><h2>Outputs</h2><div class="row small">${v.outputs.map(o => `<button onclick="view('${esc(o)}')">${esc(o)}</button>`).join("") || `<span class="muted">None yet.</span>`}</div><div id="viewer"></div></div>`;
   html += `<div class="card"><h2>Decision log <span class="small muted">(${v.log.length} entries, every agent action)</span></h2><div style="max-height:360px;overflow:auto"><table>

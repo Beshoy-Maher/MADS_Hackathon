@@ -6,6 +6,8 @@ STUBBED action.
 """
 from __future__ import annotations
 
+import re
+
 import html
 
 import approval
@@ -132,6 +134,10 @@ class Copywriter(Agent):
             if price:  # the only dollar amount a launch post may state is the price the pricing rule set
                 for bad in wrong_money(s.text, [price]):
                     s.text = s.text.replace(bad, f"${price}")
+                # The price is one number: "$11.99 or less", "from $11.99", "$11.99 and up" make it vague, so the hedge goes.
+                s.text = re.sub(rf"(\${re.escape(str(price))})\s*(?:or (?:less|lower|under|so|more)|and (?:up|under|below)|\+)", r"\1", s.text)
+                s.text = re.sub(rf"\b(?:from|starting (?:at|from)|as low as|only|just|under|up to)\s+(\${re.escape(str(price))})", r"\1", s.text,
+                                flags=re.IGNORECASE)
             act = approval.request_action(self.run, "publish", f"launch post: {place}", f"Post in {place}", {"text": s.text}, agent=self.role)
             ids.append(act["id"])
             md += [f"## {place}", "", s.text, "", f"Approval: `{act['id']}` (pending)", ""]

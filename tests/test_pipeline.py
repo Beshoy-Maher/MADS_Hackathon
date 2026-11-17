@@ -1,3 +1,4 @@
+import pytest
 """Smoke test of all six phases, the STOP path and the decision log."""
 import json
 import re
@@ -161,3 +162,13 @@ def test_user_guide_has_no_invented_email_or_sources(monkeypatch):
     res = Builder(run).user_guide({"product_name": "X", "format": "PDF", "modules": [{"title": "M1"}]})
     assert "madeup.com" not in res.content and "Sources" not in res.content and "if not used" not in res.content
     assert "the address on your receipt" in res.content
+
+
+@pytest.mark.parametrize("hedged", ["$11.99 or less", "from $11.99", "only $11.99", "$11.99 and up", "starting at $11.99"])
+def test_launch_posts_state_the_price_as_one_number(monkeypatch, hedged):
+    from agents.copywriter import Copywriter
+    run = orchestrator.create_run(STRONG)
+    monkeypatch.setattr(Copywriter, "ask_json",
+                        lambda self, task, fb, max_tokens=700: {"posts": {"r/learnsql": f"I made a workbook. It costs {hedged}."}})
+    res = Copywriter(run).launch_posts({"title": "SQL workbook"}, {"r/learnsql": {}}, 11.99)
+    assert "It costs $11.99." in res.content

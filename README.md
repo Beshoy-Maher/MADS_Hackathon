@@ -10,6 +10,18 @@ The committed demo run, produced by `scripts/run_demo.py` with the local model, 
 - **Weak idea, STOP:** a paid daily-quotes email for developers fails on founder fit and total score, and no alternative passes, so the system says "do not launch this" ([gate](outputs/phase1_gate_decision_weak-idea.md)).
 - **Excluded idea, refused:** a crypto-signals channel is refused before any agent runs ([gate](outputs/phase1_gate_decision_excluded-idea.md)).
 
+Where each claim can be checked:
+
+| Claim | Evidence |
+|---|---|
+| The system recommends STOP on weak evidence | [`outputs/phase1_gate_decision_weak-idea.md`](outputs/phase1_gate_decision_weak-idea.md), thresholds in [`gates.py`](gates.py) (`THRESHOLDS`) |
+| Nothing is published, sent, spent or refunded without the founder | [`approval.py`](approval.py) (`request_action`, `execute_action`), [`tests/test_approval.py`](tests/test_approval.py) |
+| Guardrail results, including the prompts that get through | [`evals/results.md`](evals/results.md), cases in [`evals/`](evals/) |
+| Every market claim has a source or the label `ASSUMPTION` | [`outputs/phase1_step1_opportunities.md`](outputs/phase1_step1_opportunities.md), [`outputs/phase1_step3_market.md`](outputs/phase1_step3_market.md), checker in [`tools/claims.py`](tools/claims.py) |
+| Payment triggers delivery, refunds revoke access, books reconcile (MOCKED provider) | [`outputs/payment_test_log.md`](outputs/payment_test_log.md), [`tests/test_payments.py`](tests/test_payments.py) |
+| Every agent action is logged with sources, model, cost and approver | [`decision_log.json`](decision_log.json) |
+| The product passes 11 deterministic tests | [`outputs/phase3_step4_qa-report.md`](outputs/phase3_step4_qa-report.md), tests in [`agents/qa.py`](agents/qa.py) |
+
 ## Quickstart
 
 ```bash
@@ -66,7 +78,7 @@ An **orchestrator** (`orchestrator.py`) runs the six phases in order. Each phase
 
 ## Cost per run
 
-**About $0.00 per run** (local model, ~23k tokens for all three demo founders in our demo run: 28 model calls, including the verifier's reviews and one module revision; research APIs are free). The dashboard header shows the running cost, and every decision-log entry records `"cost": 0`.
+**About $0.00 per run** (local model, ~23k tokens for all three demo founders in our demo run: 28 model calls, including the verifier's reviews and one module revision; research APIs are free). `decision_log.json` has 25 entries with a model because one entry is one agent action: the builder writes the product's 4 modules in 4 calls and logs them as one `build_product` action. The dashboard header shows the running cost, and every decision-log entry records `"cost": 0`.
 
 ## Demo video
 

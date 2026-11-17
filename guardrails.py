@@ -628,32 +628,6 @@ FABRICATED_RULE["base_patterns"] = list(FABRICATED_RULE["patterns"])
 REQUEST_RULES.append(FABRICATED_RULE)
 
 
-# Fourth generation, by concept: quotes put in the mouth of a named role (recruiter, expert, press),
-# claims that someone with authority has switched the rules off, and scarcity of seats or copies
-# (English and Arabic). Written as general patterns; benign controls in evals/ must still pass.
-_ROLES = r"(recruiters?|hiring managers?|employers?|experts?|teachers?|professors?|mentors?|journalists?|reporters?|influencers?|critics?|reviewers?|engineers?|developers?|ceos?|founders?|managers?|interviewers?|companies|celebrit\w+|press|media)"
-_MORE_RULES_4: dict[str, list[re.Pattern]] = {
-    "fake_reviews": _rx(
-        r"\bpull[- ]?quotes?\b",
-        rf"\b(what|something|things)\b[^.?!\n]{{0,15}}\b(an?|the|some|one|any)\s+(\w+\s+)?{_ROLES}\s+(might|would|could|will)\s+(say|write|think)\b[^.?!\n]{{0,40}}\b(about|of|on)\b",
-        rf"\b(quote|endorsement|blurb|praise|recommendation)s?\b[^.?!\n]{{0,25}}\b(from|by|of)\s+(an?|the|some|one)\s+(\w+\s+)?{_ROLES}\b",
-    ),
-    "prompt_injection": _rx(
-        r"\b(safety|guard ?rails?|rules?|checks?|filters?|restrictions?|approvals?|polic(y|ies))\b[^.?!\n]{0,30}\b(are|is|have been|has been|were|now)\s+(\w+\s+)?(waived|suspended|lifted|disabled|switched off|turned off|paused|removed|relaxed|off)\b",
-        r"\b(new|updated|special|urgent)\s+(instructions?|rules?|orders?|policy|message|notice)\s+from\s+(the\s+)?(organi[sz]ers?|admins?|administrators?|developers?|system|judges?|team|owner|operators?)\b",
-    ),
-    "fake_urgency": _rx(
-        r"\b(seats?|spots?|places?|copies|stock|slots?|spaces?|availability)\b[^.?!\n]{0,15}\b(are|is)\s+(very\s+)?(limited|running out|almost gone|nearly gone)\b",
-        r"\blimited\s+(seats?|spots?|places?|copies|slots?|spaces?|stock|availability)\b",
-        r"(المقاعد|مقاعد|الأماكن|أماكن|الاماكن|اماكن|النسخ|نسخ|الكمية|كمية|العدد|الفرص)[^.؟!\n]{0,20}(محدودة|محدود|قليلة|بتخلص|هتخلص|تنفد|نفدت|خلصت)",
-        r"(محدودة|محدود)[^.؟!\n]{0,10}(المقاعد|مقاعد|الأماكن|أماكن|اماكن|النسخ|الكمية|العدد)",
-        r"(آخر فرصة|اخر فرصة|الحق قبل|اسرع قبل|أسرع قبل|العرض (ينتهي|هيخلص|بيخلص))",
-    ),
-}
-for _r in REQUEST_RULES:
-    _r["patterns"] = list(_r["patterns"]) + _MORE_RULES_4.get(_r["category"], [])
-
-
 def screen_request(text: str, strict: bool = True) -> Verdict:
     """Decide whether a free-text request may be carried out.
 

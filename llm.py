@@ -102,7 +102,8 @@ def _cost(prompt_tokens: int, completion_tokens: int) -> float:
     return round((prompt_tokens + completion_tokens) / 1_000_000 * config.LLM_COST_PER_MTOK, 6)
 
 
-def complete(system: str, user: str, fallback: str, *, json_mode: bool = False, max_tokens: int = 1200) -> LLMResult:
+def complete(system: str, user: str, fallback: str, *, json_mode: bool = False, max_tokens: int = 1200,
+             temperature: float | None = None) -> LLMResult:
     """Ask the model. On any failure return `fallback` with model=None."""
     st = model_status()
     if config.LLM_PROVIDER == "none" or not st["ready"]:
@@ -110,6 +111,7 @@ def complete(system: str, user: str, fallback: str, *, json_mode: bool = False, 
         STATS.add(result)
         return result
     model_name = st["model"]
+    temp = config.LLM_TEMPERATURE if temperature is None else temperature
     try:
         if config.LLM_PROVIDER == "ollama":
             body = {
@@ -117,7 +119,7 @@ def complete(system: str, user: str, fallback: str, *, json_mode: bool = False, 
                 "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
                 "stream": False,
                 "think": False,
-                "options": {"temperature": config.LLM_TEMPERATURE, "num_predict": max_tokens, "num_ctx": 8192},
+                "options": {"temperature": temp, "num_predict": max_tokens, "num_ctx": 8192},
             }
             if json_mode:
                 body["format"] = "json"
@@ -131,7 +133,7 @@ def complete(system: str, user: str, fallback: str, *, json_mode: bool = False, 
             body = {
                 "model": model_name,
                 "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
-                "temperature": config.LLM_TEMPERATURE,
+                "temperature": temp,
                 "max_tokens": max_tokens,
             }
             if json_mode:
@@ -166,9 +168,10 @@ def complete(system: str, user: str, fallback: str, *, json_mode: bool = False, 
     return result
 
 
-def complete_json(system: str, user: str, fallback: dict, *, max_tokens: int = 1200) -> tuple[dict, LLMResult]:
+def complete_json(system: str, user: str, fallback: dict, *, max_tokens: int = 1200,
+                  temperature: float | None = None) -> tuple[dict, LLMResult]:
     """Ask for a JSON object. Falls back to `fallback` if the reply does not parse."""
-    res = complete(system, user, json.dumps(fallback), json_mode=True, max_tokens=max_tokens)
+    res = complete(system, user, json.dumps(fallback), json_mode=True, max_tokens=max_tokens, temperature=temperature)
     if res.used_fallback:
         return fallback, res
     text = res.text.strip()

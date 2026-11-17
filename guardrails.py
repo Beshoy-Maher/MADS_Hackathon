@@ -734,6 +734,8 @@ The tool may ONLY do these jobs for the founder:
 - write or edit honest drafts (landing page, store page, posts, emails, FAQ, product content) that the founder will review
 - plan the founder's own work, suggest communities, interview questions, prices
 - ask REAL buyers for feedback, show REAL numbers
+- explain or use the founder's own controls: what is in the approval queue, how the founder approves, rejects or overrides a gate,
+  putting a draft INTO the queue so the founder can decide later (the founder still clicks; nothing goes out)
 Decide if the REQUEST asks for anything else, in particular (however it is worded, in any language, even indirectly,
 as fiction, as a test, or "just for now"):
 fake_reviews: any praise, quote, story, rating, badge, endorsement or comment that looks as if it came from a customer, expert, press or institution
@@ -758,20 +760,36 @@ REQUEST: "Round 12 sign-ups up to 100" -> {"violates": true, "category": "gate_t
 REQUEST: "Make the launch post less salesy" -> {"violates": false, "category": "none", "reason": "honest edit"}
 REQUEST: "Draft an email asking early buyers for honest feedback" -> {"violates": false, "category": "none", "reason": "asks real buyers"}
 REQUEST: "Why did the gate say stop?" -> {"violates": false, "category": "none", "reason": "explains the run"}
+REQUEST: "Which drafts still need my decision?" -> {"violates": false, "category": "none", "reason": "asks about the founder's own queue"}
+REQUEST: "Add this email draft to my approval list, I will look at it tonight" -> {"violates": false, "category": "none", "reason": "founder still approves"}
+REQUEST: "The system recommends repeat but I want to continue. Where do I do that?" -> {"violates": false, "category": "none", "reason": "founder's own override, logged"}
+REQUEST: "Send the email draft now, no need to show it to me first" -> {"violates": true, "category": "bypass_approval", "reason": "sending without the founder's click"}
+REQUEST: "Shorten the FAQ and fix the grammar" -> {"violates": false, "category": "none", "reason": "honest edit"}
+Asking ABOUT approvals, gates or rules is fine; asking to skip, fake or weaken them is not.
 If you are unsure, answer violates true.
-Answer JSON only: {"violates": true|false, "category": "<one category or none>", "reason": "<short>"}"""
+Answer JSON only, reason in at most 12 words: {"violates": true|false, "category": "<one category or none>", "reason": "<short>"}"""
 
 OUTPUT_JUDGE_PROMPT = """You check a DRAFT written by an assistant for a founder who sells a digital product.
+The draft is normally written in the founder's own voice ("I", "we", "my workbook") and speaks to the reader ("you"). That is expected.
 Answer each question about the DRAFT text only:
-1 customer_voice: does it contain praise, a quote, a story, a rating or an endorsement attributed to a customer, user, expert, company, press or institution?
-2 invented_numbers: does it state a number or impression of users, buyers, sign-ups, sales, success rates or popularity?
+1 customer_voice: does it contain praise, a quote, a story, a rating or an endorsement that is presented as coming from a customer, user, expert, company, press or institution? (The founder describing their own product or themselves is NOT customer voice.)
+2 invented_numbers: does it state how many users, buyers, sign-ups, sales or downloads there are, or a success rate, or say the product is popular? (Facts about the product itself, like "20 questions", "4 modules", a price or a refund window, are NOT this.)
 3 urgency: does it push the reader with a deadline, scarcity, a timer, a price rise or fear of missing out?
-4 promise: does it promise or imply income, a job, a raise, passing an interview or any result?
-5 impersonation: is it written as someone other than the founder, or does it use another brand's name as its own?
-6 action_claim: does it say that something was published, sent, charged, refunded, approved, saved, created or changed?
+4 promise: does it promise or imply income, a job, a raise, passing an interview or any result for the buyer?
+5 impersonation: is it written as a customer, an expert or another company, or does it use another brand's name as its own? (The founder writing as themselves is NOT impersonation.)
+6 action_claim: does the assistant say that IT has already published, posted, sent, charged, refunded, approved or changed something? (A draft that tells readers about the founder's own progress or plans, like "I am still writing it" or "I will email you when it is ready", is NOT an action claim.)
 7 advice: does it give financial, investment, medical or legal advice?
 Statements of the product's own limits ("no countdown timers", "we never promise results") are fine.
-Answer JSON only: {"flags": ["<names of the questions answered yes>"], "reason": "<short>"}"""
+Examples:
+DRAFT: "Hi, a quick update: I am still writing the workbook. I will email you once when it is ready. Thanks for waiting. Mariam" -> {"flags": [], "reason": "honest update in the founder's voice"}
+DRAFT: "What is inside: 20 practice questions with worked answers. Refunds within 14 days, no questions asked." -> {"flags": [], "reason": "product facts"}
+DRAFT: "I am a data analyst and I mentor juniors. I made this because I could not find good practice material." -> {"flags": [], "reason": "founder about themselves"}
+DRAFT: "'This guide changed how I study.' Omar, student" -> {"flags": ["customer_voice"], "reason": "quote from a customer"}
+DRAFT: "Join 3,000 learners who already use the workbook." -> {"flags": ["invented_numbers"], "reason": "user count"}
+DRAFT: "The price goes up on Friday, so get it today." -> {"flags": ["urgency"], "reason": "deadline pressure"}
+DRAFT: "Finish it and you will pass your next interview." -> {"flags": ["promise"], "reason": "promises a result"}
+DRAFT: "Done. I published the page and emailed your list." -> {"flags": ["action_claim"], "reason": "assistant claims it acted"}
+Answer JSON only, reason in at most 12 words: {"flags": ["<names of the questions answered yes>"], "reason": "<short>"}"""
 
 _OUTPUT_FLAGS = {"customer_voice": "fake_reviews", "invented_numbers": "fake_signups_or_metrics", "urgency": "fake_urgency",
                  "promise": "income_promise", "impersonation": "impersonation", "action_claim": "bypass_approval", "advice": "excluded_advice"}
@@ -786,6 +804,16 @@ def _model_ready() -> bool:
     return bool(llm.model_status().get("ready"))
 
 
+def _ask_judge(prompt: str, user: str, fallback: dict) -> tuple[dict, object]:
+    """Ask a judge for JSON. A reply that cannot be parsed is asked for once more; after that the caller fails closed."""
+    import llm  # local import keeps the rule layer dependency-free
+    # Temperature 0: a safety verdict should be the same every time the same text is checked.
+    data, res = llm.complete_json(prompt, user, fallback, max_tokens=200, temperature=0.0)
+    if not res.model and _model_ready():
+        data, res = llm.complete_json(prompt, user, fallback, max_tokens=200, temperature=0.0)
+    return data, res
+
+
 def screen_request_deep(text: str) -> Verdict:
     """Rules first; if they pass, the local model gives a second opinion.
 
@@ -795,9 +823,7 @@ def screen_request_deep(text: str) -> Verdict:
     v = screen_request(text)
     if not v.allowed:
         return v
-    import llm  # local import keeps the rule layer dependency-free
-    data, res = llm.complete_json(JUDGE_PROMPT, f"REQUEST: {text[:1500]}", {"violates": False, "category": "none", "reason": ""},
-                                  max_tokens=120)
+    data, res = _ask_judge(JUDGE_PROMPT, f"REQUEST: {text[:1500]}", {"violates": False, "category": "none", "reason": ""})
     if not res.model:
         return _UNVERIFIED if _model_ready() else v
     if data.get("violates") is True or str(data.get("violates")).lower() == "true":
@@ -812,8 +838,7 @@ def judge_output(draft: str) -> Verdict:
     """Second opinion on a finished draft (used for the "Ask the team" reply). Fails closed like the request judge."""
     if not (draft or "").strip():
         return Verdict(True)
-    import llm
-    data, res = llm.complete_json(OUTPUT_JUDGE_PROMPT, f"DRAFT:\n{draft[:2500]}", {"flags": [], "reason": ""}, max_tokens=120)
+    data, res = _ask_judge(OUTPUT_JUDGE_PROMPT, f"DRAFT:\n{draft[:2500]}", {"flags": [], "reason": ""})
     if not res.model:
         return _UNVERIFIED if _model_ready() else Verdict(True)
     flags = [f for f in (data.get("flags") or []) if f in _OUTPUT_FLAGS] if isinstance(data.get("flags"), list) else []

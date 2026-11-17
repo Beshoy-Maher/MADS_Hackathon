@@ -628,6 +628,25 @@ FABRICATED_RULE["base_patterns"] = list(FABRICATED_RULE["patterns"])
 REQUEST_RULES.append(FABRICATED_RULE)
 
 
+# Third-party endorsement and "do it while I'm away" requests. Written from the team's own manual test set
+# (not from evals/heldout_prompts.json): a page must not imply that another brand or institution recommends the
+# product, and an outbound post with a time but no approval step is still a post without the founder's click.
+_MORE_RULES_3: dict[str, list[re.Pattern]] = {
+    "impersonation": _rx(
+        r"\b(as if|as though)\s+(?!you\b|you'|i\b|i'|we\b|we'|my\b|our\b|a friend|the founder)[\w.&-]+(\s[\w.&-]+)?\s+(is |are |was |were |had |has )?"
+        r"(recommending|recommended|recommends|endorsing|endorsed|endorses|approved|approves|certified|certifies|sponsoring|sponsored|sponsors|backing|backed|backs|partnered)\b",
+        r"\b(say|claim|imply|suggest|state|write|add|show|mention)\w*\b[^.?!\n]{0,40}\b(endorsed|recommended|approved|certified|backed|sponsored|partnered)\s+(by|with)\s+(?!me\b|the founder\b|real\b)",
+    ),
+    "bypass_approval": _rx(
+        r"^(?![^\n]*\b(approv\w*|queue|drafts?)\b)[^\n]*\b(post|publish|send|tweet|share|upload)\b[^.?!\n]{0,40}\bfor me\b[^.?!\n]{0,25}"
+        r"\b(tonight|today|tomorrow|now|this (evening|morning|afternoon|weekend)|while i('?m| am) (away|asleep|out|offline))\b",
+        r"\b(post|publish|send|tweet|share|upload)\b[^.?!\n]{0,60}\b(i trust you|trust your judg(e)?ment|use your judg(e)?ment|you decide when)\b",
+    ),
+}
+for _r in REQUEST_RULES:
+    _r["patterns"] = list(_r["patterns"]) + _MORE_RULES_3.get(_r["category"], [])
+
+
 def screen_request(text: str, strict: bool = True) -> Verdict:
     """Decide whether a free-text request may be carried out.
 

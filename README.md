@@ -62,6 +62,22 @@ Then open **http://localhost:8000**, pick a sample founder (or paste any brief) 
 
 An **orchestrator** ([`orchestrator.py`](orchestrator.py)) runs the six phases in order; each phase is a few role-named agents (`agents/<role>.py`, prompts in `prompts/`) that call local models through `llm.py` and free public evidence APIs through `tools/sources.py`. After every phase a **gate** ([`gates.py`](gates.py)) compares the results with thresholds fixed in code before the data arrives and recommends go, repeat, pivot or stop; the run pauses until the founder decides. Before each gate a **critic** ([`agents/critic.py`](agents/critic.py)) challenges the phase's documents, and only corrections that pass the safety checks are written into them. Anything outbound goes through [`approval.py`](approval.py), [`guardrails.py`](guardrails.py) screens briefs, requests and every generated text, and every agent action is appended to [`decision_log.json`](decision_log.json). Full design, diagrams and the sale-to-cash flow: [ARCHITECTURE.md](ARCHITECTURE.md).
 
+```mermaid
+flowchart LR
+  B[Founder brief] --> S{Guardrails: excluded or borderline?}
+  S -- refused --> X[STOP]
+  S --> P1[1 Discover: researcher, scorer, market analyst, interviewer] --> G1{Evidence gate}
+  G1 --> P2[2 Validate: strategist, copywriter, analyst] --> G2{Demand gate}
+  G2 --> P3[3 Build: builder, verifier, QA] --> G3{Build gate}
+  G3 --> P4[4 Commercial: pricing, policy writer] --> G4{Commercial gate}
+  G4 --> P5[5 Launch: copywriter, launcher, promise checker] --> G5{Launch gate}
+  G5 --> P6[6 Operate: support, analyst] --> G6{Operate gate}
+  G1 & G2 & G3 & G4 & G5 & G6 -. founder clicks go / repeat / pivot / stop .-> F((Founder))
+  P1 & P2 & P5 -. publish / send / refund .-> A[[approval.py: Approve / Reject]]
+```
+
+Each gate pauses the run until the founder decides.
+
 ## Models and free resources
 
 - **Default:** `qwen3:4b-instruct-2507-q4_K_M` (Qwen3-4B-Instruct-2507, Apache-2.0, open weights) for every role, served by **Ollama** and downloaded by `docker compose up`; fallbacks `qwen3:4b-instruct`, `qwen3:4b`, `qwen3:1.7b`.

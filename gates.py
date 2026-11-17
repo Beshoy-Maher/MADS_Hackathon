@@ -129,6 +129,14 @@ def evidence_gate(candidates: list[dict], attempt: int = 1, sources_ok: bool = T
                            f"Alternative '{best['title']}' passes every threshold (total {best['total']:.0f})."],
                           main_checks, pivot_to=best["title"], allowed=allowed)
     too_little = all(c["relevant_sources"] < t["min_relevant_sources"] for c in candidates if not c.get("excluded"))
+    no_fit = all(c["founder_fit"] < t["min_founder_fit"] for c in candidates if not c.get("excluded"))
+    if too_little and no_fit:
+        # More searching cannot fix founder fit: it depends on the founder's skills, hours and budget, not on evidence.
+        return GateResult(1, "evidence_gate", "evidence", STOP,
+                          ["Too little public discussion was found, and founder fit fails for every candidate.",
+                           "A broader search could not change founder fit, which comes from the founder's skills, hours and budget.",
+                           "Recommendation: do not launch this. Spending time and money on it is not supported by the evidence."],
+                          main_checks, allowed=allowed)
     if too_little and REPEAT in allowed:
         return GateResult(1, "evidence_gate", "evidence", REPEAT,
                           ["Too little public discussion was found for any candidate to judge demand either way.",

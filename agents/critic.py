@@ -1,0 +1,420 @@
+"""Debate before each gate: the critic (devil's advocate) challenges a phase's outputs, their authors answer.
+
+    Round 1  critic   -> objections to statements that are wrong, unsupported by the fetched evidence or contradicted by
+                         another output, each quoting the exact words it disputes (quote checked in code)
+    Round 2  authors  -> concede (with replacement text for the quoted words) or defend (with a fetched source)
+    Apply    code     -> a conceded replacement is written into the document only if it passes every safety check
+    Round 3  critic   -> verdict on each defence: accepted or open
+    Moderator (code)  -> transcript and summary on the gate card
+
+Four statuses, and only these:
+    fixed                  conceded, and the correction was written into the document (logged as apply_debate_correction)
+    conceded, not applied  conceded, but the replacement failed a safety check; the document is unchanged, the reason is shown
+    defended               defended with a fetched source, and the critic accepted it
+    open                   anything else
+
+The critic's model is set separately (config.LLM_CRITIC_MODEL); with models-large.env it is a different model
+family from the writer, so it does not share the writer's blind spots. The debate informs the founder; it never changes a gate's recommendation. Every turn
+goes through the guardrail output scan and gets its own decision-log entry. Without a model the debate is not
+run, and the output says so: objections are never made up by templates.
+"""
+from __future__ import annotations
+
+import re
+from pathlib import Path
+
+import decision_log
+import guardrails
+import llm
+from agents.base import GLOBAL_RULES, Agent, StepResult, load_prompt
+
+MAX_OBJECTIONS = 4
+DOC_CHARS = 3500
+# Which steps of each phase are debated, and the debate's own step number (after the phase's other steps;
+# phase 1 step 5 is kept for the founder's interview notes).
+# Phase 4: the pricing rationale only. The policies are commitments the founder makes (drafts marked not legal advice),
+# not market claims, so a critic arguing them into "ASSUMPTION" would make them worse.
+DEBATED_STEPS = {1: [1, 3], 2: [1, 3], 3: [1, 2], 4: [1], 5: [1, 2], 6: [3]}
+DEBATE_STEP = {1: 6, 2: 4, 3: 5, 4: 5, 5: 5, 6: 4}  # phase 4: step 4 is the unit economics; phase 5: step 4 is the promise check
+SEVERITIES = ("high", "medium", "low")
+FIXED, NOT_APPLIED, DEFENDED, OPEN = "fixed", "conceded, not applied", "defended", "open"
+STATUSES = (FIXED, NOT_APPLIED, DEFENDED, OPEN)
+COMPUTED = ("Counts, scores, thresholds and tables of results (lines like 'Relevant items found', 'Total', 'demand', "
+            "'founder fit', pass/fail checks) are computed by code from the fetched search results. They are facts about this run, "
+            "not claims: do not dispute them, and do not concede them. Facts from the founder's brief (the founder's name, "
+            "skills, budget, hours and target market) are given by the founder, not claims to dispute.")
+
+
+def _norm(text: str) -> str:
+    return re.sub(r"[\s`*_#|>\"'“”‘’]+", " ", (text or "").lower()).strip()
+
+
+def _clean(text) -> str:
+    """One line, guardrail-scanned (urgency, income promises, fake proof removed)."""
+    t = " ".join(str(text or "").split())[:500]
+    return guardrails.scan_output(t).text.strip() if t else ""
+
+
+# Lines written by code, not by a model: counts from the searches, score tables, check results. Not debated.
+_COMPUTED_LINE = re.compile(r"^\s*(- (Search queries|Relevant items found|Sources cited)\b|\||Sources cited:|Claim check"
+                            r"|[-*]?\s*(\*\*)?(Price|Anchor|Final price|Recommendation|Gate|Decision)(\*\*)?:)", re.I)  # prices come from the rule in pricing.py
+# A fetched evidence item (title + link) is data from the source, not the author's claim.
+_EVIDENCE_LINE = re.compile(r"^\s*- \[[^\]]*\]\(https?://")
+# Sentences the pipeline writes itself, the same for every run (not the author's claims).
+_TEMPLATE_LINE = re.compile(r"Every item below links to its source|No sources found\. Every market statement below is an ASSUMPTION"
+                            r"|^\s*(People describing the problem|Existing solutions) \(\d+\):\s*$|^\s*- Nothing of this kind was found"
+                            r"|^\s*Both lists are built by code|^\s*\*\*Recommendation: [A-Z]+\*\* \(operate gate"
+                            r"|^\s*Evidence:\s*$|^\s*## Source coverage|^\s*- (hackernews|reddit|github|stackexchange): \d+ quer", re.I)
+_LINK_DOUBT = re.compile(r"\b(does not exist|doesn't exist|invalid|broken|fake|not real|misreferenced|dead link)\b", re.I)
+
+
+# Sections built by code from the facts (the memo's evidence lists and decision history, the scorecard's evidence):
+# not debated, and never corrected by the debate.
+_CODE_SECTION = re.compile(r"^##+\s*(Evidence for|Evidence against|Decision history|What would change the decision|Evidence behind each candidate)\s*$",
+                           re.I)
+
+
+def _drop_code_sections(text: str) -> str:
+    out, skip = [], False
+    for ln in text.splitlines():
+        if re.match(r"^##+\s", ln):
+            skip = bool(_CODE_SECTION.match(ln.strip()))
+        if not skip:
+            out.append(ln)
+    return "\n".join(out)
+
+
+def _in_code_section(raw: str, pos: int) -> bool:
+    heads = [m for m in re.finditer(r"^##+\s.*$", raw[:pos], re.M)]
+    return bool(heads) and bool(_CODE_SECTION.match(heads[-1].group(0).strip()))
+
+
+def _quoted_line(quote: str, text: str) -> str:
+    q = _norm(quote)
+    return next((ln for ln in text.splitlines() if q and q in _norm(ln)), "")
+
+
+def doc_text(raw: str, limit: int = DOC_CHARS, html: bool = False) -> str:
+    """The part of an output worth debating: no HTML tags (HTML files only: in Markdown, `<` is SQL or text),
+    no pipeline footer, no lines computed by code."""
+    t = raw or ""
+    if html:
+        t = re.sub(r"<(script|style)[^>]*>.*?</\1>", " ", t, flags=re.S | re.I)
+        t = re.sub(r"<[^>]+>", "\n", t)
+    t = t.split("\n---\nGenerated by the pipeline")[0]
+    t = _drop_code_sections(t)
+    # Fetched evidence lines are data, not the author's claims; the critic gets the evidence URLs separately.
+    # Leaving them out also keeps the debated text short enough that nothing is cut in the middle of a link.
+    t = "\n".join(ln for ln in t.splitlines()
+                  if not _COMPUTED_LINE.match(ln) and not _EVIDENCE_LINE.match(ln) and not _TEMPLATE_LINE.search(ln))
+    t = re.sub(r"[ \t]+", " ", t)
+    t = re.sub(r"\n{3,}", "\n\n", t).strip()
+    return t[:limit]
+
+
+def mirror_correction(obj, quote: str, fix: str) -> int:
+    """Apply a written correction to text held outside the file (an approval item's payload, the store page's copy),
+    so what the founder approves and what the promise checker reads match the corrected document. Returns hits."""
+    import html as _html
+    rx = _quote_rx(_html.unescape(quote))
+    new_text = _html.unescape(fix)
+    hits = 0
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            if isinstance(v, str):
+                new, n = rx.subn(lambda _m: new_text, v, count=1)
+                if n:
+                    obj[k], hits = new, hits + n
+            else:
+                hits += mirror_correction(v, quote, fix)
+    elif isinstance(obj, list):
+        for i, v in enumerate(obj):
+            if isinstance(v, str):
+                new, n = rx.subn(lambda _m: new_text, v, count=1)
+                if n:
+                    obj[i], hits = new, hits + n
+            else:
+                hits += mirror_correction(v, quote, fix)
+    return hits
+
+
+def summary_line(s: dict) -> str:
+    return (f"{s['objections']} objection(s): {s['fixed']} fixed, {s['not_applied']} conceded not applied, "
+            f"{s['defended']} defended, {s['open']} open")
+
+
+def _quote_rx(quote: str) -> re.Pattern:
+    """The quote as it appears in the file: same words, any run of whitespace between them."""
+    return re.compile(r"\s+".join(re.escape(w) for w in quote.split()))
+
+
+_LINE_PREFIX = re.compile(r"^\s*(\d+[.)]|- \[[ xX]\]|[-*+]|#+|>)?\s*")
+_PLACEHOLDER = re.compile(r"placeholder|lorem ipsum|\bTODO\b|\bTBD\b|\[insert|\[your |XXX", re.I)
+
+
+def _apply_problem(quote: str, fix: str, path, allowed: set[str]) -> str:
+    """Why a conceded replacement must not be written into the document, or "" if it is safe."""
+    from tools import claims
+    if not path or not Path(path).exists():
+        return "the document file was not found"
+    fix = fix or ""
+    if not fix.strip():
+        return "no replacement text was given"
+    if _norm(fix) == _norm(quote):
+        return "the replacement is the same as the quote"
+    if len(fix) > 3 * len(quote) + 20:
+        return f"the replacement is {len(fix)} characters for a {len(quote)}-character quote (more than about 3 times)"
+    raw = Path(path).read_text(encoding="utf-8")
+    hits = list(_quote_rx(quote).finditer(raw))
+    if len(hits) != 1:
+        return f"the quote is found {len(hits)} times in the file, not exactly once"
+    start = raw.rfind("\n", 0, hits[0].start()) + 1
+    end = raw.find("\n", hits[0].end())
+    line = raw[start:end if end != -1 else len(raw)]
+    if (_COMPUTED_LINE.match(line) or _EVIDENCE_LINE.match(line) or _TEMPLATE_LINE.search(line)
+            or _in_code_section(raw, hits[0].start())):
+        return "the quote is on a line computed by code"
+    span = raw[hits[0].start():hits[0].end()]
+    new_line = line.replace(span, fix, 1)
+    if ("\n" in span or "<" in fix or ">" in fix or "`" in fix or "|" in fix
+            or _LINE_PREFIX.match(new_line).group(0).strip() != _LINE_PREFIX.match(line).group(0).strip()
+            or span.count("**") % 2 or span.count("`") % 2 or fix.count("*") % 2):
+        # Numbered steps, checklist boxes, headings, tables and formatting stay as they were, so the build tests
+        # that already ran on this document still hold.
+        return "the replacement would change the document's structure"
+    if "ASSUMPTION" in span and "ASSUMPTION" not in fix:
+        return "the replacement would remove an ASSUMPTION label"
+    if _PLACEHOLDER.search(fix):
+        return "the replacement contains placeholder text"
+    if _norm(fix) in _norm(raw):
+        return "the replacement text is already in the document (it would repeat a sentence)"
+    if guardrails.scan_output(fix).violations:
+        return "the guardrail scan would remove part of the replacement"
+    from tools import honesty
+    if honesty.fix_punctuation(new_line) != new_line and honesty.fix_punctuation(line) == line:
+        return "the replacement would leave broken punctuation (a full stop in the middle of a sentence)"
+    if honesty.PAUSE.search(fix) and not honesty.PAUSE.search(span):
+        return "the replacement advises stopping or pausing; only the gate can recommend that"
+    if honesty.EXPERIENCE.search(fix) and not honesty.EXPERIENCE.search(span):
+        return "the replacement claims experience for the founder"
+    if honesty.COVERT.search(fix) and not honesty.COVERT.search(span):
+        return "the replacement adds covert promotion or urgency"
+    checked, _ = claims.check(fix, allowed, mode="light")
+    if checked.strip() != fix.strip():
+        return "the claim check would change the replacement (an unsourced figure or a link that was never fetched)"
+    return ""
+
+
+class Critic(Agent):
+    role = "critic"
+
+    def _log(self, agent: str, action: str, model: str | None, cost: float, detail: str, sources: list[str] | None = None):
+        decision_log.log(agent, action, model=model, cost=cost, run_id=self.run["id"], sources=sources or [], detail=detail[:300])
+
+    def debate(self, phase: int, docs: list[dict], opposite: bool = False) -> StepResult:
+        """docs: [{"file", "author", "text"}]. opposite=True: argue for the opposite decision (phase 6 memo)."""
+        allowed = self.evidence_urls()
+        for d in docs:
+            allowed |= set(re.findall(r"https?://[^\s)\]>\"']+", d["text"]))
+        models: set[str] = set()
+        evidence = "\n".join(sorted(allowed)[:30]) or "(none)"
+        listing = "\n\n".join(f"DOCUMENT {i + 1} ({d['file']}, written by the {d['author']} agent):\n{d['text']}"
+                              for i, d in enumerate(docs))
+        goal = ("Argue the strongest honest case for the OPPOSITE of the decision this memo recommends: quote the claims that "
+                "lead to its recommendation and say why they do not hold." if opposite else
+                "Object only to statements that are factually wrong, unsupported by the fetched evidence, or contradicted by "
+                "another document of this run. No objections about missing analysis, style, tone, or things the author "
+                "\"should also consider\".")
+        task = (f"Founder brief: {self.brief.get('idea', '')} | market: {self.brief.get('target_market', '')}\n"
+                f"Phase {phase} before its gate.\n\n{listing}\n\nEVIDENCE URLS fetched by the researcher:\n{evidence}\n\n"
+                f"{goal} {COMPUTED} At most {MAX_OBJECTIONS} objections; zero is a valid answer.\n"
+                'JSON: {"objections": [{"document": 1, "quote": "exact words (5-25) from that document", '
+                '"problem": "what is wrong and why it matters", "severity": "high|medium|low", "evidence": "URL or ASSUMPTION"}]}. '
+                'Nothing serious: {"objections": []}.')
+        data, res = llm.complete_json(self.system(), task, {"objections": []}, max_tokens=900, temperature=0.2, role="critic")
+        self._track(res)
+        if not res.model:
+            return self._not_run(phase, docs)
+        models.add(res.model)
+
+        objections = []
+        for o in data.get("objections") if isinstance(data.get("objections"), list) else []:
+            if not isinstance(o, dict) or len(objections) >= MAX_OBJECTIONS:
+                continue
+            try:
+                d = docs[int(o.get("document", 1)) - 1]
+            except (ValueError, TypeError, IndexError):
+                continue
+            quote, problem = " ".join(str(o.get("quote", "")).split()), _clean(o.get("problem"))
+            # The quote must really be in the document: this stops the critic from attacking words nobody wrote.
+            if len(_norm(quote)) < 8 or _norm(quote) not in _norm(d["text"]) or not problem:
+                continue
+            line = _quoted_line(quote, d["text"])
+            # The founder's own facts (name, skills, budget, market) come from the brief: they are given, not claims.
+            name = str(self.brief.get("founder_name") or "").strip()
+            if name and len(name) > 1 and name.lower() in quote.lower():
+                continue
+            # Code-computed lines and fetched evidence titles are not the author's claims; the critic cannot check
+            # whether a fetched link exists, so "this link is fake" about a link the researcher fetched is dropped.
+            if _COMPUTED_LINE.match(line) or _EVIDENCE_LINE.match(line):
+                continue
+            # A statement already labelled ASSUMPTION already says it is unsupported; "unsupported" is no objection to it.
+            if "ASSUMPTION" in line:
+                continue
+            if _LINK_DOUBT.search(problem) and any(u in allowed for u in re.findall(r"https?://[^\s)\]>\"']+", line)):
+                continue
+            ev = str(o.get("evidence", "")).strip()
+            sev = str(o.get("severity", "medium")).lower()
+            objections.append({"id": len(objections) + 1, "file": d["file"], "author": d["author"], "quote": quote[:300],
+                               "problem": problem, "severity": sev if sev in SEVERITIES else "medium",
+                               "evidence": ev if ev in allowed else "ASSUMPTION", "stance": None, "reply": "", "fix": "",
+                               "reply_evidence": "", "status": "open", "verdict": ""})
+        self._log("critic", "debate_challenge", res.model, res.cost,
+                  f"phase {phase}: {len(objections)} objection(s) kept" + (" (argues the opposite decision)" if opposite else ""),
+                  [o["evidence"] for o in objections])
+
+        # Round 2: each author answers the objections to its own document, in its own role.
+        for author in dict.fromkeys(o["author"] for o in objections):
+            mine = [o for o in objections if o["author"] == author]
+            # An author can have several debated documents (Phase 3: spec and product): show all of them, and apply
+            # each correction to the document its objection quotes.
+            own = [d for d in docs if d["author"] == author and any(o["file"] == d["file"] for o in mine)]
+            listing2 = "\n".join(f'{o["id"]}. In {o["file"]}: "{o["quote"]}": {o["problem"]}' for o in mine)
+            yours = "\n\n".join(f"DOCUMENT {d['file']}:\n{d['text']}" for d in own)
+            task2 = (f"You wrote these documents:\n{yours}\n\nEVIDENCE URLS:\n{evidence}\n\n"
+                     f"A critic raised these objections:\n{listing2}\n\n"
+                     f"{COMPUTED}\n"
+                     "Answer each one honestly, using the same numbers as the objections.\n"
+                     "- CONCEDE only if the quoted statement is actually wrong or unsupported by the evidence. Then \"fix\" is the "
+                     "replacement text for the quoted words only: it replaces them word for word in your document. Same language and "
+                     "about the same length; no advice, no explanation, no new numbers, no new links. Making the claim smaller or "
+                     "marking it ASSUMPTION is a good fix.\n"
+                     "- DEFEND if the statement is correct: cite the URL from EVIDENCE URLS that supports it in \"evidence\". "
+                     "Do not concede to be polite, and do not defend with confidence alone.\n"
+                     'JSON: {"responses": [{"id": 1, "stance": "concede|defend", "reply": "...", "fix": "...", "evidence": "URL or empty"}]}')
+            system = load_prompt(author) + "\n\nYou are now answering a reviewer's objections to your own draft.\n\n" + GLOBAL_RULES
+            d2, r2 = llm.complete_json(system, task2, {"responses": []}, max_tokens=700, role="writer")
+            self._track(r2)
+            if r2.model:
+                models.add(r2.model)
+            by_id = {}
+            for r in d2.get("responses") if isinstance(d2.get("responses"), list) else []:
+                if isinstance(r, dict):
+                    try:
+                        by_id[int(r.get("id"))] = r
+                    except (TypeError, ValueError):
+                        pass
+            ordered = [r for r in d2.get("responses", []) if isinstance(r, dict)] if isinstance(d2.get("responses"), list) else []
+            if ordered and not any(o["id"] in by_id for o in mine) and len(ordered) == len(mine):
+                by_id = {o["id"]: r for o, r in zip(mine, ordered)}  # the model renumbered from 1: match by order
+            for o in mine:
+                r = by_id.get(o["id"])
+                if not r:
+                    continue
+                o["stance"] = "concede" if str(r.get("stance", "")).lower().startswith("concede") else "defend"
+                o["reply"], o["fix"] = _clean(r.get("reply")), " ".join(str(r.get("fix") or "").split())[:600]
+                ev = str(r.get("evidence", "")).strip()
+                o["reply_evidence"] = ev if ev in allowed else ""
+                if o["stance"] == "concede":
+                    self._apply(o, next(d for d in own if d["file"] == o["file"]), allowed, r2.model, phase)
+            self._log(author, "debate_response", r2.model, r2.cost,
+                      f"phase {phase}: " + ", ".join(f"#{o['id']} {o['stance'] or 'no answer'}" for o in mine),
+                      [o["reply_evidence"] for o in mine])
+
+        # Round 3: the critic rules on what was defended. A defence without a fetched source stays open.
+        defended = [o for o in objections if o["stance"] == "defend"]
+        if defended:
+            listing3 = "\n".join(f'{o["id"]}. Objection: {o["problem"]}\n   Reply: {o["reply"]}\n   Source given: '
+                                 f'{o["reply_evidence"] or "none"}' for o in defended)
+            task3 = (f"Your objections and the author's defences:\n{listing3}\n\n"
+                     "For each: does the reply, with its source, answer the objection (accepted), or is it still open?\n"
+                     'JSON: {"verdicts": [{"id": 1, "status": "accepted|open", "reason": "..."}]}')
+            d3, r3 = llm.complete_json(self.system(), task3, {"verdicts": []}, max_tokens=500, temperature=0.0, role="critic")
+            self._track(r3)
+            if r3.model:
+                models.add(r3.model)
+            for v in d3.get("verdicts") if isinstance(d3.get("verdicts"), list) else []:
+                if not isinstance(v, dict):
+                    continue
+                o = next((x for x in defended if str(x["id"]) == str(v.get("id"))), None)
+                if not o:
+                    continue
+                said_ok = str(v.get("status", "")).lower() in ("accepted", "resolved")
+                o["status"], o["verdict"] = (DEFENDED if said_ok and o["reply_evidence"] else OPEN), _clean(v.get("reason"))
+                if said_ok and not o["reply_evidence"]:
+                    o["verdict"] = (o["verdict"] + " (kept open: the defence cites no fetched source)").strip()
+            self._log("critic", "debate_verdict", r3.model, r3.cost,
+                      f"phase {phase}: " + ", ".join(f"#{o['id']} {o['status']}" for o in defended))
+
+        return self._result(phase, docs, objections, models, opposite)
+
+    # -------------------------------------------------------------- apply a conceded correction
+    def _apply(self, o: dict, doc: dict, allowed: set[str], model: str | None, phase: int) -> None:
+        """Write a conceded replacement into the step's output file, only if every check passes. Sets o["status"]."""
+        reason = _apply_problem(o["quote"], o["fix"], doc.get("path"), allowed)
+        if reason:
+            o["status"], o["verdict"] = NOT_APPLIED, "not applied: " + reason
+            return
+        path = Path(doc["path"])
+        raw = path.read_text(encoding="utf-8")
+        m = _quote_rx(o["quote"]).search(raw)
+        path.write_text(raw[:m.start()] + o["fix"] + raw[m.end():], encoding="utf-8")
+        o["status"], o["verdict"], o["applied"] = FIXED, "correction written into the document", True
+        used = sorted({u for u in re.findall(r"https?://[^\s)\]>\"']+", o["fix"]) if u in allowed}
+                      | ({o["evidence"]} if o["evidence"].startswith("http") else set()))
+        decision_log.log(o["author"], "apply_debate_correction", model=model, cost=0, run_id=self.run["id"], sources=used,
+                         approved_by=None, phase=phase, step=doc["file"],
+                         detail=f"objection #{o['id']}: replaced {len(o['quote'])} chars with {len(o['fix'])} chars")
+
+    # -------------------------------------------------------------- output
+    def _summary(self, objections: list[dict], ran: bool, models: set[str]) -> dict:
+        count = {st: sum(1 for o in objections if o["status"] == st) for st in STATUSES}
+        return {"ran": ran, "objections": len(objections), "fixed": count[FIXED], "not_applied": count[NOT_APPLIED],
+                "defended": count[DEFENDED], "open": count[OPEN],
+                "high_open": sum(1 for o in objections if o["status"] == OPEN and o["severity"] == "high"),
+                "items": [{k: o[k] for k in ("id", "file", "severity", "quote", "problem", "status", "stance", "fix", "verdict")}
+                          for o in objections],
+                "models": sorted(models)}
+
+    def _not_run(self, phase: int, docs: list[dict]) -> StepResult:
+        md = (f"# Phase {phase} debate before the gate\n\n**Debate not run:** no model was available for the critic. "
+              "Objections are never written by templates, so there is nothing to show. The gate is unaffected.\n")
+        r = self.result("debate", f"debate_phase{phase}", md, data=self._summary([], False, set()))
+        r.model = None
+        return r
+
+    def _result(self, phase: int, docs: list[dict], objections: list[dict], models: set[str], opposite: bool) -> StepResult:
+        s = self._summary(objections, True, models)
+        md = [f"# Phase {phase} debate before the gate", "",
+              f"Debated: {', '.join('`' + d['file'] + '`' for d in docs)}. "
+              f"Critic (devil's advocate): `{llm.role_model('critic')}` configured; models that took part: "
+              f"{', '.join('`' + m + '`' for m in sorted(models))}.",
+              "The critic quotes the words it disputes (quotes not found in the document are dropped by code). The author concedes "
+              "with replacement text or defends with a fetched source. A conceded replacement is written into the document only if "
+              "the quote is found exactly once, it is at most about 3 times as long, and the guardrail scan and claim check leave it "
+              "unchanged; code-computed lines are never changed. A defence without a fetched source stays open.",
+              "", f"**Result: {summary_line(s)}.** The debate informs the founder; it does not change the gate's recommendation.", ""]
+        if opposite:
+            md.insert(2, "Mode: the critic argues for the **opposite** of the memo's recommendation.")
+        if not objections:
+            md += ["The critic raised no objection that quotes the documents. That is not proof the documents are right.", ""]
+        for o in objections:
+            md += [f"## #{o['id']} [{o['severity']}] {o['status'].upper()}: `{o['file']}`", "",
+                   f"> {o['quote']}", "",
+                   f"**Critic:** {o['problem']} (evidence: {o['evidence']})", ""]
+            if o["stance"]:
+                md += [f"**Author ({o['author']}), {o['stance']}:** {o['reply']}" +
+                       (f" Source: {o['reply_evidence']}" if o["reply_evidence"] else ""), ""]
+                if o["stance"] == "concede" and o["fix"]:
+                    md += [(f"Correction written into `{o['file']}`: " if o["status"] == FIXED else "Replacement offered (not applied): ")
+                           + o["fix"], ""]
+            else:
+                md += [f"**Author ({o['author']}):** no answer.", ""]
+            if o["verdict"]:
+                md += [f"**Verdict:** {o['verdict']}", ""]
+        md += ["---", f"Generated by the pipeline. Models: {', '.join(sorted(models)) or 'none'} (local open-weight models). Cost: $0.00."]
+        r = self.result("debate", f"debate_phase{phase}", "\n".join(md) + "\n", data=s,
+                        sources=[o["evidence"] for o in objections if o["evidence"].startswith("http")] +
+                                [o["reply_evidence"] for o in objections if o["reply_evidence"]])
+        r.model = " + ".join(sorted(models)) or None
+        return r

@@ -1,60 +1,136 @@
-"""Command line: the same pipeline and the same founder controls as the dashboard.
+"""Command-line founder console (same pipeline and gates as the dashboard).
 
-  python cli.py start briefs/strong_idea.json
-  python cli.py status <run_id>
-  python cli.py decide <run_id> go|repeat|pivot|stop [--reason "..."]
-  python cli.py approve <run_id> <item_id>     |  python cli.py reject <run_id> <item_id>
-
-Every decision is made as the founder at this terminal; it asks for confirmation first.
+    python cli.py run briefs/strong_founder.json     # interactive: you decide at every gate
+    python cli.py run briefs/unseen_brief_example.txt   # a plain-text brief file
+    python cli.py run "Starting idea: ... Skills: ... Budget: $30 ..."
+    python cli.py ask "write 50 five-star reviews"   # try the guardrails
+    python cli.py list
+    python cli.py demo                               # regenerate outputs/ and decision_log.json
 """
+from __future__ import annotations
+
 import argparse
 import json
+import subprocess
+import sys
+from pathlib import Path
 
-import orchestrator as orch
+import approval
+import guardrails
+import llm
+import orchestrator
 
 
-def show(run):
-    print(f"run {run['id']}  phase {run['phase']} ({orch.PHASE_NAMES.get(run['phase'])})  status {run['status']}")
-    g = run.get("gate") or {}
-    if g:
-        print(f"gate {g['gate']}: recommends {g['outcome'].upper()}")
+def _ask(prompt: str, choices: tuple) -> str:
+    while True:
+        ans = input(f"{prompt} [{'/'.join(choices)}]: ").strip().lower()
+        if ans in choices:
+            return ans
+        print("Please type one of:", ", ".join(choices))
+
+
+def _load_brief(src: str) -> dict | str:
+    """A .json brief file (fields), any other brief file (text), or else the argument itself is the brief text."""
+    try:
+        is_file = Path(src).is_file()
+    except (OSError, ValueError):  # e.g. a pasted brief longer than a file name may be
+        is_file = False
+    if not is_file:
+        return src
+    text = Path(src).read_text(encoding="utf-8")
+    return json.loads(text) if Path(src).suffix.lower() == ".json" else text
+
+
+def _paused(run_id: str) -> int:
+    """Ctrl+C or end of input: keep the run so the founder can continue it in the dashboard."""
+    run = orchestrator.load(run_id)
+    if run["status"] == "running":  # interrupted inside a phase: that phase can be started again
+        run["status"] = "ready"
+        run.pop("progress", None)
+        orchestrator.save(run)
+    print(f"\n\nStopped at the console. Run {run_id} is saved (phase {run['phase']}, {run['status']}); continue it in the dashboard.")
+    return 0
+
+
+def cmd_run(args) -> int:
+    raw = _load_brief(args.brief)
+    status = llm.model_status(force=True)
+    print(f"Model: {status['model']} ({status['detail']})")
+    run = orchestrator.create_run(raw)
+    print(f"Run {run['id']} for: {run['brief']['idea']}")
+    for w in run.get("warnings", []):
+        print(f"NOTE: {w}")
+    try:
+        return _drive(run)
+    except (EOFError, KeyboardInterrupt):
+        return _paused(run["id"])
+
+
+def _drive(run: dict) -> int:
+    """Phase by phase: the founder decides every approval and every gate."""
+    while True:
+        print(f"\n=== Phase {run['phase']}: {orchestrator.PHASES[run['phase']]['name']} ===")
+        run = orchestrator.advance(run["id"])
+        for s in [s for s in run["steps"] if s["phase"] == run["phase"]]:
+            print(f"  step {s['step']}: {s['agent']} -> {s['file']} (model: {s['model'] or 'fallback'}, sources: {s['sources']})")
+        for a in approval.pending(run):
+            print(f"\n  APPROVAL NEEDED [{a['kind']}] {a['target']}: {a['description']}")
+            if a["payload"].get("message") or a["payload"].get("text"):
+                print("   ", (a["payload"].get("message") or a["payload"].get("text"))[:500])
+            pc = a["payload"].get("promise_check")
+            if pc:
+                print(f"    promise check: {pc['kept']} kept, {pc['broken']} broken, {pc['unverifiable']} unverifiable")
+                for x in pc.get("broken_items", []) + pc.get("unverifiable_items", []):
+                    print("     -", x)
+            ch = _ask("  Approve?", ("approve", "reject"))
+            try:
+                run = orchestrator.decide_action(run["id"], a["id"], ch == "approve", approval.FOUNDER)
+            except approval.BrokenPromise as e:
+                print("   ", e)
+                if _ask("  It can only be rejected now. Reject it, or leave it pending?", ("reject", "leave")) == "reject":
+                    run = orchestrator.decide_action(run["id"], a["id"], False, approval.FOUNDER, "rejected: broken promise")
+                else:
+                    run = orchestrator.load(run["id"])
+        g = orchestrator.current_gate(run)
+        print(f"\n  GATE {g['gate']}: system recommends {g['recommendation'].upper()}" + (f" -> {g['pivot_to']}" if g.get("pivot_to") else ""))
         for r in g["reasons"]:
-            print("  -", r)
+            print("   -", r)
         for c in g["checks"]:
-            print(f"  [{'PASS' if c['passed'] else 'FAIL'}] {c['name']}: {c['value']} (needs {c['threshold']})")
-    for it in run.get("outbound", []):
-        print(f"  outbound {it['id']} {it['kind']:8} {it['status']:9} {it['title']}")
+            print(f"     {'PASS' if c['passed'] else 'FAIL'} {c['name']}: {c['value']} (threshold {c['threshold']})")
+        d = _ask("  Your decision", tuple(g["allowed"]))
+        note = input("  Note (optional): ").strip()
+        run = orchestrator.decide(run["id"], d, approval.FOUNDER, note)
+        if run["status"] in ("stopped", "completed", "monitoring"):
+            print(f"\nRun {run['status']}. Outputs: {orchestrator.run_dir(run['id']) / 'outputs'}")
+            return 0
 
 
-def confirm(msg):
-    return input(f"{msg} Type 'yes' to confirm: ").strip().lower() == "yes"
+def cmd_ask(args) -> int:
+    v = guardrails.screen_request_deep(args.text)
+    print(guardrails.refusal_message(v) if not v.allowed else "Allowed: this request passes the guardrails.")
+    return 0 if v.allowed else 1
 
 
-def main(argv=None):
-    ap = argparse.ArgumentParser()
-    sub = ap.add_subparsers(dest="cmd", required=True)
-    s = sub.add_parser("start"); s.add_argument("brief")
-    s = sub.add_parser("status"); s.add_argument("run_id")
-    s = sub.add_parser("decide"); s.add_argument("run_id"); s.add_argument("decision", choices=orch.DECISIONS); s.add_argument("--reason", default="")
-    for name in ("approve", "reject"):
-        s = sub.add_parser(name); s.add_argument("run_id"); s.add_argument("item_id")
-    a = ap.parse_args(argv)
-    if a.cmd == "start":
-        run = orch.start(json.load(open(a.brief)))
-    elif a.cmd == "status":
-        run = orch.load(a.run_id)
-    elif a.cmd == "decide":
-        run = orch.load(a.run_id)
-        if not confirm(f"Founder decision {a.decision.upper()} at the {run['gate']['gate']} gate?"):
-            return print("Cancelled. Nothing changed.")
-        run = orch.decide(run, a.decision, "founder", a.reason, via="CLI")
-    else:
-        run = orch.load(a.run_id)
-        if not confirm(f"{a.cmd.capitalize()} outbound item {a.item_id}?"):
-            return print("Cancelled. Nothing changed.")
-        run = orch.decide_outbound(run, a.item_id, a.cmd == "approve", "founder", via="CLI")
-    show(run)
+def cmd_list(_) -> int:
+    for r in orchestrator.list_runs():
+        print(f"{r['id']:<36} {r['status']:<17} phase {r['phase']}  {r['idea'][:60]}")
+    return 0
+
+
+def cmd_demo(_) -> int:
+    return subprocess.call([sys.executable, str(Path(__file__).parent / "scripts" / "run_demo.py")])
+
+
+def main() -> int:
+    p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    sub = p.add_subparsers(dest="cmd", required=True)
+    r = sub.add_parser("run"); r.add_argument("brief"); r.set_defaults(fn=cmd_run)
+    a = sub.add_parser("ask"); a.add_argument("text"); a.set_defaults(fn=cmd_ask)
+    sub.add_parser("list").set_defaults(fn=cmd_list)
+    sub.add_parser("demo").set_defaults(fn=cmd_demo)
+    args = p.parse_args()
+    return args.fn(args)
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

@@ -1,43 +1,88 @@
-# Phase 1 Step 1: Opportunities and evidence
+# Phase 1, step 1: Opportunities for Mariam
 
-_TEMPLATE: no model reachable, deterministic text._
+**Starting idea (founder's words):** A practice workbook of SQL interview questions with worked answers for junior data analysts preparing for their first job
 
-Idea: a toolkit of templates and checklists that helps small software teams write changelogs and release notes
-Audience: maintainers and small software teams who ship releases
-Found 29 pain voices and 19 existing solutions across 2 search terms.
+The researcher sharpened the idea, proposed alternatives that fit the founder, and searched public discussions for evidence that people have this problem. Every item below links to its source and shows its date. A problem statement no fetched post supports is labelled ASSUMPTION.
 
-## Search terms
-changelog, release notes
+## Sharpened founder idea: SQL Interview Prep Workbook for Junior Analysts
 
-## Pain voices (most engaged first)
-- [conventional-changelog-atom 502 Bad Gateway](https://github.com/npm/npm/issues/13284) (github_issues, engagement 443, 3786 days old)
-- [17.0.0 Release Notes](https://github.com/hapijs/hapi/issues/3658) (github_issues, engagement 289, 3312 days old)
-- [JWT.io v2 Changelog](https://github.com/jsonwebtoken/jsonwebtoken.github.io/issues/723) (github_issues, engagement 285, 697 days old)
-- [[next] Major release notes & plans](https://github.com/nestjs/swagger/issues/191) (github_issues, engagement 192, 2829 days old)
-- [📢 v2 - Changelog](https://github.com/gofiber/fiber/issues/736) (github_issues, engagement 174, 2279 days old)
-- [20.0.0 Release Notes](https://github.com/hapijs/hapi/issues/4138) (github_issues, engagement 118, 2290 days old)
-- [Changelog for IDE Extension](https://github.com/openai/codex/issues/4323) (github_issues, engagement 110, 416 days old)
-- [Release Notes in the Package Manager UI ](https://github.com/NuGet/Home/issues/1823) (github_issues, engagement 107, 3995 days old)
-- [[Feature Request] rclone mount: Cache the entire drive structure at startup, and add new files by monitoring Google's ChangeLog](https://github.com/rclone/rclone/issues/897) (github_issues, engagement 92, 3649 days old)
-- [No matching version found for conventional-changelog-preset-loader@^1.1.3](https://github.com/conventional-changelog/conventional-changelog/issues/279) (github_issues, engagement 88, 3199 days old)
-- [conventional-changelog-conventionalcommits v8.0.0 breaks semantic release](https://github.com/semantic-release/release-notes-generator/issues/633) (github_issues, engagement 83, 927 days old)
-- [Major overhaul of changelog retrieval](https://github.com/renovatebot/renovate/issues/14138) (github_issues, engagement 73, 1741 days old)
-- [Increase release notes max length](https://github.com/microsoft/appcenter/issues/1089) (github_issues, engagement 65, 2610 days old)
-- [Dependabot has stopped providing the changelog of updated dependencies](https://github.com/dependabot/dependabot-core/issues/12531) (github_issues, engagement 64, 505 days old)
-- [Reduce friction for Release Notes maintenance - release notes pack support](https://github.com/NuGet/Home/issues/1203) (github_issues, engagement 64, 4109 days old)
+- Problem: ASSUMPTION (no fetched source mentions Egypt): Junior data analysts in Egypt and MENA struggle to practice real SQL interview questions with clear solutions.
+- Format: PDF workbook
+- Search queries: sql interview practice, sql questions with answers, sql interview questions
+- Relevant items found: 25 (of 76 results)
 
-## Existing solutions (competition)
-- [semantic-release/semantic-release](https://github.com/semantic-release/semantic-release) (24180 stars): 📦🚀 Fully automated version management and package publishing
-- [dotnet/core](https://github.com/dotnet/core) (22078 stars): .NET news, announcements, release notes, and more!
-- [tj/git-extras](https://github.com/tj/git-extras) (18129 stars): GIT utilities -- repo summary, repl, changelog population, author commit percentages and more
-- [changesets/changesets](https://github.com/changesets/changesets) (12584 stars): 🦋 A tool to manage versioning and changelogs with a focus on monorepos
-- [orhun/git-cliff](https://github.com/orhun/git-cliff) (12428 stars): A highly customizable Changelog Generator that follows Conventional Commit specifications ⛰️ 
-- [release-it/release-it](https://github.com/release-it/release-it) (9085 stars): 🚀 Automate versioning and package publishing
-- [conventional-changelog/conventional-changelog](https://github.com/conventional-changelog/conventional-changelog) (8534 stars): Generate changelogs and release notes from a project's commit messages and metadata.
-- [conventional-changelog/standard-version](https://github.com/conventional-changelog/standard-version) (7986 stars): :trophy: Automate versioning and CHANGELOG generation, with semver.org and conventionalcommits.org
-- [github-changelog-generator/github-changelog-generator](https://github.com/github-changelog-generator/github-changelog-generator) (7545 stars): Automatically generate change log from your tags, issues, labels and pull requests on GitHub.
-- [git-quick-stats/git-quick-stats](https://github.com/git-quick-stats/git-quick-stats) (7010 stars): ▁▅▆▃▅ Git quick statistics is a simple and efficient way to access various statistics in git repository.
+People describing the problem (11):
+- [Ask HN: Are there any good resources to practice SQL?](https://news.ycombinator.com/item?id=7357954) (hackernews, 2014-03-07, 1 pts/stars, 2 comments)
+- [Ask HN: SQL interview in 2 weeks, how to best prepare?](https://news.ycombinator.com/item?id=24659490) (hackernews, 2020-10-02, 1 pts/stars, 1 comments)
+- [Show HN: DataLemur – Ace the SQL Interview!](https://news.ycombinator.com/item?id=32584550) (hackernews, 2022-08-24, 16 pts/stars, 5 comments)
+- [SQL Interview Questions for Aspiring Data Scientist – The Histogram](https://news.ycombinator.com/item?id=18389273) (hackernews, 2018-11-06, 6 pts/stars, 0 comments)
+- [46 SQL Job Interview Questions for Data Scientists](https://news.ycombinator.com/item?id=13406474) (hackernews, 2017-01-15, 3 pts/stars, 0 comments)
+- [Issue: [IP] Interview preparation (weeks 12-24)](https://github.com/Dfscashline21/sideline/issues/16) (github, 2026-11-13, 0 pts/stars, 0 comments)
+- [Issue: [Data] Governed SQL endpoint for BI tools: Arrow Flight SQL compiled to typed questions under the PDP](https://github.com/Norn-cloud/norn/issues/1341) (github, 2026-11-13, 0 pts/stars, 0 comments)
+- [Issue: SQL interview pipeline](https://github.com/amfooladgar/leetcode-daily-cheatsheet/issues/2) (github, 2026-08-25, 0 pts/stars, 0 comments)
 
-## Sources that failed (not replaced by guesses)
-- hackernews 'changelog': URLError: <urlopen error Tunnel connection failed: 403 Forbidden>
-- hackernews 'release notes': URLError: <urlopen error Tunnel connection failed: 403 Forbidden>
+Existing solutions (14):
+- [Repository sanketrs/sql-interview-preparation-questions-with-answers: Designed as a comprehensive resource for](https://github.com/sanketrs/sql-interview-preparation-questions-with-answers) (github, 2024-12-29, 24 pts/stars, 0 comments)
+- [Repository Aafreen29/SQL-Interview-Prep-Question: This repository is for everyone who is preparing for Data Sc](https://github.com/Aafreen29/SQL-Interview-Prep-Question) (github, 2019-05-18, 475 pts/stars, 6 comments)
+- [Repository rohanmistry231/SQL-Interview-Preparation: A comprehensive resource for SQL interview preparation, f](https://github.com/rohanmistry231/SQL-Interview-Preparation) (github, 2025-04-15, 42 pts/stars, 0 comments)
+- [Repository shawlu95/Beyond-LeetCode-SQL: Analysis of SQL Leetcode and classic interview questions, common pitf](https://github.com/shawlu95/Beyond-LeetCode-SQL) (github, 2019-03-02, 1345 pts/stars, 2 comments)
+- [Repository hogan-tech/leetcode-solution: Explore diverse LeetCode solutions in Python, C++, JavaScript, SQL, a](https://github.com/hogan-tech/leetcode-solution) (github, 2023-07-08, 548 pts/stars, 1 comments)
+- [Repository nathan-abela/HackerRank-Solutions: Solutions to HackerRank practice, tutorials and interview prepar](https://github.com/nathan-abela/HackerRank-Solutions) (github, 2020-04-10, 467 pts/stars, 2 comments)
+- [Repository TeneikaAskew/tech_interview_practice: Explore what a Data Analyst or Data Scientist interview could](https://github.com/TeneikaAskew/tech_interview_practice) (github, 2022-01-07, 31 pts/stars, 0 comments)
+- [Repository ivankupach/fullstack-interview-questions: 800+ fullstack interview questions & answers with code an](https://github.com/ivankupach/fullstack-interview-questions) (github, 2026-10-08, 18 pts/stars, 4 comments)
+
+## Alternative 1: Daily SQL Challenges for Aspiring Analysts
+
+- Problem: ASSUMPTION (no fetched post describes this): New data analysts need bite-sized, consistent practice to build confidence before job interviews.
+- Format: Email newsletter
+- Search queries: daily sql challenge, sql practice email
+- Relevant items found: 14 (of 24 results)
+
+People describing the problem (6):
+- [Issue: Security: daily_challenges grants the anon role full write access and has no RLS](https://github.com/AnmolS99/voyage/issues/151) (github, 2026-11-11, 0 pts/stars, 0 comments)
+- [Issue: SkateQuest sessions, challenges and media regression QA](https://github.com/treesus6/SkateQuest-Mobile/issues/344) (github, 2026-10-22, 0 pts/stars, 15 comments)
+- [Show HN: Vertis – The simplest way to orchestrate SQL pipelines](https://news.ycombinator.com/item?id=36763504) (hackernews, 2023-07-17, 2 pts/stars, 0 comments)
+- [State of the art for Database CI/CD multi-customer with complex config](https://news.ycombinator.com/item?id=29305709) (hackernews, 2021-11-22, 1 pts/stars, 0 comments)
+- [Issue: Daily Challenge: seeded questions run out on 2027-02-16](https://github.com/AnmolS99/voyage/issues/154) (github, 2026-11-11, 0 pts/stars, 0 comments)
+- [Issue: Create and close weekly group challenges automatically in the daily cron](https://github.com/lucaclo/grip-it/issues/59) (github, 2026-10-20, 0 pts/stars, 0 comments)
+
+Existing solutions (8):
+- [Repository Srimathy-S/21Days-SQL_Challenge-by_IDC: A day-by-day documentation of my 21 Days Journey to master ](https://github.com/Srimathy-S/21Days-SQL_Challenge-by_IDC) (github, 2025-11-04, 2 pts/stars, 0 comments)
+- [Repository mahirtantod/30-Days-of-SQL:  📊 30 Days of SQL is a daily challenge guiding you from SQL basics to a](https://github.com/mahirtantod/30-Days-of-SQL) (github, 2024-12-27, 70 pts/stars, 0 comments)
+- [Repository Prakhar-002/LEETCODE: 📜 LeetCode Solution Hub 🔥 | Get all solutions 🧩 for daily challenges and spec](https://github.com/Prakhar-002/LEETCODE) (github, 2024-05-24, 5 pts/stars, 0 comments)
+- [Repository pzoladkiewicz/SQL-Prep-Daily-Challenges: ](https://github.com/pzoladkiewicz/SQL-Prep-Daily-Challenges) (github, 2017-04-27, 4 pts/stars, 0 comments)
+- [Repository Luigimattera/30-Data-Science-Projects-in-30-Days: Welcome to my 30-day data science challenge repo!](https://github.com/Luigimattera/30-Data-Science-Projects-in-30-Days) (github, 2023-01-29, 7 pts/stars, 0 comments)
+- [Repository Krushnal121/LeetCode-SQL-50: 🎉 LeetCode-SQL-50: Join me on a 50-day journey of solving one SQL prob](https://github.com/Krushnal121/LeetCode-SQL-50) (github, 2024-07-09, 4 pts/stars, 0 comments)
+- [Repository helloamanraj/30DaySQLQueryChallengebyTechTFQ: I am participating in a SQL challenge where I will be](https://github.com/helloamanraj/30DaySQLQueryChallengebyTechTFQ) (github, 2024-03-04, 2 pts/stars, 0 comments)
+- [Repository alirezazahiri/leetcode-daily: my code collections for daily leetcode challenges and study plans.](https://github.com/alirezazahiri/leetcode-daily) (github, 2023-02-14, 2 pts/stars, 0 comments)
+
+## Alternative 2: SQL Query Debugging Guide for Beginners
+
+- Problem: ASSUMPTION (no fetched post describes this): Junior analysts get stuck on common SQL errors and don’t know how to fix them independently.
+- Format: Interactive PDF
+- Search queries: sql query not working, common sql errors
+- Relevant items found: 9 (of 26 results)
+
+People describing the problem (8):
+- [Show HN: Beyond "chat with your database" – agentic data exploration](https://news.ycombinator.com/item?id=49910856) (hackernews, 2026-09-30, 2 pts/stars, 0 comments)
+- [Ask HN: SQL Query Generators?](https://news.ycombinator.com/item?id=25324429) (hackernews, 2020-12-06, 2 pts/stars, 0 comments)
+- [Issue: [Enhancement]: aws_cloudwatch_query_definition: support query_language and parameters](https://github.com/hashicorp/terraform-provider-aws/issues/50937) (github, 2026-11-12, 1 pts/stars, 1 comments)
+- [Show HN: Web-based SQL Server Query Plan Viewer](https://news.ycombinator.com/item?id=7382527) (hackernews, 2014-03-11, 1 pts/stars, 0 comments)
+- [Issue: Natural Language to SQL Query Engine](https://github.com/moogwol/htb-mentor/issues/2) (github, 2026-11-14, 0 pts/stars, 0 comments)
+- [Issue: MCP call to run SQL query ends with timeout](https://github.com/Swttch/swttch/issues/681) (github, 2026-11-12, 0 pts/stars, 0 comments)
+- [Issue: SQL queries not working](https://github.com/SIMPLE-AstroDB/SIMPLE-web/issues/217) (github, 2026-05-05, 0 pts/stars, 0 comments)
+- [Issue: 02 Query Data in Google Sheets with SQL](https://github.com/achibanisaid-bot/My-Coursework-Planner/issues/27) (github, 2026-11-06, 0 pts/stars, 0 comments)
+
+Existing solutions (1):
+- [Repository CaptainEFFF/burger: # Node Express Handlebars  ### Overview  In this assignment, you'll create a bu](https://github.com/CaptainEFFF/burger) (github, 2019-06-27, 4 pts/stars, 4 comments)
+
+## Source coverage
+
+- hackernews: 3 queries ok
+- reddit: 0 queries ok, error: HTTPStatusError: Client error '403 Blocked' for url 'https://old.reddit.com/login/?reason=lor2&dest=https%3A%2F%2Fold.reddit.com%2Fsearch
+- github: 3 queries ok
+- stackexchange: 0 queries ok, error: HTTPStatusError: Client error '429 Too Many Requests' for url 'https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&q=
+
+---
+Generated by the pipeline. Model: `qwen3:30b-a3b-instruct-2507-q4_K_M` (local open-weight model). Cost: $0.00.
+Sources cited: 48. Claims without a source are marked ASSUMPTION.

@@ -2,124 +2,260 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Venture Gates</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Venture Builder</title>
 <style>
-  :root { --bg:#f7f7f5; --card:#fff; --ink:#1d1d1b; --muted:#6b6b66; --line:#e3e3de;
-          --go:#1f7a4d; --repeat:#a86b00; --pivot:#3b5bb5; --stop:#b3261e; }
-  * { box-sizing:border-box }
-  body { margin:0; font:15px/1.5 system-ui, sans-serif; background:var(--bg); color:var(--ink) }
-  header { padding:14px 20px; border-bottom:1px solid var(--line); background:var(--card); display:flex; gap:12px; align-items:center; flex-wrap:wrap }
-  header h1 { font-size:18px; margin:0 }
-  .tag { font-size:12px; padding:2px 8px; border-radius:99px; border:1px solid var(--line); color:var(--muted) }
-  .tag.warn { border-color:var(--repeat); color:var(--repeat) }
-  main { display:grid; grid-template-columns:300px 1fr; gap:16px; padding:16px; max-width:1200px; margin:auto }
-  @media (max-width:800px) { main { grid-template-columns:1fr } }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:14px }
-  h2 { font-size:15px; margin:0 0 10px }
-  select, textarea, input, button { font:inherit }
-  textarea { width:100%; height:180px; font:12px monospace; border:1px solid var(--line); border-radius:6px; padding:6px }
-  input[type=text] { width:100%; padding:6px; border:1px solid var(--line); border-radius:6px }
-  button { padding:6px 12px; border-radius:6px; border:1px solid var(--line); background:#fff; cursor:pointer }
-  button.primary { background:var(--ink); color:#fff; border-color:var(--ink) }
-  .runs div { padding:6px; border-radius:6px; cursor:pointer } .runs div:hover { background:var(--bg) }
-  .phases { display:flex; gap:4px; flex-wrap:wrap; margin-bottom:12px }
-  .phases span { flex:1; min-width:90px; text-align:center; font-size:12px; padding:6px 4px; border-radius:6px; background:var(--bg); color:var(--muted) }
-  .phases span.done { background:#e4f1ea; color:var(--go) } .phases span.now { background:var(--ink); color:#fff }
-  .rec { font-size:22px; font-weight:700 } .go{color:var(--go)} .repeat{color:var(--repeat)} .pivot{color:var(--pivot)} .stop{color:var(--stop)}
-  table { border-collapse:collapse; width:100%; font-size:13px } td, th { border-bottom:1px solid var(--line); padding:4px 6px; text-align:left }
-  .pass { color:var(--go); font-weight:600 } .fail { color:var(--stop); font-weight:600 }
-  .btns { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px }
-  pre { white-space:pre-wrap; font-size:12px; background:var(--bg); padding:10px; border-radius:6px; max-height:420px; overflow:auto }
-  iframe { width:100%; height:420px; border:1px solid var(--line); border-radius:6px; background:#fff }
-  .files a { display:inline-block; margin:2px 6px 2px 0; font-size:13px; cursor:pointer; color:var(--pivot) }
-  .err { color:var(--stop) } .muted { color:var(--muted); font-size:13px }
+:root{--bg:#f6f7fb;--card:#fff;--ink:#1b2333;--muted:#5d6b82;--line:#e3e7ef;--blue:#2d5bff;--green:#12805c;--amber:#b25e00;--red:#c4302b;--violet:#6b3fd1}
+@media (prefers-color-scheme:dark){:root{--bg:#0f131b;--card:#171d29;--ink:#e8edf6;--muted:#9aa7bd;--line:#273043;--blue:#6e8dff;--green:#3fbf8f;--amber:#f0a040;--red:#ff6b62;--violet:#a98bff}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--line);background:var(--card);position:sticky;top:0;z-index:2}
+h1{font-size:18px;margin:0}h2{font-size:16px;margin:0 0 10px}h3{font-size:14px;margin:14px 0 6px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.wrap{display:grid;grid-template-columns:300px 1fr;gap:16px;padding:16px;max-width:1400px;margin:0 auto}
+@media (max-width:900px){.wrap{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:16px}
+.badge{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.ok{color:var(--green)}.warn{color:var(--amber)}.bad{color:var(--red)}.mock{color:var(--violet)}.muted{color:var(--muted)}
+button{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer}
+button.primary{background:var(--blue);color:#fff;border-color:var(--blue)}button.go{border-color:var(--green);color:var(--green)}
+button.stop{border-color:var(--red);color:var(--red)}button.rep{border-color:var(--amber);color:var(--amber)}button.piv{border-color:var(--violet);color:var(--violet)}
+.badge.go{color:var(--green)}.badge.rep{color:var(--amber)}.badge.piv{color:var(--violet)}.badge.stop{color:var(--red)}
+button:disabled{opacity:.45;cursor:not-allowed}button.rec{outline:2px solid currentColor;font-weight:700}
+textarea,select,input{font:inherit;width:100%;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.runs a{display:block;padding:8px;border-radius:8px;color:inherit;text-decoration:none;border:1px solid transparent}.runs a:hover,.runs a.active{border-color:var(--line);background:var(--bg)}
+.steps{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}@media (max-width:700px){.steps{grid-template-columns:repeat(2,1fr)}}
+.step{border:1px solid var(--line);border-radius:10px;padding:8px;font-size:13px}.step b{display:block}.step.cur{border-color:var(--blue)}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{border-bottom:1px solid var(--line);padding:5px 6px;text-align:left;vertical-align:top}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.grow{flex:1}
+pre{white-space:pre-wrap;word-wrap:break-word;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;max-height:520px;overflow:auto;font-size:13px}
+iframe{width:100%;height:520px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.reply{border-left:3px solid var(--blue);padding:8px 10px;margin-top:8px;background:var(--bg);border-radius:6px;white-space:pre-wrap}
+.reply.refused{border-color:var(--red)}
+.small{font-size:12px}.legend span{margin-right:6px}
 </style>
 </head>
 <body>
 <header>
-  <h1>Venture Gates</h1>
-  <span class="tag" id="model">model: checking</span>
-  <span class="tag warn">Payments: MOCKED</span>
-  <span class="tag warn">Publishing and sending: STUBBED (outbox only)</span>
+  <h1>Venture Builder <span class="muted small">open-source agent team, founder in control</span></h1>
+  <div class="row small">
+    <span id="model" class="badge muted">model: checking...</span>
+    <span class="badge ok">cost per run: $0.00</span>
+    <span class="badge mock">payments MOCKED</span>
+    <span class="badge warn">publishing STUBBED</span>
+  </div>
 </header>
-<main>
-  <section>
+<div class="wrap">
+  <aside>
     <div class="card">
-      <h2>New idea</h2>
-      <select id="sample"></select>
-      <textarea id="brief"></textarea>
-      <div class="btns"><button class="primary" onclick="startRun()">Run Phase 1</button></div>
-      <p class="muted">The brief is screened first. Excluded products (finance, crypto, health or legal advice, physical goods) and deceptive requests are refused.</p>
-      <div id="startErr" class="err"></div>
+      <h2>New founder brief</h2>
+      <label class="small muted">Start from a sample</label>
+      <select id="sample"><option value="">(paste your own below)</option></select>
+      <label class="small muted" style="display:block;margin-top:8px">Or paste a brief: idea, skills, budget, time, target market, values</label>
+      <textarea id="brief" rows="7" placeholder="Founder: Salma&#10;Starting idea: ...&#10;Skills: ...&#10;Budget: $30&#10;Time: 6 hours per week&#10;Target market: ...&#10;Values: ..."></textarea>
+      <div class="row" style="margin-top:8px"><button class="primary" id="startBtn" onclick="startRun()">Run Phase 1</button><span id="startMsg" class="small muted"></span></div>
+      <p id="modelWarn" class="small bad"></p>
     </div>
-    <div class="card"><h2>Runs</h2><div class="runs" id="runs"></div></div>
-  </section>
-  <section id="view"><div class="card muted">Start a run or pick one from the list.</div></section>
-</main>
+    <div class="card"><h2>Runs</h2><div id="runs" class="runs small"></div></div>
+    <div class="card">
+      <h2>Ask the team</h2>
+      <p class="small muted">Any request passes the guardrails first. Try "write 50 five-star reviews".</p>
+      <textarea id="ask" rows="3" placeholder="e.g. Draft an email asking my first buyers for honest feedback"></textarea>
+      <div class="row" style="margin-top:8px"><button onclick="ask()">Send</button></div>
+      <div id="askOut"></div>
+    </div>
+    <div class="card small">
+      <h2>What is real</h2>
+      <table id="components"></table>
+    </div>
+  </aside>
+  <main id="main">
+    <div class="card"><h2>How it works</h2>
+      <p>Give a founder brief. The agents run one phase at a time: <b>Discover → Validate → Build → Commercial setup → Launch → Operate and learn</b>.
+      After each phase a gate checks pre-set thresholds and recommends <b>go, repeat, pivot or stop</b>. Nothing moves on, and nothing is published or sent, until you click.</p>
+    </div>
+  </main>
+</div>
 <script>
-const PH = ["Discover","Validate","Build","Commercial","Sell & get paid","Operate & learn"];
-let current = null;
-const token = () => localStorage.getItem("founderToken") || "";
-async function api(path, body) {
-  const opt = body ? {method:"POST", headers:{"Content-Type":"application/json","X-Founder-Token":token()}, body:JSON.stringify(body)} : {};
-  const r = await fetch(path, opt); const j = await r.json(); if (!r.ok) throw new Error(j.error || r.status); return j;
+function debateHtml(d) {
+  if (!d.ran) return `<p class="small muted">Debate not run: no model was available for the critic.</p>`;
+  const sev = {high: "bad", medium: "warn", low: "muted"};
+  return `<h3>Debate before this gate <span class="small muted">(critic vs. authors; informs you, does not change the recommendation)</span></h3>
+    <p><b>${d.objections}</b> objection(s): <b>${d.fixed}</b> fixed, <b>${d.not_applied}</b> conceded not applied, <b>${d.defended}</b> defended, <b>${d.open}</b> open${d.high_open ? ` (<span class="bad">${d.high_open} open with high severity</span>)` : ""}.
+    <span class="small muted">Models: ${esc((d.models || []).join(", "))}. Full transcript: ${esc(d.file || "")}</span></p>
+    ${d.items.length ? `<table><tr><th>#</th><th>Severity</th><th>Objection</th><th>Outcome</th></tr>${d.items.map(o => `<tr><td>${o.id}</td>
+      <td><span class="badge ${sev[o.severity] || "muted"}">${esc(o.severity)}</span></td>
+      <td><span class="muted small">"${esc(o.quote)}"</span><br>${esc(o.problem)}${o.fix && o.stance === "concede" ? `<br><span class="small">${o.status === "fixed" ? "Written into the document" : "Not applied"}: ${esc(o.fix)}</span>` : ""}${o.status === "conceded, not applied" ? `<br><span class="small muted">${esc(o.verdict)}</span>` : ""}</td>
+      <td class="${o.status === "open" ? "bad" : (o.status === "conceded, not applied" ? "warn" : "ok")}">${esc(o.status.toUpperCase())}${o.stance ? ` <span class="small muted">(${esc(o.stance)})</span>` : ""}</td></tr>`).join("")}</table>
+      ${d.open ? `<p class="small muted">Click REPEAT with no note and the next attempt works from these points.</p>` : ""}` : ""}`;
 }
-const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-async function init() {
-  const s = await api("/api/status");
-  document.getElementById("model").textContent = s.model_available ? `model: ${s.model} (local)` : `model: ${s.model} not reachable, TEMPLATE text`;
-  if (s.token_required && !token()) localStorage.setItem("founderToken", prompt("Founder token") || "");
-  const sel = document.getElementById("sample");
-  sel.innerHTML = s.briefs.map(b => `<option>${b}</option>`).join("");
-  sel.onchange = loadBrief; loadBrief(); listRuns();
+let decidedOpen = false;
+let current = null, timer = null, viewerRun = null, modelReady = true, statusTimer = null;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+async function api(path, opts = {}) {
+  let token = ""; try { token = localStorage.getItem("founderToken") || "" } catch (e) {}
+  const r = await fetch(path, {headers: {"Content-Type": "application/json", "X-Founder-Token": token}, ...opts});
+  if (r.status === 403) { const t = prompt("Founder token (FOUNDER_TOKEN):"); if (t) { try { localStorage.setItem("founderToken", t) } catch (e) {} } }
+  const t = await r.text(); let d; try { d = JSON.parse(t) } catch { d = t }
+  if (!r.ok) throw new Error((d && (d.detail || d.error)) || r.status);
+  return d;
 }
-async function loadBrief() { document.getElementById("brief").value = JSON.stringify(await api("/api/briefs/" + document.getElementById("sample").value), null, 1); }
-async function listRuns() {
+const badge = s => s === "Working" ? `<span class="badge ok">Working</span>` : `<span class="badge mock">${esc(s)}</span>`;
+const recClass = {go: "go", repeat: "rep", pivot: "piv", stop: "stop"};
+const statusBadge = s => `<span class="badge ${({awaiting_founder:"warn",running:"muted",ready:"muted",stopped:"bad",completed:"ok",monitoring:"ok"})[s]||"muted"}">${esc(s.replace("_"," "))}</span>`;
+
+async function loadStatus() {
+  try {
+    const s = await api("/api/status");
+    const m = s.model;
+    $("#model").className = "badge " + (m.ready ? "ok" : "warn");
+    const roles = m.roles || {};
+    const others = m.ready ? [["fast", roles.fast], ["judge", roles.judge], ["critic", roles.critic]].filter(x => x[1] && x[1] !== m.model).map(x => `${x[0]}: ${x[1]}`) : [];
+    $("#model").textContent = m.ready ? `writer: ${m.model}${others.length ? " · " + others.join(" · ") : ""} (${m.provider === "ollama" ? "local" : "free-tier endpoint"})` : `model: ${m.model} not ready, using fallback`;
+    modelReady = m.ready || m.provider === "none";
+    const warn = $("#modelWarn");
+    if (warn) warn.innerHTML = modelReady ? "" : `<b>The model is not ready yet</b> (${esc(m.detail)}). A run started now is written by deterministic templates, and every such step is labelled "model: none". Wait for the green badge to see the AI agents work.`;
+    if ($("#startBtn")) $("#startBtn").textContent = modelReady ? "Run Phase 1" : "Run Phase 1 with templates (model not ready)";
+    clearTimeout(statusTimer); statusTimer = setTimeout(loadStatus, modelReady ? 10000 : 3000);
+    $("#model").title = m.detail;
+    $("#components").innerHTML = s.components.map(c => `<tr><td>${esc(c.name)}</td><td>${badge(c.status)}</td></tr>`).join("");
+  } catch (e) {}
+}
+async function loadSamples() {
+  const s = await api("/api/samples");
+  $("#sample").innerHTML += s.map(x => `<option value="${esc(x.name)}">${esc(x.brief.founder_name)}: ${esc(x.brief.idea.slice(0, 60))}</option>`).join("");
+}
+async function loadRuns() {
   const runs = await api("/api/runs");
-  document.getElementById("runs").innerHTML = runs.map(r => `<div onclick="show('${r.id}')"><b>${esc(r.brief_name)}</b><br><span class="muted">${r.status}, phase ${r.phase}, ${r.recommendation || ""}</span></div>`).join("") || '<span class="muted">none yet</span>';
+  $("#runs").innerHTML = runs.map(r => `<a href="#${r.id}" class="${r.id === current ? "active" : ""}" onclick="openRun('${r.id}')">
+    ${statusBadge(r.status)} <b>Phase ${r.phase}</b> · ${esc(r.founder)}<br><span class="muted">${esc((r.idea||"").slice(0, 80))}</span></a>`).join("") || `<span class="muted">No runs yet.</span>`;
 }
 async function startRun() {
-  const e = document.getElementById("startErr"); e.textContent = "Running Phase 1 (searching public sources)...";
-  try { const r = await api("/api/runs", {brief: JSON.parse(document.getElementById("brief").value)}); e.textContent = ""; render(r); listRuns(); }
-  catch (x) { e.textContent = x.message; }
+  const sample = $("#sample").value, text = $("#brief").value.trim();
+  if (!sample && !text) { $("#startMsg").textContent = "Pick a sample or paste a brief."; return; }
+  $("#startMsg").textContent = "Starting...";
+  try {
+    const r = await api("/api/runs", {method: "POST", body: JSON.stringify(sample ? {sample} : {brief: text})});
+    viewerRun = null;
+    $("#startMsg").textContent = ""; location.hash = r.id; openRun(r.id);
+  } catch (e) { $("#startMsg").textContent = e.message }
 }
-async function show(id) { render(await api("/api/runs/" + id)); }
+function openRun(id) { if (id !== current) viewerRun = null; current = id; render(); clearInterval(timer); timer = setInterval(render, 3000); }
+
+async function render() {
+  if (!current) return;
+  let v; try { v = await api(`/api/runs/${current}`) } catch (e) { return }
+  loadRuns();
+  const r = v.run, g = v.current_gate;
+  const phases = Object.entries(v.phases).map(([n, p]) => {
+    const gs = v.gates.filter(x => x.phase == n), last = gs[gs.length - 1];
+    const st = last ? (last.founder_decision ? `${last.founder_decision.toUpperCase()}` : `gate: ${last.recommendation.toUpperCase()}?`) : (r.phase == n && r.status === "running" ? "running..." : "");
+    return `<div class="step ${r.phase == n ? "cur" : ""}"><b>${n}. ${esc(p.name)}</b><span class="muted">${esc(p.core === "None" ? "Support, metrics, memo" : p.core)}</span><div>${esc(st)}</div></div>`;
+  }).join("");
+  let html = `<div class="card"><div class="row"><h2 class="grow">${esc(r.brief.founder_name)}: ${esc(r.brief.idea)}</h2>${statusBadge(r.status)}</div>
+    <p class="small muted">Skills: ${(r.brief.skills||[]).length ? esc(r.brief.skills.join(", ")) : "<b>not given</b>"} · Budget: ${r.brief.budget_usd == null ? "<b>not given</b>" : "$" + esc(r.brief.budget_usd)} · Time: ${r.brief.hours_per_week == null ? "<b>not given</b>" : esc(r.brief.hours_per_week) + " h/week"} · Market: ${r.brief.target_market ? esc(r.brief.target_market) : "<b>not given</b>"} · Values: ${esc((r.brief.values||[]).join(", "))}</p>
+    ${r.screening && !r.screening.allowed ? `<p class="bad"><b>Refused by guardrails:</b> ${esc(r.screening.reason)}</p>` : ""}
+    ${r.screening && r.screening.clarify ? `<p class="small"><span class="badge warn">scope check</span> ${esc(r.screening.reason)}</p>` : ""}
+    ${v.error ? `<p class="bad">Error: ${esc(v.error)} <button onclick="advance()">Retry</button></p>` : ""}
+    <div class="steps">${phases}</div>
+    ${(r.warnings || []).map(w => `<p class="small"><span class="badge warn">note</span> ${esc(w)}</p>`).join("")}
+    ${r.status === "running" ? `<p><span class="badge muted">phase ${r.phase} running</span> <b>${esc(r.progress ? r.progress.text : "starting")}</b>
+      <span class="muted small">${r.progress ? Math.max(0, Math.round((Date.now() - Date.parse(r.progress.since)) / 1000)) + " s on this step" : ""} · ${v.steps.filter(s => s.phase == r.phase).length} step(s) of this phase done</span></p>` : ""}
+    ${r.status === "ready" ? `<p><button class="primary" onclick="advance()">Run phase ${r.phase}</button></p>` : ""}
+    ${r.status === "monitoring" ? `<p>Operating. <button onclick="advance()">Re-run the phase 6 review</button></p>` : ""}
+  </div>`;
+  if (g) {
+    const btn = o => `<button class="${recClass[o]} ${o === g.recommendation ? "rec" : ""}" ${g.allowed.includes(o) ? "" : "disabled"} onclick="decide('${o}')">${o.toUpperCase()}</button>`;
+    html += `<div class="card"><h2>${g.gate === "scope_gate" ? "Scope check before phase 1" : `Gate after phase ${g.phase}`}: your decision</h2>
+      <p>System recommends <span class="badge ${recClass[g.recommendation]}">${g.recommendation.toUpperCase()}</span> ${g.pivot_to ? `→ pivot to <b>${esc(g.pivot_to)}</b>` : ""}</p>
+      <ul>${g.reasons.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
+      <table><tr><th>Check</th><th>Pass</th><th>Value</th><th>Threshold</th></tr>${g.checks.map(c => `<tr><td>${esc(c.name)}</td><td class="${c.passed ? "ok" : "bad"}">${c.passed ? "yes" : "NO"}</td><td>${esc(c.value)}</td><td>${esc(c.threshold)}</td></tr>`).join("")}</table>
+      ${g.debate ? debateHtml(g.debate) : ""}
+      <p class="small muted">Thresholds were fixed in gates.py before the data came in. You make the final call; overrides are logged.</p>
+      <input id="note" placeholder="Optional note (for pivot: describe the new idea)">
+      <div class="row" style="margin-top:8px">${["go", "repeat", "pivot", "stop"].map(btn).join("")}</div></div>`;
+  }
+  const acts = v.actions;
+  if (acts.length) {
+    // A repeated phase writes a new draft and asks again: number the drafts per phase and target, mark older ones replaced.
+    const seen = {}, total = {};
+    acts.forEach(a => { const k = `${a.phase}|${a.kind}|${a.target}`; total[k] = (total[k] || 0) + 1; });
+    const info = a => { const k = `${a.phase}|${a.kind}|${a.target}`; seen[k] = (seen[k] || 0) + 1;
+      return {n: seen[k], many: total[k] > 1, replaced: seen[k] < total[k]}; };
+    const rows = acts.map(a => ({a, i: info(a)}));
+    const row = ({a, i}) => `<tr><td><span class="badge ${a.kind === "refund" ? "bad" : "warn"}">${esc(a.kind)}</span></td><td><b>${esc(a.target)}</b>
+      <span class="small muted">${a.phase ? `phase ${a.phase}` : ""}${i.many ? `, attempt ${i.n}` : ""}</span>${i.replaced ? ` <span class="badge muted">replaced by a later attempt</span>` : ""}
+      <br><span class="muted small">${esc(a.description)}</span>
+      ${a.payload && (a.payload.message || a.payload.text) ? `<pre>${esc(a.payload.message || a.payload.text)}</pre>` : ""}
+      ${a.payload && a.payload.promise_check ? promiseLine(a.payload.promise_check) : ""}</td>
+      <td>${a.status === "pending" ? `<button class="go" onclick="act('${a.id}',true)">Approve</button> <button class="stop" onclick="act('${a.id}',false)">Reject</button>` :
+        `<span class="badge ${a.status === "approved" ? "ok" : "bad"}">${esc(a.status)}</span>${a.executed ? `<div class="small mock">sent to outbox (STUBBED)</div>` : ""}`}</td></tr>`;
+    const waiting = rows.filter(x => x.a.status === "pending"), done = rows.filter(x => x.a.status !== "pending");
+    html += `<div class="card"><h2>Approval queue <span class="small muted">(nothing is published, sent or refunded without you)</span></h2>${actError ? `<p class="bad small">${esc(actError)}</p>` : ""}
+      <h3>Waiting for your decision (${waiting.length})</h3>
+      ${waiting.length ? `<table>${waiting.map(row).join("")}</table>` : `<p class="small muted">Nothing is waiting for you.</p>`}
+      ${done.length ? `<details ${decidedOpen ? "open" : ""} ontoggle="decidedOpen = this.open"><summary class="small">Already decided (${done.length}): approved items went to the outbox once, rejected ones were not sent</summary><table>${done.map(row).join("")}</table></details>` : ""}</div>`;
+  }
+  if (r.researched) {
+    const n = r.interview_notes;
+    const keep = $("#notes") ? $("#notes").value : "";
+    html += `<div class="card"><h2>Interview notes <span class="small muted">(from your real conversations; stored on this machine only)</span></h2>
+      <p class="small muted">Paste what people actually said. An agent separates commitments (time, money, introductions) from compliments and quotes only your notes. It never writes an answer for anyone.</p>
+      <textarea id="notes" rows="5" style="width:100%" placeholder="e.g. Ahmed: showed me his spreadsheet and booked a second call for Thursday. Sara: said it sounds great.">${esc(keep)}</textarea>
+      <div class="row" style="margin-top:8px"><button onclick="saveNotes()" ${r.status === "running" ? "disabled" : ""}>Analyse notes</button>
+      <span id="notesMsg" class="small muted">${n ? `Last analysis: ${n.commitments} commitment(s), ${n.problems || 0} problem signal(s), ${n.compliments} compliment(s). See phase1_step5_interview-notes.md below.` : "No notes added yet."}</span></div></div>`;
+  }
+  html += `<div class="card"><h2>Outputs</h2><div class="row small">${v.outputs.map(o => `<button onclick="view('${esc(o)}')">${esc(o)}</button>`).join("") || `<span class="muted">None yet.</span>`}</div><div id="viewer"></div></div>`;
+  html += `<div class="card"><h2>Decision log <span class="small muted">(${v.log.length} entries, every agent action)</span></h2><div style="max-height:360px;overflow:auto"><table>
+    <tr><th>Time</th><th>Agent</th><th>Action</th><th>Model</th><th>Sources</th><th>Approved by</th><th>Outcome</th></tr>
+    ${v.log.slice().reverse().map(e => `<tr><td>${esc(e.timestamp.slice(11, 19))}</td><td>${esc(e.agent)}</td><td>${esc(e.action)}</td><td>${esc(e.model || "none")}</td><td>${e.sources.length}</td><td>${esc(e.approved_by || "")}</td><td>${esc(e.outcome || "")}</td></tr>`).join("")}
+  </table></div></div>`;
+  const viewer = ($("#viewer") && viewerRun === current) ? $("#viewer").innerHTML : "";
+  const typing = document.activeElement && document.activeElement.id === "notes";
+  if (typing) return;  // do not redraw (and lose the cursor) while the founder is typing notes
+  $("#main").innerHTML = html;
+  if (viewer) $("#viewer").innerHTML = viewer;
+}
+async function advance() { await api(`/api/runs/${current}/advance`, {method: "POST"}).catch(e => alertBox(e)); render(); }
 async function decide(d) {
-  try { render(await api(`/api/runs/${current.id}/decide`, {decision:d, reason:document.getElementById("reason").value})); listRuns(); }
-  catch (x) { document.getElementById("decErr").textContent = x.message; }
+  const note = $("#note") ? $("#note").value : "";
+  try { await api(`/api/runs/${current}/decide`, {method: "POST", body: JSON.stringify({decision: d, note})}); } catch (e) { alertBox(e) }
+  render();
 }
-async function outbound(item, ok) {
-  if (!confirm((ok ? "Approve" : "Reject") + " this item?")) return;
-  render(await api(`/api/runs/${current.id}/outbound/${item}`, {approve: ok})); listRuns();
+async function saveNotes() {
+  const notes = $("#notes").value.trim(); if (!notes) return;
+  $("#notesMsg").textContent = "Reading the notes...";
+  try { await api(`/api/runs/${current}/interview-notes`, {method: "POST", body: JSON.stringify({notes})}); $("#notes").value = ""; await render(); view("phase1_step5_interview-notes.md"); }
+  catch (e) { alertBox(e); $("#notesMsg").textContent = ""; }
 }
-async function openFile(name) {
-  const t = await (await fetch(`/api/runs/${current.id}/file/${name}`)).text();
-  document.getElementById("file").innerHTML = name.endsWith(".html") ? `<iframe sandbox srcdoc="${esc(t)}"></iframe>` : `<pre>${esc(t)}</pre>`;
+let actError = "";
+async function act(id, approve) {
+  actError = "";
+  try { await api(`/api/runs/${current}/actions/${id}`, {method: "POST", body: JSON.stringify({approve})}); }
+  catch (e) { actError = e.message; }
+  render();
 }
-function render(r) {
-  current = r; const g = r.gate || {checks:[], reasons:[]};
-  const phases = PH.map((p,i) => `<span class="${i+1 < r.phase || r.status==='done' ? 'done' : (i+1===r.phase ? 'now' : '')}">${i+1}. ${p}</span>`).join("");
-  const checks = g.checks.map(c => `<tr><td>${esc(c.name)}</td><td>${esc(c.value)}</td><td>${esc(c.threshold)}</td><td class="${c.passed?'pass':'fail'}">${c.passed?'PASS':'FAIL'}</td></tr>`).join("");
-  const waiting = r.status === "awaiting_founder";
-  const out = (r.outbound||[]).map(i => `<tr><td>${esc(i.kind)}</td><td>${esc(i.title)}</td><td>${i.status}</td><td>${i.status==='pending' ? `<button onclick="outbound('${i.id}',true)">Approve</button> <button onclick="outbound('${i.id}',false)">Reject</button>` : ''}</td></tr>`).join("");
-  document.getElementById("view").innerHTML = `
-  <div class="card"><div class="phases">${phases}</div>
-    <div class="muted">Run ${r.id}, status <b>${r.status}</b></div>
-    <h2 style="margin-top:10px">Gate: ${esc(g.gate)}</h2>
-    <div class="rec ${g.outcome}">Recommends ${String(g.outcome).toUpperCase()}</div>
-    <ul>${g.reasons.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
-    <table><tr><th>Check</th><th>Value</th><th>Threshold</th><th></th></tr>${checks}</table>
-    ${waiting ? `<p class="muted">Your call. Choosing something other than ${String(g.outcome).toUpperCase()} needs a reason, which is logged.</p>
-      <input type="text" id="reason" placeholder="Reason (required to override)">
-      <div class="btns">${["go","repeat","pivot","stop"].map(d => `<button class="${d===g.outcome?'primary':''}" onclick="decide('${d}')">${d.toUpperCase()}</button>`).join("")}</div>
-      <div id="decErr" class="err"></div>` : ""}
-  </div>
-  <div class="card"><h2>Approval queue (nothing leaves without your click)</h2>
-    ${out ? `<table><tr><th>Kind</th><th>Item</th><th>Status</th><th></th></tr>${out}</table>` : '<span class="muted">empty</span>'}</div>
-  <div class="card"><h2>Outputs</h2><div class="files">${(r.outputs||[]).map(f => `<a onclick="openFile('${f}')">${f}</a>`).join("")}</div><div id="file"></div></div>`;
+// The promise checker's result for an item, shown beside Approve / Reject.
+function promiseLine(pc) {
+  const items = (pc.broken_items || []).map(x => `<li class="bad">BROKEN: ${esc(x)}</li>`).concat((pc.unverifiable_items || []).map(x => `<li>Unverifiable: ${esc(x)}</li>`));
+  return `<div class="small"><b>Promise check:</b> ${pc.kept} kept, <span class="${pc.broken ? "bad" : ""}">${pc.broken} broken</span>, ${pc.unverifiable} unverifiable
+    ${pc.broken ? `<b class="bad">(cannot be approved until fixed)</b>` : ""} (${esc(pc.file)})${items.length ? `<ul>${items.join("")}</ul>` : ""}</div>`;
 }
-init();
+async function view(name) {
+  viewerRun = current;
+  const url = `/api/runs/${current}/outputs/${encodeURIComponent(name)}`;
+  if (name.endsWith(".html")) { $("#viewer").innerHTML = `<p class="small muted">Preview of ${esc(name)} (not published)</p><iframe sandbox src="${url}"></iframe>`; return; }
+  const t = await (await fetch(url)).text();
+  $("#viewer").innerHTML = `<p class="small muted">${esc(name)}</p><pre>${esc(t)}</pre>`;
+}
+async function ask() {
+  const text = $("#ask").value.trim(); if (!text) return;
+  $("#askOut").innerHTML = `<div class="reply muted">Checking...</div>`;
+  const r = await api("/api/ask", {method: "POST", body: JSON.stringify({text, run_id: current})});
+  $("#askOut").innerHTML = `<div class="reply ${r.allowed ? "" : "refused"}">${esc(r.reply)}${r.note ? `<div class="small muted">${esc(r.note)}</div>` : ""}</div>`;
+}
+function alertBox(e) { const d = document.createElement("div"); d.className = "card bad"; d.textContent = e.message || e; $("#main").prepend(d); setTimeout(() => d.remove(), 5000); }
+loadStatus(); loadSamples(); loadRuns();
+if (location.hash.length > 1) openRun(location.hash.slice(1));
 </script>
 </body>
 </html>

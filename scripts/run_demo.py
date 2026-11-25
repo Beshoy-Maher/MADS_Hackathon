@@ -1,70 +1,83 @@
-"""Regenerates outputs/ and decision_log.json from a real pipeline run.
+"""Run the demo founders through the real pipeline and export the results.
 
-Three demo briefs (fictional founders): a strong idea, a weak idea, an excluded idea.
-The founder's clicks are scripted in briefs/demo_decisions.json and logged with
-via="scripted demo founder", so the log shows exactly what was decided and by whom.
+    python scripts/run_demo.py            (or: docker compose run --rm app python scripts/run_demo.py)
+
+* strong_founder: a promising idea, driven through all six phases.
+* weak_founder:   a weak idea; the evidence gate recommends STOP.
+* excluded_founder: a crypto-signals idea; refused by the guardrails.
+* designer_founder: a brief the pipeline was not tuned on; every recommendation is accepted, whatever it is.
+
+The founder's choices at each gate are read from briefs/demo_decisions.json,
+keyed by phase (the demo stands in for a founder clicking the buttons). Outputs are copied
+to outputs/ and the run's decision log to decision_log.json. Nothing here is
+written by hand.
 """
+from __future__ import annotations
+
 import json
+import os
 import shutil
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
+DEMO_DATA = ROOT / "data" / "demo"
+os.environ.setdefault("DATA_DIR", str(DEMO_DATA))
+os.environ["DECISION_LOG_PATH"] = str(DEMO_DATA / "decision_log.json")
 
 import config  # noqa: E402
-
-TMP = ROOT / "data" / "demo"
-shutil.rmtree(TMP, ignore_errors=True)
-config.DATA_DIR = TMP
-config.DECISION_LOG = TMP / "decision_log.json"
-
 import llm  # noqa: E402
-import orchestrator as orch  # noqa: E402
+import orchestrator  # noqa: E402
 
-VIA = "scripted demo founder (briefs/demo_decisions.json)"
-
-
-def play(brief_file, script):
-    run = orch.start(json.load(open(ROOT / "briefs" / brief_file)), name=brief_file)
-    for step in script:
-        if run["status"] != "awaiting_founder":
-            break
-        if step.get("approve_all_outbound"):
-            for it in list(run["outbound"]):
-                if it["status"] == "pending":
-                    run = orch.decide_outbound(run, it["id"], True, "founder", via=VIA)
-            continue
-        if step["decision"] == "wait":
-            break
-        run = orch.decide(run, step["decision"], "founder", step.get("reason", ""), via=VIA)
-    return run
+RUNS = [("weak_founder", "_weak-idea"), ("excluded_founder", "_excluded-idea"), ("designer_founder", "_designer-idea"),
+        ("strong_founder", "")]
 
 
-def main():
-    decisions = json.load(open(ROOT / "briefs" / "demo_decisions.json"))
-    out = ROOT / "outputs"
-    shutil.rmtree(out, ignore_errors=True)
-    out.mkdir()
-    summary = {"model_available": llm.available(), "model": config.LLM_MODEL if llm.available() else None, "runs": []}
-    for brief_file, suffix in (("strong_idea.json", ""), ("weak_idea.json", "_weak-idea"), ("excluded_idea.json", "_excluded-idea")):
-        run = play(brief_file, decisions[brief_file])
-        for f in run.get("outputs", []):
-            stem, ext = f.rsplit(".", 1)
-            name = f if (suffix == "" or f == "payment_test_log.md") else f"{stem}{suffix}.{ext}"
-            shutil.copy(Path(run["dir"]) / "outputs" / f, out / name)
-        summary["runs"].append({"brief": brief_file, "run_id": run["id"], "final_status": run["status"],
-                                "last_phase": run["phase"], "history": run["history"],
-                                "last_recommendation": (run.get("gate") or {}).get("outcome"),
-                                "outbound": [{k: i[k] for k in ("kind", "title", "status")} for i in run["outbound"]]})
-    shutil.copy(config.DECISION_LOG, ROOT / "decision_log.json")
-    entries = json.load(open(ROOT / "decision_log.json"))
-    summary["decision_log_entries"] = len(entries)
-    summary["entries_with_model"] = sum(1 for e in entries if e["model"])
-    summary["total_cost_usd"] = round(sum(e["cost"] for e in entries), 4)
-    (out / "demo_run_summary.json").write_text(json.dumps(summary, indent=1))
-    print(json.dumps(summary, indent=1))
+def main() -> int:
+    if DEMO_DATA.exists():
+        shutil.rmtree(DEMO_DATA)
+    DEMO_DATA.mkdir(parents=True)
+    status = llm.model_status(force=True)
+    print(f"Model: {status['model']} via {status['provider']}: {status['detail']}")
+    decisions = json.loads((ROOT / "briefs" / "demo_decisions.json").read_text())
+    final_dir = ROOT / "outputs"
+    out_dir = DEMO_DATA / "outputs_export"  # build here; replace outputs/ only when every run finished
+    out_dir.mkdir(parents=True, exist_ok=True)
+    summary = []
+    for name, suffix in RUNS:
+        brief = json.loads((ROOT / "briefs" / f"{name}.json").read_text())
+        run = orchestrator.create_run(brief, slug=brief.get("slug"))
+        # Decisions are keyed by phase: an unexpected REPEAT reruns that phase and never shifts a later decision.
+        run = orchestrator.run_with_phase_decisions(run["id"], decisions.get(name, {}))
+        src = orchestrator.run_dir(run["id"]) / "outputs"
+        for f in sorted(src.iterdir()):
+            if suffix and f.name == "payment_test_log.md":
+                continue
+            target = f.stem + suffix + f.suffix
+            shutil.copy(f, out_dir / target)
+        gates = [(g["phase"], g["recommendation"], g.get("founder_decision")) for g in run["gates"]]
+        summary.append((name, run["status"], gates))
+        print(f"{name}: status={run['status']} gates={gates}")
+    if status["ready"] and llm.STATS.fallbacks and "--allow-fallback" not in sys.argv:
+        print(f"ABORT: the model was ready but {llm.STATS.fallbacks} call(s) fell back (model crashed or timed out). "
+              "outputs/ left unchanged. " + " | ".join(llm.STATS.errors[:5]))
+        return 2
+    if final_dir.exists():
+        for f in final_dir.iterdir():
+            if f.is_file():
+                f.unlink()
+    final_dir.mkdir(exist_ok=True)
+    for f in out_dir.iterdir():
+        shutil.copy(f, final_dir / f.name)
+    shutil.copy(config.DECISION_LOG_PATH, ROOT / "decision_log.json")
+    s = llm.STATS
+    print(f"LLM calls: {s.calls}, fallbacks: {s.fallbacks}, tokens: {s.prompt_tokens + s.completion_tokens}, cost: $0.00")
+    (DEMO_DATA / "stats.json").write_text(json.dumps({"calls": s.calls, "fallbacks": s.fallbacks, "prompt_tokens": s.prompt_tokens,
+                                                      "completion_tokens": s.completion_tokens, "model": status["model"],
+                                                      "model_ready": status["ready"], "summary": summary}, indent=1))
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

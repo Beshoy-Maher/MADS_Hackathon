@@ -1,36 +1,38 @@
-"""Webhook handler: payment triggers delivery, refund revokes access.
+"""Webhook handler: the provider's events drive delivery and revocation.
 
-Idempotency: every event id is stored; a repeated event (providers retry) does nothing.
-Events with a bad signature are rejected.
+* Signature checked on every event (forged events are rejected).
+* Each event id is processed once (event-level idempotency).
+* Delivery itself is idempotent per order (order-level idempotency), so a
+  provider retry with a new event id still cannot deliver twice.
 """
-import json
+from __future__ import annotations
 
+import delivery
 import payments
+from payments import Store
 
 
-class WebhookHandler:
-    def __init__(self, provider, delivery):
-        self.provider, self.delivery = provider, delivery
-        self.seen = set()
-        self.log = []
-
-    def handle(self, body, sig):
-        if not payments.verify(body, sig):
-            self.log.append(("rejected", "bad signature"))
-            return "rejected"
-        evt = json.loads(body)
-        if evt["id"] in self.seen:
-            self.log.append(("duplicate", evt["id"]))
-            return "duplicate_ignored"
-        self.seen.add(evt["id"])
-        d = evt["data"]
-        if evt["type"] == "payment.succeeded":
-            email = self.provider.orders[d["order_id"]]["email"]
-            _, new = self.delivery.grant(d["order_id"], email)
-            self.log.append(("delivered" if new else "already_delivered", d["order_id"]))
-            return "delivered" if new else "already_delivered"
-        if evt["type"] == "payment.refunded":
-            self.delivery.revoke(d["order_id"])
-            self.log.append(("revoked", d["order_id"]))
-            return "revoked"
-        return "ignored"
+def handle(store: Store, event: dict) -> str:
+    if not payments.verify(event):
+        store.note(f"rejected event {event.get('id')}: bad signature")
+        return "rejected"
+    if event["id"] in store.processed_events:
+        store.note(f"ignored duplicate event {event['id']}")
+        return "duplicate"
+    store.processed_events.add(event["id"])
+    order = store.orders.get(event["order_id"])
+    if order is None:
+        store.note(f"event {event['id']} for unknown order {event['order_id']}")
+        return "unknown_order"
+    if event["type"] == "payment.succeeded":
+        if order["status"] == "pending":
+            order["status"] = "paid"
+        delivery.grant_access(store, order["id"])
+        return "delivered"
+    if event["type"] == "refund.succeeded":
+        order["status"] = "refunded"
+        order["refunded"] = True
+        delivery.revoke_access(store, order["id"])
+        return "revoked"
+    store.note(f"ignored event type {event['type']}")
+    return "ignored"

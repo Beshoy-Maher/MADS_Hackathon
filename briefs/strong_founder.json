@@ -1,0 +1,11 @@
+{
+  "slug": "sql-workbook",
+  "founder_name": "Mariam",
+  "idea": "A practice workbook of SQL interview questions with worked answers for junior data analysts preparing for their first job",
+  "skills": ["SQL", "data analysis", "Excel", "technical writing", "mentoring junior analysts"],
+  "budget_usd": 50,
+  "hours_per_week": 10,
+  "target_market": "Junior and aspiring data analysts preparing for SQL interviews, especially in Egypt and the wider MENA region",
+  "values": ["honest", "affordable for students", "practical"],
+  "constraints": "Works full time as a data analyst; can work evenings only."
+}
